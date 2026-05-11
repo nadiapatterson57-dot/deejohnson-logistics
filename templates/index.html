@@ -1,0 +1,2245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeeJohnson Logistics - Premium Logistics Services Nigeria</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Deep Navy Blue Color Variables */
+        :root {
+            --navy-deep: #0A192F;
+            --navy-dark: #0B2B4D;
+            --navy-medium: #0F3B5C;
+            --navy-light: #1A4A6F;
+            --navy-accent: #2C5F8A;
+            --gold-accent: #C9A03D;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--navy-deep);
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--navy-dark);
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy-dark) 100%);
+            transition: all 0.4s ease;
+            padding: 15px 0;
+        }
+        .navbar.scrolled {
+            padding: 10px 0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: 700;
+            animation: slideInLeft 0.8s ease;
+            color: white !important;
+        }
+        .nav-link {
+            position: relative;
+            transition: all 0.3s;
+            color: white !important;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--gold-accent);
+            transition: all 0.3s;
+            transform: translateX(-50%);
+        }
+        .nav-link:hover::after {
+            width: 80%;
+        }
+
+        /* Hero Section with Parallax */
+        .hero {
+            background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy-dark) 50%, var(--navy-medium) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1920') center/cover;
+            opacity: 0.08;
+            animation: zoomIn 20s ease infinite;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        .hero h1 {
+            animation: slideInUp 0.8s ease;
+        }
+        .hero p {
+            animation: slideInUp 1s ease;
+        }
+        .hero-buttons {
+            animation: slideInUp 1.2s ease;
+        }
+
+        /* Premium Services Section - UPDATED */
+        .services-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        }
+        .service-card {
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+        .service-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+        .service-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .service-card:hover .service-image {
+            transform: scale(1.05);
+        }
+        .service-icon-overlay {
+            background: linear-gradient(135deg, var(--navy-deep), var(--navy-medium));
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: -35px auto 0;
+            position: relative;
+            z-index: 2;
+            border: 4px solid var(--gold-accent);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .service-icon-overlay i {
+            font-size: 2rem;
+            color: var(--gold-accent);
+        }
+        .service-content {
+            padding: 25px 20px 30px;
+        }
+        .service-content h4 {
+            color: var(--navy-deep);
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        .service-content p {
+            color: #666;
+            line-height: 1.6;
+        }
+        .service-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--gold-accent), #d4aa3a);
+            color: var(--navy-deep);
+            padding: 5px 15px;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        /* Stats Counter Section */
+        .stats-section {
+            background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy-dark) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .stats-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 1%, transparent 1%);
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        .stat-item:hover {
+            transform: scale(1.05);
+        }
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        /* Reviews Section */
+        .review-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            border-left: 5px solid var(--navy-medium);
+        }
+        .review-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .review-stars i {
+            margin: 0 2px;
+            transition: all 0.2s;
+            color: var(--gold-accent);
+        }
+        .review-card:hover .review-stars i {
+            transform: scale(1.2);
+        }
+        .review-text {
+            font-style: italic;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin: 20px 0;
+        }
+        .reviewer-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--navy-deep), var(--navy-medium));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        /* Timeline Section */
+        .timeline {
+            position: relative;
+            padding: 40px 0;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--navy-deep), var(--navy-medium));
+            transform: translateX(-50%);
+        }
+        .timeline-item {
+            margin-bottom: 50px;
+            position: relative;
+        }
+        .timeline-content {
+            width: 45%;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        .timeline-content:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-left: auto;
+        }
+        .timeline-icon {
+            position: absolute;
+            top: 20px;
+            width: 50px;
+            height: 50px;
+            background: var(--navy-medium);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            z-index: 2;
+        }
+        .timeline-item:nth-child(odd) .timeline-icon {
+            left: calc(50% - 25px);
+        }
+        .timeline-item:nth-child(even) .timeline-icon {
+            right: calc(50% - 25px);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy-dark) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shine 3s infinite;
+        }
+        @keyframes shine {
+            100% { left: 100%; }
+        }
+        .cta-button {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            background-color: var(--gold-accent);
+            border: none;
+            color: var(--navy-deep);
+            font-weight: bold;
+        }
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            background-color: #d4aa3a;
+            color: var(--navy-deep);
+        }
+
+        /* Contact Form */
+        .contact-form {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+        .form-control:focus {
+            border-color: var(--navy-medium);
+            box-shadow: 0 0 0 0.2rem rgba(15,59,92,0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--navy-deep);
+            position: relative;
+        }
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 5px;
+            transition: all 0.3s;
+            color: white;
+        }
+        .social-icon:hover {
+            background: var(--gold-accent);
+            transform: translateY(-3px) rotate(360deg);
+            color: var(--navy-deep);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--navy-medium);
+            border: none;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: var(--navy-deep);
+            transform: translateY(-2px);
+        }
+        .btn-outline-primary {
+            border-color: var(--navy-medium);
+            color: var(--navy-medium);
+        }
+        .btn-outline-primary:hover {
+            background-color: var(--navy-medium);
+            border-color: var(--navy-medium);
+        }
+
+        /* Text Colors */
+        .text-primary {
+            color: var(--navy-medium) !important;
+        }
+        .bg-primary {
+            background-color: var(--navy-medium) !important;
+        }
+
+        /* Animations */
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        @keyframes zoomIn {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes moveBackground {
+            from { transform: translate(0, 0); }
+            to { transform: translate(100px, 100px); }
+        }
+
+        /* Loading Animation */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s;
+        }
+        .loader-inner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--navy-medium);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .timeline::before { left: 30px; }
+            .timeline-content { width: calc(100% - 80px); margin-left: 80px !important; }
+            .timeline-icon { left: 5px !important; }
+            .service-image {
+                height: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Loader -->
+<div class="loader" id="loader">
+    <div class="loader-inner"></div>
+</div>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="navbar">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" 
+                 alt="DeeJohnson Logistics Logo" 
+                 style="height: 45px; width: auto; margin-right: 12px;"
+                 onerror="this.style.display='none'">
+            <span>DeeJohnson Logistics</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#china-shipping">China Shipping</a></li>
+                <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+                <li class="nav-item"><a class="nav-link" href="#process">How It Works</a></li>
+                <li class="nav-item"><a class="nav-link" href="#reviews">Reviews</a></li>
+                <li class="nav-item"><a class="nav-link" href="/track">Track</a></li>
+                <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+                <li class="nav-item"><a class="nav-link" href="/admin"><i class="fas fa-user-shield"></i> Admin</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section id="home" class="hero">
+    <div class="container hero-content">
+        <div class="row align-items-center">
+            <div class="col-lg-7 text-white" data-aos="fade-right">
+                <h1 class="display-3 fw-bold mb-4">Fast & Reliable Logistics<br>From Ibadan to <span style="color: var(--gold-accent);">Worldwide</span></h1>
+                <p class="lead mb-4">Professional package clearance at Lagos Airport and international shipping with FedEx, DHL, and UPS. Track your package in real-time from pickup to delivery.</p>
+                <div class="hero-buttons">
+                    <a href="/track" class="btn btn-light btn-lg px-4 me-3 cta-button">
+                        <i class="fas fa-search"></i> Track Package
+                    </a>
+                    <a href="#contact" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fas fa-envelope"></i> Get Quote
+                    </a>
+                </div>
+                <div class="mt-5">
+                    <div class="d-flex gap-4">
+                        <div><i class="fas fa-check-circle"></i> 24/7 Support</div>
+                        <div><i class="fas fa-check-circle"></i> Real-time Tracking</div>
+                        <div><i class="fas fa-check-circle"></i> Insurance Available</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5 text-center" data-aos="fade-left">
+                <div class="floating">
+                    <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=500" alt="Logistics" class="img-fluid rounded shadow-lg" style="border-radius: 30px;">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Premium Services Section - EMOJI STYLE (100% Works) -->
+<section id="services" class="services-section py-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-5 fw-bold" style="color: var(--navy-deep);">Our Premium Services</h2>
+            <p class="lead">Comprehensive logistics solutions tailored to your needs</p>
+        </div>
+        <div class="row g-4">
+            <!-- Service 1 -->
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="service-card">
+                    <div style="background: linear-gradient(135deg, #0A192F, #0F3B5C); height: 200px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-truck fa-5x" style="color: var(--gold-accent);"></i>
+                    </div>
+                    <div class="service-icon-overlay">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <div class="service-content">
+                        <h4>Ibadan to Lagos Clearing</h4>
+                        <p>Fast customs clearance at Lagos Airport. We handle all documentation, paperwork, and regulatory requirements for smooth transit.</p>
+                        <div class="service-badge">
+                            <i class="fas fa-check-circle"></i> Same Day Processing
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service 2 -->
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="service-card">
+                    <div style="background: linear-gradient(135deg, #0A192F, #0F3B5C); height: 200px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-plane fa-5x" style="color: var(--gold-accent);"></i>
+                    </div>
+                    <div class="service-icon-overlay">
+                        <i class="fas fa-plane"></i>
+                    </div>
+                    <div class="service-content">
+                        <h4>International Shipping</h4>
+                        <p>Seamless overseas delivery via FedEx, DHL, and UPS partnerships. Door-to-door service to over 200 countries worldwide.</p>
+                        <div class="service-badge">
+                            <i class="fas fa-globe"></i> 200+ Countries
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service 3 -->
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="service-card">
+                    <div style="background: linear-gradient(135deg, #0A192F, #0F3B5C); height: 200px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-chart-line fa-5x" style="color: var(--gold-accent);"></i>
+                    </div>
+                    <div class="service-icon-overlay">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="service-content">
+                        <h4>Real-time Tracking</h4>
+                        <p>Your DeeJohnson code + FedEx code for complete visibility. Track every step of your package's journey across borders.</p>
+                        <div class="service-badge">
+                            <i class="fas fa-map-marker-alt"></i> 24/7 Access
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Counter Section -->
+<div class="stats-section py-5 text-white">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3" data-aos="zoom-in">
+                <div class="stat-item">
+                    <div class="stat-number counter" data-target="5000">0</div>
+                    <p><i class="fas fa-box"></i> Packages Delivered</p>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="zoom-in" data-aos-delay="100">
+                <div class="stat-item">
+                    <div class="stat-number counter" data-target="98">0</div>
+                    <p><i class="fas fa-clock"></i> On-Time Delivery %</p>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="zoom-in" data-aos-delay="200">
+                <div class="stat-item">
+                    <div class="stat-number counter" data-target="50">0</div>
+                    <p><i class="fas fa-plane"></i> Countries Served</p>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="zoom-in" data-aos-delay="300">
+                <div class="stat-item">
+                    <div class="stat-number counter" data-target="1000">0</div>
+                    <p><i class="fas fa-smile"></i> Happy Customers</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works Timeline -->
+<section id="process" class="py-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-5 fw-bold" style="color: var(--navy-deep);">How It Works</h2>
+            <p class="lead">Simple 4-step process for stress-free shipping</p>
+        </div>
+        <div class="timeline">
+            <div class="timeline-item" data-aos="fade-right">
+                <div class="timeline-icon">
+                    <i class="fas fa-box"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4 style="color: var(--navy-medium);">1. Package Pickup</h4>
+                    <p>We collect your package from your location in Ibadan or surrounding areas in Oyo State.</p>
+                </div>
+            </div>
+            <div class="timeline-item" data-aos="fade-left">
+                <div class="timeline-icon">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4 style="color: var(--navy-medium);">2. Transport to Lagos</h4>
+                    <p>Your package is safely transported to Lagos Airport for customs processing.</p>
+                </div>
+            </div>
+            <div class="timeline-item" data-aos="fade-right">
+                <div class="timeline-icon">
+                    <i class="fas fa-file-invoice"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4 style="color: var(--navy-medium);">3. Customs Clearance</h4>
+                    <p>We handle all customs documentation and clearance at Lagos Airport.</p>
+                </div>
+            </div>
+            <div class="timeline-item" data-aos="fade-left">
+                <div class="timeline-icon">
+                    <i class="fas fa-plane"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4 style="color: var(--navy-medium);">4. International Delivery</h4>
+                    <p>Package handed over to FedEx/DHL for final delivery to your destination worldwide.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- China to Nigeria Shipping Section -->
+<section id="china-shipping" class="py-5" style="background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-5 fw-bold" style="color: var(--navy-deep);">
+                <i class="fas fa-china-flag"></i> China to Nigeria Shipping
+            </h2>
+            <p class="lead">Your trusted partner for importing goods from China to Nigeria</p>
+            <div class="divider" style="width: 80px; height: 3px; background: var(--gold-accent); margin: 15px auto;"></div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Left Column - Text Content -->
+            <div class="col-lg-6" data-aos="fade-right">
+                <div class="china-content">
+                    <h3 style="color: var(--navy-medium);" class="mb-3">
+                        <i class="fas fa-ship"></i> Complete China Logistics Solution
+                    </h3>
+                    <p>We specialize in importing goods from China to Nigeria. Whether you're a business owner, retailer, or individual, we handle everything from warehouse pickup in China to delivery at your doorstep in Nigeria.</p>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6 mb-3">
+                            <div class="feature-box">
+                                <i class="fas fa-warehouse fa-2x" style="color: var(--gold-accent);"></i>
+                                <h5 class="mt-2">China Warehouse</h5>
+                                <p>We have partner warehouses in Guangzhou, Yiwu, and Shanghai</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="feature-box">
+                                <i class="fas fa-boxes fa-2x" style="color: var(--gold-accent);"></i>
+                                <h5 class="mt-2">Consolidation Service</h5>
+                                <p>Combine multiple orders into one shipment to save costs</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="feature-box">
+                                <i class="fas fa-dollar-sign fa-2x" style="color: var(--gold-accent);"></i>
+                                <h5 class="mt-2">Competitive Rates</h5>
+                                <p>Sea freight: $150-300 per CBM | Air freight: $5-8 per kg</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="feature-box">
+                                <i class="fas fa-clock fa-2x" style="color: var(--gold-accent);"></i>
+                                <h5 class="mt-2">Fast Transit Times</h5>
+                                <p>Sea: 30-35 days | Air: 5-7 days | Express: 3-5 days</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Popular items we ship:</strong> Electronics, Fashion, Machinery, Spare Parts, Furniture, Household goods, and more!
+                    </div>
+                    
+                    <a href="#contact" class="btn btn-primary btn-lg mt-3" style="background-color: var(--navy-medium);">
+                        <i class="fas fa-envelope"></i> Get China Shipping Quote
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Column - Images -->
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="china-image-gallery">
+                    <div class="row g-3">
+                        <!-- Chinese Worker in Warehouse -->
+                        <div class="col-12">
+                            <div class="image-card">
+                                <img src="https://images.pexels.com/photos/4483610/pexels-photo-4483610.jpeg?w=600" 
+                                     alt="Chinese worker in warehouse" 
+                                     class="china-image">
+                                <div class="image-caption">
+                                    <p><i class="fas fa-user-tie"></i> Our partner warehouse team in Guangzhou</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Chinese Products - Electronics -->
+                        <div class="col-md-6">
+                            <div class="image-card">
+                                <img src="https://images.pexels.com/photos/577769/pexels-photo-577769.jpeg?w=400" 
+                                     alt="Electronics from China" 
+                                     class="china-image">
+                                <div class="image-caption small">
+                                    <p>📱 Electronics & Gadgets</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Chinese Products - Fashion/Textiles -->
+                        <div class="col-md-6">
+                            <div class="image-card">
+                                <img src="https://images.pexels.com/photos/297933/pexels-photo-297933.jpeg?w=400" 
+                                     alt="Fashion and Textiles" 
+                                     class="china-image">
+                                <div class="image-caption small">
+                                    <p>👕 Fashion & Textiles</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Container Ship - Working Image -->
+                        <div class="col-12">
+                            <div class="image-card">
+                                <img src="https://cdn.pixabay.com/photo/2017/05/10/15/09/ship-2301179_640.jpg" 
+                                    alt="Container ship China to Nigeria" 
+                                    class="china-image">
+                                <div class="image-caption">
+                                    <p><i class="fas fa-ship"></i> Direct shipping routes from China to Lagos Port</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+        <!-- Shipping Methods Comparison Table -->
+        <div class="row mt-5" data-aos="fade-up">
+            <div class="col-12">
+                <h3 class="text-center mb-4" style="color: var(--navy-deep);">
+                    <i class="fas fa-chart-line"></i> Shipping Methods Comparison
+                </h3>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover shipping-table">
+                        <thead style="background-color: var(--navy-deep); color: white;">
+                            <tr>
+                                <th>Shipping Method</th>
+                                <th>Transit Time</th>
+                                <th>Best For</th>
+                                <th>Price Range</th>
+                                <th>Tracking</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong><i class="fas fa-ship"></i> Sea Freight (LCL)</strong></td>
+                                <td>30-35 days</td>
+                                <td>Large quantities, heavy items</td>
+                                <td>$150-300 per CBM</td>
+                                <td><i class="fas fa-check-circle text-success"></i> Basic tracking</td>
+                            </tr>
+                            <tr>
+                                <td><strong><i class="fas fa-plane"></i> Air Freight</strong></td>
+                                <td>5-7 days</td>
+                                <td>Medium quantities, time-sensitive</td>
+                                <td>$5-8 per kg</td>
+                                <td><i class="fas fa-check-circle text-success"></i> Full tracking</td>
+                            </tr>
+                            <tr>
+                                <td><strong><i class="fas fa-truck-fast"></i> Express (DHL/FedEx)</strong></td>
+                                <td>3-5 days</td>
+                                <td>Small packages, urgent items</td>
+                                <td>$10-15 per kg</td>
+                                <td><i class="fas fa-check-circle text-success"></i> Real-time tracking</td>
+                            </tr>
+                            <tr>
+                                <td><strong><i class="fas fa-box"></i> Consolidation</strong></td>
+                                <td>25-30 days</td>
+                                <td>Multiple small orders combined</td>
+                                <td>Starting from $100 per CBM</td>
+                                <td><i class="fas fa-check-circle text-success"></i> Full tracking</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- What We Ship Section -->
+        <div class="row mt-5" data-aos="fade-up">
+            <div class="col-12">
+                <h3 class="text-center mb-4" style="color: var(--navy-deep);">
+                    <i class="fas fa-box-open"></i> What We Ship from China to Nigeria
+                </h3>
+                <div class="row g-3">
+                    <div class="col-md-3 col-6">
+                        <div class="product-category">
+                            <i class="fas fa-mobile-alt fa-2x" style="color: var(--gold-accent);"></i>
+                            <p>Electronics<br><small>Phones, Laptops, Accessories</small></p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="product-category">
+                            <i class="fas fa-tshirt fa-2x" style="color: var(--gold-accent);"></i>
+                            <p>Fashion<br><small>Clothing, Shoes, Bags</small></p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="product-category">
+                            <i class="fas fa-cogs fa-2x" style="color: var(--gold-accent);"></i>
+                            <p>Machinery<br><small>Industrial Equipment, Parts</small></p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="product-category">
+                            <i class="fas fa-couch fa-2x" style="color: var(--gold-accent);"></i>
+                            <p>Furniture<br><small>Home, Office, Outdoor</small></p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="product-category">
+                            <i class="fas fa-baby-carriage fa-2x" style="color: var(--gold-accent);"></i>
+                            <p>Baby Products<br><small>Toys, Strollers, Clothes</small></p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="product-category">
+                            <i class="fas fa-car fa-2x" style="color: var(--gold-accent);"></i>
+                            <p>Auto Parts<br><small>Spare Parts, Accessories</small></p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="product-category">
+                            <i class="fas fa-home fa-2x" style="color: var(--gold-accent);"></i>
+                            <p>Household<br><small>Kitchenware, Decor, Tools</small></p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="product-category">
+                            <i class="fas fa-prescription-bottle fa-2x" style="color: var(--gold-accent);"></i>
+                            <p>Health/Beauty<br><small>Cosmetics, Supplements</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Why Choose Us for China Shipping -->
+        <div class="row mt-5" data-aos="fade-up">
+            <div class="col-12">
+                <div class="china-why-us">
+                    <h3 class="text-center mb-4">Why Choose DeeJohnson for China Shipping?</h3>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="benefit-card">
+                                <i class="fas fa-handshake fa-2x" style="color: var(--gold-accent);"></i>
+                                <h5>Direct Partnership</h5>
+                                <p>We work directly with Chinese warehouses, no middlemen</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="benefit-card">
+                                <i class="fas fa-shield-alt fa-2x" style="color: var(--gold-accent);"></i>
+                                <h5>Customs Clearance</h5>
+                                <p>Full documentation and clearance at Lagos Port/Airport</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="benefit-card">
+                                <i class="fas fa-headset fa-2x" style="color: var(--gold-accent);"></i>
+                                <h5>Chinese Speaking Staff</h5>
+                                <p>Our team communicates directly with Chinese suppliers</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* China Shipping Section Styles */
+    .china-content .feature-box {
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 12px;
+        transition: all 0.3s;
+        text-align: center;
+    }
+    
+    .china-content .feature-box:hover {
+        transform: translateY(-5px);
+        background: white;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .china-image-gallery .image-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s;
+    }
+    
+    .china-image-gallery .image-card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    
+    .china-image {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        transition: transform 0.5s;
+    }
+    
+    .china-image-gallery .image-card:hover .china-image {
+        transform: scale(1.05);
+    }
+    
+    .image-caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(10,25,47,0.9), transparent);
+        color: white;
+        padding: 10px;
+        text-align: center;
+    }
+    
+    .image-caption p {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+    
+    .shipping-table {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    .shipping-table td, .shipping-table th {
+        padding: 12px;
+        vertical-align: middle;
+    }
+    
+    .product-category {
+        text-align: center;
+        padding: 20px;
+        background: white;
+        border-radius: 12px;
+        transition: all 0.3s;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .product-category:hover {
+        transform: translateY(-5px);
+        border-color: var(--gold-accent);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .product-category p {
+        margin-top: 10px;
+        margin-bottom: 0;
+        font-weight: 500;
+    }
+    
+    .product-category small {
+        font-size: 0.75rem;
+        color: #666;
+    }
+    
+    .china-why-us {
+        background: linear-gradient(135deg, #f8f9fa, #ffffff);
+        padding: 30px;
+        border-radius: 20px;
+    }
+    
+    .benefit-card {
+        text-align: center;
+        padding: 20px;
+        background: white;
+        border-radius: 12px;
+        height: 100%;
+        transition: all 0.3s;
+    }
+    
+    .benefit-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    @media (max-width: 768px) {
+        .china-image {
+            height: 200px;
+        }
+        
+        .product-category {
+            padding: 10px;
+        }
+        
+        .china-why-us {
+            padding: 20px;
+        }
+    }
+</style>
+
+<!-- Meet Our Team Section -->
+<section id="team" class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-5 fw-bold" style="color: var(--navy-deep);">Meet Our Leadership Team</h2>
+            <p class="lead">Dedicated professionals committed to your logistics success</p>
+            <div class="divider" style="width: 80px; height: 3px; background: var(--gold-accent); margin: 15px auto;"></div>
+        </div>
+        
+        <div class="row g-4">
+            <!-- CEO - Mr. Damilola Johnson -->
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="team-card">
+                    <div class="team-image-wrapper">
+                        <img src="{{ url_for('static', filename='images/ceo.jpg') }}" alt="CEO" class="team-image"
+                             onerror="this.src='https://placehold.co/400x500/0A192F/FFFFFF?text=CEO'">
+                        <div class="team-social">
+                            <a href="https://wa.me/2348035787545" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>
+                    <div class="team-info">
+                        <h3 class="team-name">Mr. Damilola Johnson</h3>
+                        <p class="team-position">Chief Executive Officer (CEO)</p>
+                        <div class="team-bio">
+                            <p>10+ years of experience in logistics and supply chain management. Visionary leader transforming logistics in Nigeria.</p>
+                        </div>
+                        <div class="team-contact">
+                            <span class="badge bg-primary">CEO Office</span>
+                            <small><i class="fas fa-phone"></i> +234 803 578 7545</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Managing Director - Mrs. Omolara Johnson -->
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="team-card">
+                    <div class="team-image-wrapper">
+                        <img src="{{ url_for('static', filename='images/md.jpg') }}" alt="Managing Director" class="team-image"
+                             onerror="this.src='https://placehold.co/400x500/0F3B5C/FFFFFF?text=MD'">
+                        <div class="team-social">
+                            <a href="https://wa.me/2348065006916" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>
+                    <div class="team-info">
+                        <h3 class="team-name">Mrs. Omolara Johnson</h3>
+                        <p class="team-position">Managing Director (MD)</p>
+                        <div class="team-bio">
+                            <p>10+ years expertise in customs clearance and international freight forwarding. Expert in China-Nigeria trade routes.</p>
+                        </div>
+                        <div class="team-contact">
+                            <span class="badge bg-primary">Executive Management</span>
+                            <small><i class="fas fa-phone"></i> +234 806 500 6916</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Operations Manager - Mr. Adeleke Ibirogba -->
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="team-card">
+                    <div class="team-image-wrapper">
+                        <img src="{{ url_for('static', filename='images/operations.jpg') }}" alt="Operations Manager" class="team-image"
+                             onerror="this.src='https://placehold.co/400x500/1A4A6F/FFFFFF?text=Operations'">
+                        <div class="team-social">
+                            <a href="https://wa.me/2347012345678" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>
+                    <div class="team-info">
+                        <h3 class="team-name">Mr. Adeleke Ibirogba</h3>
+                        <p class="team-position">Operations Manager</p>
+                        <div class="team-bio">
+                            <p>10+ years managing logistics operations, fleet coordination, and customer satisfaction across Nigeria.</p>
+                        </div>
+                        <div class="team-contact">
+                            <span class="badge bg-primary">Operations</span>
+                            <small><i class="fas fa-phone"></i> +234 701 234 5678</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Service Officer 1 - Olorunniwo Timileyin James -->
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                <div class="team-card">
+                    <div class="team-image-wrapper">
+                        <img src="{{ url_for('static', filename='images/cso1.jpg') }}" alt="Customer Service Officer" class="team-image"
+                             onerror="this.src='https://placehold.co/400x500/0A192F/FFFFFF?text=CSO'">
+                        <div class="team-social">
+                            <a href="https://wa.me/2348149980445" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>
+                    <div class="team-info">
+                        <h3 class="team-name">Olorunniwo Timileyin James</h3>
+                        <p class="team-position">Customer Service Officer</p>
+                        <div class="team-bio">
+                            <p>Dedicated customer service professional with 6+ years experience. Specializes in shipment tracking and customer inquiries.</p>
+                        </div>
+                        <div class="team-contact">
+                            <span class="badge bg-primary">Customer Support</span>
+                            <small><i class="fas fa-phone"></i> +234 814 998 0445</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Service Officer 2 - Fatunmbi Motunrayo Grace -->
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="500">
+                <div class="team-card">
+                    <div class="team-image-wrapper">
+                        <img src="{{ url_for('static', filename='images/cso2.jpg') }}" alt="Customer Service Officer" class="team-image"
+                             onerror="this.src='https://placehold.co/400x500/0F3B5C/FFFFFF?text=CSO'">
+                        <div class="team-social">
+                            <a href="https://wa.me/2349033715087" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>
+                    <div class="team-info">
+                        <h3 class="team-name">Fatunmbi Motunrayo Grace</h3>
+                        <p class="team-position">Customer Service Officer</p>
+                        <div class="team-bio">
+                            <p>Passionate about customer satisfaction with 4+ years experience. Expert in handling shipment documentation and tracking.</p>
+                        </div>
+                        <div class="team-contact">
+                            <span class="badge bg-primary">Customer Support</span>
+                            <small><i class="fas fa-phone"></i> +234 903 371 5087</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Service Officer 3 - Adetoyinbo Adebimpe Precious -->
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="600">
+                <div class="team-card">
+                    <div class="team-image-wrapper">
+                        <img src="{{ url_for('static', filename='images/cso3.jpg') }}" alt="Customer Service Officer" class="team-image"
+                             onerror="this.src='https://placehold.co/400x500/1A4A6F/FFFFFF?text=CSO'">
+                        <div class="team-social">
+                            <a href="https://wa.me/2349130953914" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>
+                    <div class="team-info">
+                        <h3 class="team-name">Adetoyinbo Adebimpe Precious</h3>
+                        <p class="team-position">Customer Service Officer</p>
+                        <div class="team-bio">
+                            <p>Detail-oriented customer service specialist with 3+ years experience. Focuses on timely resolution of customer issues.</p>
+                        </div>
+                        <div class="team-contact">
+                            <span class="badge bg-primary">Customer Support</span>
+                            <small><i class="fas fa-phone"></i> +234 913 095 3914</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Team Section Styles */
+    .team-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        height: 100%;
+    }
+    
+    .team-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    
+    .team-image-wrapper {
+        position: relative;
+        overflow: hidden;
+        height: 350px;
+        background: linear-gradient(135deg, var(--navy-deep), var(--navy-medium));
+    }
+    
+    .team-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .team-card:hover .team-image {
+        transform: scale(1.05);
+    }
+    
+    .team-social {
+        position: absolute;
+        bottom: -50px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        padding: 15px;
+        background: linear-gradient(to top, rgba(10,25,47,0.9), transparent);
+        transition: bottom 0.3s ease;
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+    
+    .team-card:hover .team-social {
+        bottom: 0;
+    }
+    
+    .team-social a {
+        width: 35px;
+        height: 35px;
+        background: var(--gold-accent);
+        color: var(--navy-deep);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        text-decoration: none;
+    }
+    
+    .team-social a:hover {
+        transform: scale(1.1);
+        background: white;
+    }
+    
+    .team-info {
+        padding: 20px;
+    }
+    
+    .team-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--navy-deep);
+        margin-bottom: 5px;
+    }
+    
+    .team-position {
+        color: var(--gold-accent);
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+    
+    .team-bio {
+        font-size: 0.9rem;
+        color: #666;
+        line-height: 1.5;
+        margin-bottom: 15px;
+    }
+    
+    .team-contact {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #eee;
+    }
+    
+    .team-contact small {
+        color: #666;
+        font-size: 0.8rem;
+    }
+    
+    .team-contact small i {
+        margin-right: 5px;
+        color: var(--gold-accent);
+    }
+    
+    .team-card .badge {
+        background: linear-gradient(135deg, var(--navy-dark), var(--navy-medium)) !important;
+        font-size: 0.7rem;
+        padding: 5px 10px;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .team-image-wrapper {
+            height: 300px;
+        }
+        
+        .team-name {
+            font-size: 1.1rem;
+        }
+        
+        .team-contact {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<!-- FAQ Section -->
+<section id="faq" class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-5 fw-bold" style="color: var(--navy-deep);">Frequently Asked Questions</h2>
+            <p class="lead">Got questions? We've got answers. Here's what our customers usually ask us.</p>
+            <div class="divider" style="width: 80px; height: 3px; background: var(--gold-accent); margin: 15px auto;"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-6 mb-4" data-aos="fade-right">
+                <div class="faq-category">
+                    <h3 class="faq-category-title">
+                        <i class="fas fa-truck"></i> Shipping & Delivery
+                    </h3>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>How long does delivery take from Ibadan to Lagos?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Standard delivery from Ibadan to Lagos takes 1-2 business days. Express delivery is available within 24 hours for urgent shipments.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>Do you offer international shipping?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Yes! We ship to over 200 countries worldwide through our partnership with FedEx, DHL, and UPS. International delivery typically takes 5-7 business days.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>How can I track my package from Ibadan to Lagos?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>You can track your package by entering our local DeeJohnson tracking code (e.g., DJL-2024-XXXXX) on our <a href="/track">Track Page</a>. You'll receive real-time updates on your shipment's location and status.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>What happens if my package is delayed?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>If your package is delayed due to customs or other factors, we will notify you immediately via email or SMS. Our customer support team will keep you updated on the status and provide an estimated delivery date.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 mb-4" data-aos="fade-left">
+                <div class="faq-category">
+                    <h3 class="faq-category-title">
+                        <i class="fas fa-file-invoice-dollar"></i> Pricing & Payments
+                    </h3>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>How much does shipping cost?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Shipping costs vary based on package weight, dimensions, and destination. Contact us for a free quote, or use our shipping calculator (coming soon) to get an instant estimate.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>What payment methods do you accept?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>We accept bank transfers, cash on delivery (COD), and online payments via Paystack. International payments can be made via wire transfer or PayPal.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>Do I need to pay customs duties?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Customs duties and taxes are the responsibility of the recipient. However, we provide full customs clearance services and will inform you of any applicable duties before delivery.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>Are there any hidden fees?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>No hidden fees! We provide transparent pricing with a detailed breakdown of all costs including shipping, handling, customs clearance, and insurance (if applicable).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 mb-4" data-aos="fade-right" data-aos-delay="100">
+                <div class="faq-category">
+                    <h3 class="faq-category-title">
+                        <i class="fas fa-box"></i> Package Information
+                    </h3>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>What items are restricted or prohibited?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>We cannot ship hazardous materials, flammable items, weapons, illegal drugs, perishable goods without proper packaging, or items prohibited by Nigerian customs. Contact us for a complete list of restricted items.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>How should I package my items?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Use sturdy boxes with proper cushioning material (bubble wrap, foam, or packing peanuts). Seal all seams with strong packing tape. For fragile items, mark "FRAGILE" on the box. We also offer professional packaging services.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>Is my package insured?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>We offer optional insurance coverage for valuable shipments. Insurance covers loss or damage during transit. Contact us to add insurance to your shipment.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>What if my package is damaged?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>If your package arrives damaged, please document it with photos and contact us within 24 hours. We'll initiate a damage claim and work with our insurance provider to compensate you.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 mb-4" data-aos="fade-left" data-aos-delay="100">
+                <div class="faq-category">
+                    <h3 class="faq-category-title">
+                        <i class="fas fa-headset"></i> Customer Support
+                    </h3>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>How can I contact customer support?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>You can reach us via:
+                                <ul>
+                                    <li>📞 Phone: +234 706 255 0379</li>
+                                    <li>💬 WhatsApp: Click the chat button on this page</li>
+                                    <li>📧 Email: deejohnsonnigerialimited@gmail.com</li>
+                                    <li>📍 Visit our office: No. 7, Kajegbo Street, Opp. Chicken Republic, Ibadan</li>
+                                </ul>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>What are your business hours?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Monday - Friday: 8:00 AM to 5:00 PM<br>
+                            <p>Saturday: 9:00 AM to 1:00 PM<br>
+                            Sunday: Closed (emergency support available via WhatsApp)</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>Do you offer pickup and delivery?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Yes! We offer free pickup within Ibadan metro area for shipments over 5kg. For other locations, a small pickup fee may apply. Delivery is available to any address in Nigeria and internationally.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>Can I change my delivery address after shipping?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Yes, address changes are possible if the package hasn't been delivered yet. Additional fees may apply depending on the shipment's current location. Contact us immediately to request an address change.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Still have questions? -->
+        <div class="text-center mt-5" data-aos="fade-up">
+            <div class="faq-footer">
+                <i class="fas fa-question-circle fa-3x" style="color: var(--gold-accent);"></i>
+                <h4 class="mt-3">Still have questions?</h4>
+                <p>Can't find the answer you're looking for? Please chat with our friendly team.</p>
+                <a href="#contact" class="btn btn-primary btn-lg mt-2" style="background-color: var(--navy-medium);">
+                    <i class="fas fa-envelope"></i> Contact Us
+                </a>
+                <button class="btn btn-success btn-lg mt-2 ms-2" onclick="openWhatsApp()" style="background-color: #25D366;">
+                    <i class="fab fa-whatsapp"></i> WhatsApp Us
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* FAQ Section Styles */
+    .faq-category {
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s;
+    }
+    
+    .faq-category:hover {
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    }
+    
+    .faq-category-title {
+        font-size: 1.5rem;
+        color: var(--navy-deep);
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--gold-accent);
+        display: inline-block;
+    }
+    
+    .faq-category-title i {
+        color: var(--gold-accent);
+        margin-right: 10px;
+    }
+    
+    .faq-item {
+        margin-bottom: 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s;
+    }
+    
+    .faq-item:hover {
+        border-color: var(--navy-medium);
+    }
+    
+    .faq-question {
+        background: #f8f9fa;
+        padding: 15px 20px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 600;
+        color: var(--navy-deep);
+        transition: all 0.3s;
+    }
+    
+    .faq-question:hover {
+        background: #e9ecef;
+    }
+    
+    .faq-question i {
+        transition: transform 0.3s;
+        color: var(--navy-medium);
+    }
+    
+    .faq-question.active i {
+        transform: rotate(180deg);
+    }
+    
+    .faq-answer {
+        padding: 0 20px;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+        background: white;
+        line-height: 1.6;
+        color: #555;
+    }
+    
+    .faq-answer.active {
+        padding: 15px 20px;
+        max-height: 500px;
+    }
+    
+    .faq-answer ul {
+        margin-top: 10px;
+        padding-left: 20px;
+    }
+    
+    .faq-answer li {
+        margin: 5px 0;
+    }
+    
+    .faq-footer {
+        background: linear-gradient(135deg, #f8f9fa, #ffffff);
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .faq-category {
+            padding: 15px;
+        }
+        
+        .faq-category-title {
+            font-size: 1.2rem;
+        }
+        
+        .faq-question {
+            font-size: 0.9rem;
+            padding: 12px 15px;
+        }
+        
+        .faq-answer.active {
+            font-size: 0.9rem;
+        }
+        
+        .faq-footer {
+            padding: 25px;
+        }
+        
+        .faq-footer .btn {
+            display: block;
+            width: 100%;
+            margin: 10px 0 !important;
+        }
+    }
+</style>
+
+<script>
+    // FAQ Toggle Function
+    function toggleFAQ(element) {
+        // Toggle active class on question
+        element.classList.toggle('active');
+        
+        // Get the answer div
+        var answer = element.nextElementSibling;
+        
+        // Toggle active class on answer
+        answer.classList.toggle('active');
+        
+        // Optional: Close other FAQs (uncomment if you want only one open at a time)
+        /*
+        var allQuestions = document.querySelectorAll('.faq-question');
+        for (var i = 0; i < allQuestions.length; i++) {
+            if (allQuestions[i] !== element && allQuestions[i].classList.contains('active')) {
+                allQuestions[i].classList.remove('active');
+                allQuestions[i].nextElementSibling.classList.remove('active');
+            }
+        }
+        */
+    }
+    
+    // Open WhatsApp function
+    function openWhatsApp() {
+        window.open('https://wa.me/2347062550379?text=Hello%20DeeJohnson%20Logistics%2C%20I%20have%20a%20question%20about%20your%20services', '_blank');
+    }
+    
+    // Smooth scroll to contact section from FAQ
+    document.querySelectorAll('.faq-footer .btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            if (this.getAttribute('onclick')) return;
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+</script>
+
+<!-- Customer Reviews Section -->
+<section id="reviews" class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-5 fw-bold" style="color: var(--navy-deep);">What Our Customers Say</h2>
+            <p class="lead">Trusted by businesses and individuals across Ibadan & Oyo</p>
+        </div>
+        <div class="row g-4">
+            {% for review in reviews %}
+            <div class="col-md-4" data-aos="flip-left" data-aos-delay="{{ loop.index * 100 }}">
+                <div class="review-card">
+                    <div class="review-stars">
+                        {% for i in range(review.rating) %}
+                        <i class="fas fa-star"></i>
+                        {% endfor %}
+                    </div>
+                    <div class="review-text">
+                        "{{ review.comment }}"
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <strong>{{ review.customer_name }}</strong><br>
+                            <small class="text-muted"><i class="fas fa-map-marker-alt"></i> {{ review.location }}</small>
+                        </div>
+                        <div class="reviewer-image">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<div class="cta-section py-5 text-white">
+    <div class="container text-center" data-aos="zoom-in">
+        <h2 class="display-5 fw-bold mb-3">Ready to Ship Your Package?</h2>
+        <p class="lead mb-4">Get a free quote today and experience seamless logistics</p>
+        <a href="#contact" class="btn btn-light btn-lg px-5 cta-button">
+            <i class="fas fa-envelope"></i> Request Quote
+        </a>
+    </div>
+</div>
+
+<!-- Contact Section -->
+<section id="contact" class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-5 mb-4" data-aos="fade-right">
+                <h2 class="display-5 fw-bold mb-4" style="color: var(--navy-deep);">Get In Touch</h2>
+                <div class="mb-4">
+                    <div class="d-flex mb-3">
+                        <div class="me-3"><i class="fas fa-map-marker-alt fa-2x" style="color: var(--navy-medium);"></i></div>
+                        <div><strong>Address</strong><br>No. 7 Kajegbo Street, Opp. Chicken Republic, Ibadan, Oyo State, Nigeria</div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <div class="me-3"><i class="fas fa-phone fa-2x" style="color: var(--navy-medium);"></i></div>
+                        <div><strong>Phone</strong><br>+234 706 255 0379<br>+234 803 578 7545</div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <div class="me-3"><i class="fas fa-envelope fa-2x" style="color: var(--navy-medium);"></i></div>
+                        <div><strong>Email</strong><br>deejohnsonnigerialimited@gmail.com<br>deejohnsonnigerialimited@gmail.com</div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <div class="me-3"><i class="fas fa-clock fa-2x" style="color: var(--navy-medium);"></i></div>
+                        <div><strong>Business Hours</strong><br>Monday - Friday: 8:00 AM - 5:00 PM<br>Saturday: 9:00 AM - 1:00 PM<br>Sunday: Closed<br></div>
+                    </div>
+                </div>
+                <div class="social-links">
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-7" data-aos="fade-left">
+                <div class="contact-form">
+                    <h3 class="mb-4" style="color: var(--navy-deep);">Send Us a Message</h3>
+                    <form>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <input type="text" class="form-control" placeholder="Your Name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="email" class="form-control" placeholder="Your Email" required>
+                            </div>
+                            <div class="col-12">
+                                <input type="text" class="form-control" placeholder="Phone Number">
+                            </div>
+                            <div class="col-12">
+                                <select class="form-control">
+                                    <option>Select Service</option>
+                                    <option>Ibadan to Lagos Clearing</option>
+                                    <option>International Shipping</option>
+                                    <option>Package Tracking</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <textarea rows="4" class="form-control" placeholder="Your Message"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn w-100 cta-button">Send Message <i class="fas fa-paper-plane"></i></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Fixed WhatsApp Chat Widget -->
+<div class="whatsapp-widget">
+    <div class="whatsapp-header" id="whatsappToggle">
+        <i class="fab fa-whatsapp"></i>
+        <span>Need Help? Chat with us</span>
+        <i class="fas fa-chevron-down"></i>
+    </div>
+    <div class="whatsapp-body" id="whatsappBody" style="display: none;">
+        <p class="chat-greeting">👋 Hello! How can we help you today?</p>
+        <div class="chat-options">
+            <a href="https://wa.me/2347062550379?text=Hello%20DeeJohnson%20Logistics%2C%20I%20want%20to%20track%20my%20package" 
+               target="_blank" class="chat-option" rel="noopener noreferrer">
+                <i class="fas fa-box"></i> Track My Package
+            </a>
+            <a href="https://wa.me/2347062550379?text=Hello%20DeeJohnson%20Logistics%2C%20I%20need%20a%20shipping%20quote" 
+               target="_blank" class="chat-option" rel="noopener noreferrer">
+                <i class="fas fa-calculator"></i> Request a Quote
+            </a>
+            <a href="https://wa.me/2347062550379?text=Hello%20DeeJohnson%20Logistics%2C%20I%20need%20customer%20support%20for%20my%20shipment" 
+               target="_blank" class="chat-option" rel="noopener noreferrer">
+                <i class="fas fa-headset"></i> Customer Support
+            </a>
+            <a href="https://wa.me/2347062550379?text=Hello%20DeeJohnson%20Logistics%2C%20I%20want%20to%20ship%20internationally" 
+               target="_blank" class="chat-option" rel="noopener noreferrer">
+                <i class="fas fa-globe"></i> International Shipping
+            </a>
+        </div>
+        <div class="chat-footer">
+            <small>⏱️ Response time: Usually within 5 minutes</small>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* WhatsApp Chat Widget Styles */
+    .whatsapp-widget {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 9999;
+        width: 320px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .whatsapp-header {
+        background: linear-gradient(135deg, #25D366, #128C7E);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 50px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        transition: all 0.3s;
+        font-weight: 500;
+    }
+    
+    .whatsapp-header:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    }
+    
+    .whatsapp-header i:first-child {
+        font-size: 1.5rem;
+    }
+    
+    .whatsapp-header span {
+        flex: 1;
+    }
+    
+    .whatsapp-header .fa-chevron-down {
+        transition: transform 0.3s;
+    }
+    
+    .whatsapp-body {
+        background: white;
+        border-radius: 15px;
+        margin-top: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        overflow: hidden;
+    }
+    
+    .whatsapp-body.show {
+        display: block !important;
+    }
+    
+    .chat-greeting {
+        padding: 15px 15px 5px 15px;
+        color: #075E54;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .chat-options {
+        padding: 10px 15px;
+    }
+    
+    .chat-option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 15px;
+        margin: 8px 0;
+        background: #f8f9fa;
+        border-radius: 10px;
+        color: #333;
+        text-decoration: none;
+        transition: all 0.3s;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .chat-option:hover {
+        background: #25D366;
+        color: white;
+        transform: translateX(5px);
+        border-color: #25D366;
+    }
+    
+    .chat-option i {
+        font-size: 1.2rem;
+        width: 25px;
+    }
+    
+    .chat-footer {
+        padding: 10px 15px;
+        background: #f8f9fa;
+        text-align: center;
+        border-top: 1px solid #e0e0e0;
+        color: #666;
+        font-size: 0.8rem;
+    }
+    
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .whatsapp-widget {
+            width: calc(100% - 40px);
+            bottom: 20px;
+            right: 20px;
+            left: 20px;
+        }
+        
+        .whatsapp-header {
+            border-radius: 30px;
+        }
+    }
+</style>
+
+<script>
+    // Fixed toggle functionality
+    (function() {
+        var toggleBtn = document.getElementById('whatsappToggle');
+        var whatsappBody = document.getElementById('whatsappBody');
+        var chevronIcon = toggleBtn ? toggleBtn.querySelector('.fa-chevron-down') : null;
+        
+        if (toggleBtn && whatsappBody) {
+            toggleBtn.addEventListener('click', function(event) {
+                event.stopPropagation();
+                console.log('Button clicked'); // For debugging
+                
+                if (whatsappBody.classList.contains('show')) {
+                    whatsappBody.classList.remove('show');
+                    if (chevronIcon) chevronIcon.style.transform = 'rotate(0deg)';
+                } else {
+                    whatsappBody.classList.add('show');
+                    if (chevronIcon) chevronIcon.style.transform = 'rotate(180deg)';
+                }
+            });
+            
+            // Close when clicking outside
+            document.addEventListener('click', function(event) {
+                var widget = document.querySelector('.whatsapp-widget');
+                if (widget && !widget.contains(event.target)) {
+                    whatsappBody.classList.remove('show');
+                    if (chevronIcon) chevronIcon.style.transform = 'rotate(0deg)';
+                }
+            });
+        }
+    })();
+</script>
+
+<!-- Quick Track Widget -->
+<div class="position-fixed bottom-0 end-0 m-4" style="z-index: 1000;" data-aos="fade-up">
+    <button class="btn rounded-circle p-3 shadow" data-bs-toggle="modal" data-bs-target="#quickTrackModal" style="width: 60px; height: 60px; background-color: var(--navy-medium); color: white;">
+        <i class="fas fa-search fa-lg"></i>
+    </button>
+</div>
+
+<!-- Quick Track Modal -->
+<div class="modal fade" id="quickTrackModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: var(--navy-medium); color: white;">
+                <h5 class="modal-title"><i class="fas fa-box"></i> Quick Track Package</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/track" method="post">
+                    <input type="text" name="tracking_code" class="form-control form-control-lg mb-3" placeholder="Enter tracking code" required>
+                    <button type="submit" class="btn w-100 cta-button">Track Now</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer text-white py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Company Info Column -->
+<div class="col-md-4 mb-4" data-aos="fade-up">
+    <h4 class="mb-3">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" 
+             alt="DeeJohnson Logistics Logo" 
+             style="height: 35px; width: auto; margin-right: 10px;">
+        DeeJohnson Logistics
+    </h4>
+    <p>Your trusted logistics partner in Nigeria since 2025. Professional, reliable, and efficient package delivery services.</p>
+</div>
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <h5 class="mb-3">Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#home" class="text-white-50 text-decoration-none">Home</a></li>
+                    <li><a href="#services" class="text-white-50 text-decoration-none">Services</a></li>
+                    <li><a href="/track" class="text-white-50 text-decoration-none">Track Package</a></li>
+                    <li><a href="/admin" class="text-white-50 text-decoration-none">Admin Portal</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <h5 class="mb-3">Newsletter</h5>
+                <p>Subscribe for updates and offers</p>
+                <div class="input-group">
+                    <input type="email" class="form-control" placeholder="Your email">
+                    <button class="btn" style="background-color: var(--gold-accent); color: var(--navy-deep);">Subscribe</button>
+                </div>
+            </div>
+        </div>
+        <hr class="mt-3">
+        <div class="text-center">
+            <p class="mb-0">&copy; 2026 DeeJohnson Company Nigeria Limited. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    // Initialize AOS animations
+    AOS.init({
+        duration: 1000,
+        once: true,
+        offset: 100
+    });
+
+    // Hide loader
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            document.getElementById('loader').style.opacity = '0';
+            setTimeout(function() {
+                document.getElementById('loader').style.display = 'none';
+            }, 500);
+        }, 500);
+    });
+
+    // Navbar scroll effect
+    window.addEventListener('scroll', function() {
+        const navbar = document.getElementById('navbar');
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+
+    // Counter animation
+    const counters = document.querySelectorAll('.counter');
+    const speed = 200;
+
+    const animateCounter = (counter) => {
+        const target = parseInt(counter.getAttribute('data-target'));
+        let count = 0;
+        const updateCount = () => {
+            const increment = target / speed;
+            if (count < target) {
+                count += increment;
+                counter.innerText = Math.ceil(count);
+                setTimeout(updateCount, 20);
+            } else {
+                counter.innerText = target;
+            }
+        };
+        updateCount();
+    };
+
+    // Trigger counters when in viewport
+    const observerOptions = {
+        threshold: 0.5
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateCounter(entry.target);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    counters.forEach(counter => {
+        observer.observe(counter);
+    });
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+ 
+</script>
+</body>
+</html>

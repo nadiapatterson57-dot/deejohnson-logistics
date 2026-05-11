@@ -1,0 +1,33 @@
+:root {
+    --primary-blue: #0d6efd;
+    --dark-blue: #0a58ca;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.btn-primary {
+    background-color: var(--primary-blue);
+    border: none;
+    padding: 12px 30px;
+}
+
+.btn-primary:hover {
+    background-color: var(--dark-blue);
+}
+
+.card {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.form-control:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}

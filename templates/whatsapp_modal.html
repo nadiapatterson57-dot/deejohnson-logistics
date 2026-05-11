@@ -1,0 +1,133 @@
+<!-- WhatsApp Send Modal -->
+<div class="modal fade" id="whatsappModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #25D366, #128C7E); border: none;">
+                <div class="d-flex align-items-center">
+                    <i class="fab fa-whatsapp fa-3x text-white"></i>
+                    <div class="ms-3">
+                        <h4 class="modal-title text-white mb-0">Send WhatsApp Notification</h4>
+                        <p class="text-white-50 mb-0">Share tracking details with customer</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding: 25px;">
+                <!-- Customer Preview -->
+                <div class="customer-preview" style="background: #f8f9fa; border-radius: 15px; padding: 15px; margin-bottom: 20px;">
+                    <h6 class="mb-2"><i class="fas fa-user-circle"></i> Sending to:</h6>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong id="whatsappCustomerName">Customer Name</strong><br>
+                            <small class="text-muted" id="whatsappCustomerPhone">+234 XXX XXX XXX</small>
+                        </div>
+                        <i class="fab fa-whatsapp fa-2x" style="color: #25D366;"></i>
+                    </div>
+                </div>
+
+                <!-- Message Preview -->
+                <div class="message-preview" style="background: #dcf8c5; border-radius: 15px; padding: 15px; margin-bottom: 20px;">
+                    <h6><i class="fas fa-comment-dots"></i> Message Preview:</h6>
+                    <div id="whatsappMessagePreview" style="font-size: 0.9rem; line-height: 1.5;">
+                        Loading...
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="row g-3">
+                    <div class="col-12">
+                        <button class="btn btn-send-whatsapp w-100" onclick="sendWhatsAppMessage()" style="background: linear-gradient(135deg, #25D366, #128C7E); color: white; border: none; padding: 14px; border-radius: 10px; font-weight: bold;">
+                            <i class="fab fa-whatsapp fa-lg me-2"></i> Send to Customer Now
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-outline-secondary w-100" onclick="copyWhatsAppMessage()">
+                            <i class="fas fa-copy"></i> Copy Message
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-outline-primary w-100" data-bs-dismiss="modal">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
+                </div>
+
+                <div class="alert alert-info mt-3 mb-0 small">
+                    <i class="fas fa-info-circle"></i>
+                    Clicking send will open WhatsApp with the pre-filled message. Just press enter to deliver!
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-send-whatsapp {
+        transition: all 0.3s;
+    }
+    .btn-send-whatsapp:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(37,211,102,0.3);
+    }
+    .message-preview {
+        max-height: 250px;
+        overflow-y: auto;
+    }
+</style>
+
+<script>
+    // Store current shipment data for WhatsApp
+    var whatsappShipmentData = {};
+    
+    // Function to open WhatsApp modal
+    function openWhatsAppModal(shipmentData) {
+        whatsappShipmentData = shipmentData;
+        
+        // Update customer info
+        document.getElementById('whatsappCustomerName').innerText = shipmentData.customer_name;
+        document.getElementById('whatsappCustomerPhone').innerText = shipmentData.customer_phone;
+        
+        // Generate message
+        var msg = '🎉 DeeJohnson Logistics 🎉\n\n';
+        msg += 'Dear ' + shipmentData.customer_name + ',\n\n';
+        msg += 'Your shipment has been registered successfully!\n\n';
+        msg += '📦 *Tracking Code:* ' + shipmentData.tracking_code + '\n';
+        msg += '📍 *From:* ' + shipmentData.origin + '\n';
+        msg += '📍 *To:* ' + shipmentData.destination + '\n';
+        msg += '📦 *Package:* ' + shipmentData.package_type + '\n\n';
+        msg += '🔗 *Track your package:* ' + window.location.origin + '/track\n\n';
+        msg += 'Thank you for choosing DeeJohnson Logistics! 🚚';
+        
+        // Display preview (convert line breaks to <br>)
+        document.getElementById('whatsappMessagePreview').innerHTML = msg.replace(/\n/g, '<br>');
+        
+        // Store message for later use
+        whatsappShipmentData.message = msg;
+        
+        // Show modal
+        var modalEl = document.getElementById('whatsappModal');
+        var modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    }
+    
+    // Function to send WhatsApp message
+    function sendWhatsAppMessage() {
+        var phone = whatsappShipmentData.customer_phone.replace(/[^0-9]/g, '');
+        // Remove leading zero if present (Nigeria numbers)
+        if (phone.startsWith('0')) {
+            phone = '234' + phone.substring(1);
+        }
+        // Add country code if not present
+        if (!phone.startsWith('234') && !phone.startsWith('+')) {
+            phone = '234' + phone;
+        }
+        var whatsappUrl = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(whatsappShipmentData.message);
+        window.open(whatsappUrl, '_blank');
+    }
+    
+    // Function to copy message to clipboard
+    function copyWhatsAppMessage() {
+        navigator.clipboard.writeText(whatsappShipmentData.message);
+        alert('✓ Message copied to clipboard! You can now paste it manually.');
+    }
+</script>

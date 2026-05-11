@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Package - DeeJohnson Logistics</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --navy-deep: #0A192F;
+            --navy-dark: #0B2B4D;
+            --navy-medium: #0F3B5C;
+            --gold-accent: #C9A03D;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+        }
+        .navbar { background-color: var(--navy-deep) !important; }
+        .tracking-card {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .card-header-custom {
+            background: linear-gradient(135deg, var(--navy-deep), var(--navy-medium));
+            color: white;
+            padding: 20px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .status-delivered { background: #d4edda; color: #155724; }
+        .status-transit { background: #fff3cd; color: #856404; }
+        .status-pending { background: #f8d7da; color: #721c24; }
+        .status-cleared { background: #d1ecf1; color: #0c5460; }
+        
+        .timeline-steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+            position: relative;
+        }
+        .timeline-step {
+            text-align: center;
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+        .step-icon {
+            width: 50px;
+            height: 50px;
+            background: #e0e0e0;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        .timeline-step.completed .step-icon {
+            background: var(--navy-medium);
+            color: white;
+        }
+        .timeline-step.active .step-icon {
+            background: var(--gold-accent);
+            color: var(--navy-deep);
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .partner-card {
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            border-left: 4px solid var(--navy-medium);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .btn-track {
+            background-color: var(--navy-medium);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .btn-track:hover {
+            background-color: var(--navy-deep);
+            transform: translateY(-2px);
+        }
+        .btn-copy {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .btn-copy:hover {
+            background-color: #5a6268;
+        }
+        
+        @media (max-width: 768px) {
+            .timeline-steps {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .timeline-step {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+            .step-icon {
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-shipping-fast me-2"></i>DeeJohnson Logistics
+            </a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link text-white" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="/admin">Admin</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5 pt-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Tracking Search Card -->
+                <div class="tracking-card">
+                    <div class="card-header-custom">
+                        <h3 class="mb-0"><i class="fas fa-search"></i> Track Your Shipment</h3>
+                        <p class="mb-0 mt-2 opacity-75">Enter your DeeJohnson tracking code to get real-time updates</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="POST">
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Tracking Code</label>
+                                <div class="input-group input-group-lg">
+                                    <input type="text" name="tracking_code" class="form-control" 
+                                           placeholder="e.g., DJL-2024-ABC12" required>
+                                    <button type="submit" class="btn-track px-4">
+                                        <i class="fas fa-search"></i> Track
+                                    </button>
+                                </div>
+                                <small class="text-muted">Your DeeJohnson tracking code starts with DJL-</small>
+                            </div>
+                        </form>
+
+                        {% if shipment %}
+                        <!-- Shipment Found -->
+                        <div class="mt-4">
+                            <!-- Success Alert -->
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle"></i> 
+                                <strong>Shipment Found!</strong> Tracking Code: {{ shipment.tracking_code }}
+                            </div>
+                            
+                            <!-- Status Timeline -->
+                            <div class="timeline-steps">
+                                {% set status_lower = shipment.status.lower() %}
+                                <div class="timeline-step {% if 'registered' in status_lower or 'picked' in status_lower or 'transit' in status_lower or 'customs' in status_lower or 'delivered' in status_lower %}completed{% endif %}">
+                                    <div class="step-icon"><i class="fas fa-receipt"></i></div>
+                                    <div>Order Received</div>
+                                </div>
+                                <div class="timeline-step {% if 'picked' in status_lower or 'transit' in status_lower or 'customs' in status_lower or 'delivered' in status_lower %}completed{% endif %} {% if 'picked' in status_lower %}active{% endif %}">
+                                    <div class="step-icon"><i class="fas fa-box"></i></div>
+                                    <div>Picked Up</div>
+                                </div>
+                                <div class="timeline-step {% if 'transit' in status_lower or 'customs' in status_lower or 'delivered' in status_lower %}completed{% endif %} {% if 'transit' in status_lower %}active{% endif %}">
+                                    <div class="step-icon"><i class="fas fa-truck"></i></div>
+                                    <div>In Transit</div>
+                                </div>
+                                <div class="timeline-step {% if 'customs' in status_lower or 'delivered' in status_lower %}completed{% endif %} {% if 'customs' in status_lower %}active{% endif %}">
+                                    <div class="step-icon"><i class="fas fa-file-invoice"></i></div>
+                                    <div>Customs Clearance</div>
+                                </div>
+                                <div class="timeline-step {% if 'delivered' in status_lower %}completed active{% endif %}">
+                                    <div class="step-icon"><i class="fas fa-home"></i></div>
+                                    <div>Delivered</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Current Status Card -->
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <h5 class="card-title" style="color: var(--navy-medium);">
+                                        <i class="fas fa-info-circle"></i> Current Status
+                                    </h5>
+                                    {% set status_lower = shipment.status.lower() %}
+                                    <p class="card-text fs-5">
+                                        {% if 'delivered' in status_lower %}
+                                            <span class="status-badge status-delivered">
+                                                <i class="fas fa-check-circle"></i> {{ shipment.status }}
+                                            </span>
+                                        {% elif 'transit' in status_lower %}
+                                            <span class="status-badge status-transit">
+                                                <i class="fas fa-truck"></i> {{ shipment.status }}
+                                            </span>
+                                        {% elif 'customs' in status_lower %}
+                                            <span class="status-badge status-cleared">
+                                                <i class="fas fa-file-invoice"></i> {{ shipment.status }}
+                                            </span>
+                                        {% else %}
+                                            <span class="status-badge status-pending">
+                                                <i class="fas fa-clock"></i> {{ shipment.status }}
+                                            </span>
+                                        {% endif %}
+                                    </p>
+                                    <p class="text-muted mb-0">
+                                        <i class="fas fa-map-marker-alt"></i> Location: {{ shipment.current_location }}
+                                    </p>
+                                    <p class="text-muted mb-0">
+                                        <i class="fas fa-calendar"></i> Last Update: {{ shipment.last_update.strftime('%Y-%m-%d %H:%M') }}
+                                    </p>
+                                    {% if shipment.estimated_delivery %}
+                                    <p class="text-muted mb-0">
+                                        <i class="fas fa-hourglass-half"></i> Estimated Delivery: {{ shipment.estimated_delivery }}
+                                    </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Shipment Details Card -->
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <h5 class="card-title" style="color: var(--navy-medium);">
+                                        <i class="fas fa-clipboard-list"></i> Shipment Details
+                                    </h5>
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <th width="40%">Customer Name:</th>
+                                            <td>{{ shipment.customer_name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>From:</th>
+                                            <td>{{ shipment.origin }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>To:</th>
+                                            <td>{{ shipment.destination }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Package Type:</th>
+                                            <td>{{ shipment.package_type }}</td>
+                                        </tr>
+                                        {% if shipment.package_weight > 0 %}
+                                        <tr>
+                                            <th>Weight:</th>
+                                            <td>{{ shipment.package_weight }} kg</td>
+                                        </tr>
+                                        {% endif %}
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <!-- INTERNATIONAL TRACKING SECTION - PARTNER COURIER INTEGRATION -->
+                            {% if shipment.partner_courier and shipment.partner_tracking %}
+                            <div class="partner-card">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6">
+                                        <div class="partner-info">
+                                            <p class="mb-1 text-muted">
+                                                <i class="fas fa-globe"></i> International Tracking
+                                            </p>
+                                            <h4 class="mb-2" style="color: var(--navy-medium);">
+                                                {% if shipment.partner_courier == 'FedEx' %}
+                                                    <i class="fab fa-fedex"></i>
+                                                {% elif shipment.partner_courier == 'DHL' %}
+                                                    <i class="fas fa-shuttle-van"></i>
+                                                {% elif shipment.partner_courier == 'Royal Mail' %}
+                                                    <i class="fas fa-crown"></i>
+                                                {% else %}
+                                                    <i class="fas fa-truck"></i>
+                                                {% endif %}
+                                                {{ shipment.partner_courier }}
+                                            </h4>
+                                            <p class="mb-1"><strong>Partner Tracking Number:</strong></p>
+                                            <code style="background: #f4f4f4; padding: 8px 12px; border-radius: 6px; font-size: 1rem;">
+                                                {{ shipment.partner_tracking }}
+                                            </code>
+                                            <div class="mt-2">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-info-circle"></i> 
+                                                    Your package has left Nigeria and is now with {{ shipment.partner_courier }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mt-3 mt-md-0">
+                                        <div class="tracking-actions text-center">
+                                            <a href="{{ partner_url }}" 
+                                               target="_blank" 
+                                               class="btn btn-track w-100 mb-2">
+                                                <i class="fas fa-external-link-alt"></i> Track on {{ shipment.partner_courier }} Website
+                                            </a>
+                                            <button onclick="copyTrackingCode('{{ shipment.partner_tracking }}')" 
+                                                    class="btn btn-copy w-100">
+                                                <i class="fas fa-copy"></i> Copy Tracking Number
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="alert alert-info mt-3 mb-0 small">
+                                    <i class="fas fa-sync-alt"></i>
+                                    <strong>Seamless Tracking Experience:</strong>
+                                    You tracked your package from pickup to customs with DeeJohnson. 
+                                    Now continue tracking with <strong>{{ shipment.partner_courier }}</strong> 
+                                    for final delivery to your destination.
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                        </div>
+                        {% elif request.method == 'POST' %}
+                        <!-- Not Found -->
+                        <div class="alert alert-danger mt-4">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            <strong>Tracking code not found!</strong> Please check the code and try again.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Help Section -->
+                <div class="text-center mt-4">
+                    <p class="text-muted">
+                        <i class="fas fa-question-circle"></i> Need help? 
+                        <a href="#contact" class="text-decoration-none">Contact our support team</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyTrackingCode(code) {
+            navigator.clipboard.writeText(code).then(function() {
+                alert('✅ Tracking code copied: ' + code);
+            }, function() {
+                alert('❌ Failed to copy. Please copy manually.');
+            });
+        }
+    </script>
+</body>
+</html>

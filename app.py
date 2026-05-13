@@ -7,26 +7,35 @@ import hashlib
 import os
 from functools import wraps
 
-
-
 app = Flask(__name__)
 app.secret_key = 'deejohnson_super_secret_key_2024'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///logistics.db'
+
+# ============================================
+# DATABASE CONFIGURATION - FIXED FOR RENDER
+# ============================================
+import os
+
+# Check if we're on Render (PostgreSQL) or local (SQLite)
+if os.environ.get('DATABASE_URL'):
+    # Production on Render - Use PostgreSQL (PERSISTENT)
+    database_url = os.environ.get('DATABASE_URL')
+    # Fix for Render's postgres:// vs postgresql://
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    print("=" * 50)
+    print("✅ USING POSTGRESQL DATABASE (Data will persist!)")
+    print("=" * 50)
+else:
+    # Local development - Use SQLite
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///logistics.db'
+    print("=" * 50)
+    print("✅ USING SQLITE DATABASE (Local development)")
+    print("=" * 50)
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-
-# Database configuration - works on both local and Render
-import os
-
-# For Render, use /tmp for database (Render's free tier uses ephemeral storage)
-if os.environ.get('RENDER'):
-    DB_PATH = '/tmp/logistics.db'
-else:
-    DB_PATH = 'logistics.db'
-
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_PATH}'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # ============================================
 # DATABASE MODELS
@@ -440,7 +449,7 @@ def detect_courier_ajax():
         return jsonify({
             'success': False,
             'error': str(e)
-        }), 500        
+        }), 500
 
 # For Render deployment
 application = app

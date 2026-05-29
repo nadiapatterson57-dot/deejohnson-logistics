@@ -102,16 +102,24 @@ def detect_courier(tracking_number):
     if len(tracking_number) >= 10 and len(tracking_number) <= 11 and tracking_number.isdigit():
         return 'DHL'
     
+    # DPD: starts with 10-12 digits, often starts with 0
+    if len(tracking_number) >= 10 and len(tracking_number) <= 12 and tracking_number.isdigit():
+        return 'DPD'
+    
     # USPS: 20-22 digits, or 13 chars starting with 9
     if (len(tracking_number) >= 20 and len(tracking_number) <= 22 and tracking_number.isdigit()) or \
        (len(tracking_number) == 13 and tracking_number.startswith('9')):
         return 'USPS'
     
-    # Royal Mail: XX123456789GB format
+    # Royal Mail: XX123456789GB format (2 letters, 9 digits, 2 letters)
     if (len(tracking_number) == 13 and 
         tracking_number[:2].isalpha() and 
         tracking_number[2:11].isdigit() and 
         tracking_number[11:13].isalpha()):
+        return 'Royal Mail'
+    
+    # Royal Mail alternative: 16 digits starting with 8
+    if len(tracking_number) == 16 and tracking_number.startswith('8') and tracking_number.isdigit():
         return 'Royal Mail'
     
     # UPS: starts with 1Z and total 18 characters
@@ -128,6 +136,7 @@ def get_tracking_url(courier, tracking_number):
     urls = {
         'FedEx': f'https://www.fedex.com/fedextrack/?trknbr={tracking_number}',
         'DHL': f'https://www.dhl.com/global-en/home/tracking.html?tracking-id={tracking_number}',
+        'DPD': f'https://track.dpd.co.uk/{tracking_number}',
         'USPS': f'https://tools.usps.com/go/TrackConfirmAction?tLabels={tracking_number}',
         'Royal Mail': f'https://www.royalmail.com/track-your-item?trackNumber={tracking_number}',
         'UPS': f'https://www.ups.com/track?tracknum={tracking_number}'
@@ -139,6 +148,7 @@ def get_courier_icon(courier):
     icons = {
         'FedEx': 'fa-solid fa-box',
         'DHL': 'fa-solid fa-truck-fast',
+        'DPD': 'fa-solid fa-truck',
         'USPS': 'fa-solid fa-envelope',
         'Royal Mail': 'fa-solid fa-crown',
         'UPS': 'fa-solid fa-truck'
@@ -148,11 +158,12 @@ def get_courier_icon(courier):
 def get_courier_color(courier):
     """Return color for each courier"""
     colors = {
-        'FedEx': '#4B0082',
-        'DHL': '#FFCC00',
-        'USPS': '#004B87',
-        'Royal Mail': '#C8102E',
-        'UPS': '#351C15'
+        'FedEx': '#4B0082',      # Purple
+        'DHL': '#FFCC00',         # Yellow
+        'DPD': '#E3000F',         # Red
+        'USPS': '#004B87',        # Navy Blue
+        'Royal Mail': '#C8102E',  # Red
+        'UPS': '#351C15'          # Brown
     }
     return colors.get(courier, '#0F3B5C')
 
@@ -262,6 +273,12 @@ def track():
                          get_tracking_url=get_tracking_url,
                          get_courier_icon=get_courier_icon,
                          get_courier_color=get_courier_color)
+
+# ✅ ADD GOOGLE VERIFICATION ROUTE HERE
+@app.route('/google79bcbfa2d09351d4.html')
+def google_verify():
+    from flask import send_from_directory
+    return send_from_directory('static', 'google79bcbfa2d09351d4.html')                         
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
@@ -453,6 +470,11 @@ def detect_courier_ajax():
 
 # For Render deployment
 application = app
+
+@app.route('/health')
+def health():
+    """Lightweight health check endpoint for cron-job.org"""
+    return "OK", 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

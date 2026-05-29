@@ -496,6 +496,11 @@
             }
         }
     </style>
+
+<!-- Favicon - Browser Tab Icon -->
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+<link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.png') }}">
+<link rel="apple-touch-icon" href="{{ url_for('static', filename='images/favicon.png') }}">
 </head>
 <body>
 
@@ -527,7 +532,7 @@
                 <li class="nav-item"><a class="nav-link" href="/track">Track</a></li>
                 <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                 <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
-                <li class="nav-item"><a class="nav-link" href="/admin"><i class="fas fa-user-shield"></i> Admin</a></li>
+                <!-- <li class="nav-item"><a class="nav-link" href="/admin"><i class="fas fa-user-shield"></i> Admin</a></li> -->
             </ul>
         </div>
     </div>
@@ -565,17 +570,19 @@
     </div>
 </section>
 
-<!-- Premium Services Section - EMOJI STYLE (100% Works) -->
+<!-- Premium Services Section - Clickable Cards with Modals -->
 <section id="services" class="services-section py-5">
     <div class="container">
         <div class="text-center mb-5" data-aos="fade-up">
             <h2 class="display-5 fw-bold" style="color: var(--navy-deep);">Our Premium Services</h2>
-            <p class="lead">Comprehensive logistics solutions tailored to your needs</p>
+            <p class="lead">Click on any service to learn more</p>
+            <div class="divider" style="width: 80px; height: 3px; background: var(--gold-accent); margin: 15px auto;"></div>
         </div>
+
         <div class="row g-4">
-            <!-- Service 1 -->
+            <!-- Service 1: Ibadan to Lagos Clearing -->
             <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
-                <div class="service-card">
+                <div class="service-card" data-bs-toggle="modal" data-bs-target="#modalIbadanLagos" style="cursor: pointer;">
                     <div style="background: linear-gradient(135deg, #0A192F, #0F3B5C); height: 200px; display: flex; align-items: center; justify-content: center;">
                         <i class="fas fa-truck fa-5x" style="color: var(--gold-accent);"></i>
                     </div>
@@ -592,9 +599,9 @@
                 </div>
             </div>
 
-            <!-- Service 2 -->
+            <!-- Service 2: International Shipping -->
             <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
-                <div class="service-card">
+                <div class="service-card" data-bs-toggle="modal" data-bs-target="#modalInternational" style="cursor: pointer;">
                     <div style="background: linear-gradient(135deg, #0A192F, #0F3B5C); height: 200px; display: flex; align-items: center; justify-content: center;">
                         <i class="fas fa-plane fa-5x" style="color: var(--gold-accent);"></i>
                     </div>
@@ -611,9 +618,9 @@
                 </div>
             </div>
 
-            <!-- Service 3 -->
+            <!-- Service 3: Real-time Tracking -->
             <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
-                <div class="service-card">
+                <div class="service-card" data-bs-toggle="modal" data-bs-target="#modalTracking" style="cursor: pointer;">
                     <div style="background: linear-gradient(135deg, #0A192F, #0F3B5C); height: 200px; display: flex; align-items: center; justify-content: center;">
                         <i class="fas fa-chart-line fa-5x" style="color: var(--gold-accent);"></i>
                     </div>
@@ -632,6 +639,208 @@
         </div>
     </div>
 </section>
+
+<!-- ========================================== -->
+<!-- SERVICE MODALS - POPUP WINDOWS             -->
+<!-- ========================================== -->
+
+<!-- Modal 1: Ibadan to Lagos Clearing -->
+<div class="modal fade" id="modalIbadanLagos" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #0A192F, #0F3B5C); color: white;">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-truck fa-2x me-3" style="color: var(--gold-accent);"></i>
+                    <div>
+                        <h4 class="modal-title mb-0">Ibadan to Lagos Clearing</h4>
+                        <small>Fast & reliable customs clearance service</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding: 30px;">
+                <h5><i class="fas fa-info-circle" style="color: var(--gold-accent);"></i> What is this service?</h5>
+                <p>We handle your package from pickup in Ibadan through to customs clearance at Lagos Airport. Perfect for businesses importing goods or individuals sending items that require customs processing.</p>
+                
+                <hr>
+                
+                <h5><i class="fas fa-check-circle" style="color: var(--gold-accent);"></i> What's included?</h5>
+                <ul>
+                    <li><strong>Door-to-door pickup</strong> from your location in Ibadan or Oyo State</li>
+                    <li><strong>Secure transport</strong> to Lagos Airport</li>
+                    <li><strong>Customs documentation</strong> preparation and submission</li>
+                    <li><strong>Professional customs clearance</strong> at Lagos Airport</li>
+                    <li><strong>Real-time tracking</strong> throughout the journey</li>
+                    <li><strong>Final delivery</strong> to any address in Lagos</li>
+                </ul>
+                
+                <hr>
+                
+                <h5><i class="fas fa-clock" style="color: var(--gold-accent);"></i> Estimated Timeline</h5>
+                <ul>
+                    <li><strong>Pickup to Lagos:</strong> 1 business day</li>
+                    <li><strong>Customs clearance:</strong> 1 business day</li>
+                    <li><strong>Total:</strong> 1-2 business days</li>
+                </ul>
+                
+                <hr>
+                
+                <h5><i class="fas fa-file-alt" style="color: var(--gold-accent);"></i> Documents Required</h5>
+                <ul>
+                    <li>Valid ID (Driver's license, International passport, National ID)</li>
+                    <li>Description of items being shipped</li>
+                    <li>Commercial invoice (for business goods)</li>
+                    <li>Tracking number (provided upon pickup)</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <a href="#contact" class="btn btn-primary" data-bs-dismiss="modal">Contact Us</a>
+                <a href="https://wa.me/2347062550379?text=Hello%20DeeJohnson%20Logistics%2C%20I%20need%20more%20information%20about%20Ibadan%20to%20Lagos%20clearing" 
+                   target="_blank" class="btn btn-success">
+                    <i class="fab fa-whatsapp"></i> Ask on WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 2: International Shipping -->
+<div class="modal fade" id="modalInternational" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #0A192F, #0F3B5C); color: white;">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-plane fa-2x me-3" style="color: var(--gold-accent);"></i>
+                    <div>
+                        <h4 class="modal-title mb-0">International Shipping</h4>
+                        <small>Worldwide delivery with trusted partners</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding: 30px;">
+                <h5><i class="fas fa-info-circle" style="color: var(--gold-accent);"></i> What is this service?</h5>
+                <p>We ship your packages from Nigeria to any destination worldwide. Our international shipping service handles everything from pickup, export documentation, international freight, to final delivery at your customer's doorstep.</p>
+                
+                <hr>
+                
+                <h5><i class="fas fa-handshake" style="color: var(--gold-accent);"></i> Our Partner Couriers</h5>
+                <div class="row text-center mt-3 mb-3">
+                    <div class="col-4 col-md-2 mb-2"><strong>FedEx</strong></div>
+                    <div class="col-4 col-md-2 mb-2"><strong>DHL</strong></div>
+                    <div class="col-4 col-md-2 mb-2"><strong>UPS</strong></div>
+                    <div class="col-4 col-md-2 mb-2"><strong>Royal Mail</strong></div>
+                    <div class="col-4 col-md-2 mb-2"><strong>DPD UK</strong></div>
+                </div>
+                
+                <hr>
+                
+                <h5><i class="fas fa-check-circle" style="color: var(--gold-accent);"></i> What's included?</h5>
+                <ul>
+                    <li><strong>Pickup from your location</strong> in Ibadan or Oyo State</li>
+                    <li><strong>Export documentation</strong> preparation and processing</li>
+                    <li><strong>International freight</strong> via sea, air, or express courier</li>
+                    <li><strong>Customs clearance assistance</strong> at destination country</li>
+                    <li><strong>Door-to-door delivery</strong> to recipient address</li>
+                    <li><strong>Real-time tracking</strong> with partner courier</li>
+                </ul>
+                
+                <hr>
+                
+                <h5><i class="fas fa-ship" style="color: var(--gold-accent);"></i> Shipping Methods</h5>
+                <ul>
+                    <li><strong>Sea Freight (LCL):</strong> Best for large quantities and heavy items</li>
+                    <li><strong>Air Freight:</strong> For medium quantities and time-sensitive goods</li>
+                    <li><strong>Express (FedEx/DHL/UPS):</strong> For small packages needing fast delivery</li>
+                    <li><strong>Consolidation:</strong> Combine multiple small orders to save costs</li>
+                </ul>
+                
+                <hr>
+                
+                <h5><i class="fas fa-clock" style="color: var(--gold-accent);"></i> Estimated Delivery Times</h5>
+                <ul>
+                    <li><strong>Express (Courier):</strong> 3-5 business days</li>
+                    <li><strong>Air Freight:</strong> 5-7 business days</li>
+                    <li><strong>Sea Freight:</strong> 30-35 business days</li>
+                    <li><strong>Consolidation:</strong> 25-30 business days</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <a href="#contact" class="btn btn-primary" data-bs-dismiss="modal">Contact Us</a>
+                <a href="https://wa.me/2347062550379?text=Hello%20DeeJohnson%20Logistics%2C%20I%20need%20more%20information%20about%20International%20Shipping" 
+                   target="_blank" class="btn btn-success">
+                    <i class="fab fa-whatsapp"></i> Ask on WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 3: Real-time Tracking -->
+<div class="modal fade" id="modalTracking" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #0A192F, #0F3B5C); color: white;">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-chart-line fa-2x me-3" style="color: var(--gold-accent);"></i>
+                    <div>
+                        <h4 class="modal-title mb-0">Real-time Tracking</h4>
+                        <small>Know where your package is at all times</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding: 30px;">
+                <h5><i class="fas fa-info-circle" style="color: var(--gold-accent);"></i> What is this service?</h5>
+                <p>Every package shipped with DeeJohnson Logistics receives a unique tracking code. You can use this code on our website to see exactly where your package is, what stage it's at, and when to expect delivery.</p>
+                
+                <hr>
+                
+                <h5><i class="fas fa-qrcode" style="color: var(--gold-accent);"></i> How tracking works</h5>
+                <ol>
+                    <li><strong>Receive tracking code</strong> via email, SMS, or WhatsApp after shipment</li>
+                    <li><strong>Enter code on our tracking page</strong> at <a href="/track">deejohnson-logistics.com/track</a></li>
+                    <li><strong>See real-time updates</strong> on your package location and status</li>
+                    <li><strong>Track internationally</strong> with partner courier after customs</li>
+                </ol>
+                
+                <hr>
+                
+                <h5><i class="fas fa-map-marker-alt" style="color: var(--gold-accent);"></i> What information will I see?</h5>
+                <ul>
+                    <li><strong>Current location</strong> - Where your package is right now</li>
+                    <li><strong>Status updates</strong> - Picked up, in transit, customs clearance, out for delivery</li>
+                    <li><strong>Timestamps</strong> - Date and time of each update</li>
+                    <li><strong>Estimated delivery date</strong> - When to expect arrival</li>
+                    <li><strong>Partner tracking link</strong> - Continue tracking with FedEx/DHL after international handoff</li>
+                </ul>
+                
+                <hr>
+                
+                <h5><i class="fas fa-bell" style="color: var(--gold-accent);"></i> Get notifications</h5>
+                <ul>
+                    <li><strong>Email updates</strong> - Receive automatic status updates</li>
+                    <li><strong>SMS alerts</strong> - Text message notifications (available on request)</li>
+                    <li><strong>WhatsApp notifications</strong> - Get updates via WhatsApp</li>
+                </ul>
+                
+                <hr>
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> 
+                    <strong>Note:</strong> Once your package leaves Nigeria, you will receive a partner tracking code (FedEx, DHL, UPS, Royal Mail, or DPD UK) to continue tracking internationally.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="/track" class="btn btn-primary">Track Your Package</a>
+                <a href="https://wa.me/2347062550379?text=Hello%20DeeJohnson%20Logistics%2C%20I%20need%20help%20tracking%20my%20package" 
+                   target="_blank" class="btn btn-success">
+                    <i class="fab fa-whatsapp"></i> Need Help?
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Stats Counter Section -->
 <div class="stats-section py-5 text-white">
@@ -1399,6 +1608,147 @@
     }
 </style>
 
+<!-- Video Gallery Section - YouTube Version -->
+<section class="video-gallery-section py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold" style="color: #0A192F;">
+                <i class="fas fa-video"></i> Company Videos
+            </h2>
+            <p class="lead">Watch and learn more about DeeJohnson Logistics</p>
+            <div class="divider" style="width: 80px; height: 3px; background: #C9A03D; margin: 15px auto;"></div>
+        </div>
+
+        <div class="row">
+            <!-- Video 1: CEO Message -->
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="ratio ratio-16x9">
+                        <iframe src="https://www.youtube.com/embed/8UthVnbVjY8" 
+                                title="CEO Message"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="card-body text-center">
+                        <h5 class="card-title">🎙️ CEO Message</h5>
+                        <p class="card-text text-muted">Our founder shares the vision of DeeJohnson Logistics</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video 2: Company Overview -->
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="ratio ratio-16x9">
+                        <iframe src="https://www.youtube.com/embed/4rsb8KkJnIk" 
+                                title="Company Overview"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="card-body text-center">
+                        <h5 class="card-title">🏢 Company Overview</h5>
+                        <p class="card-text text-muted">Learn about our services and commitment to excellence</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video 3: Professional Packaging -->
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="ratio ratio-16x9">
+                        <iframe src="https://www.youtube.com/embed/KU8JB0ZV1NA" 
+                                title="Professional Packaging"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="card-body text-center">
+                        <h5 class="card-title">📦 Professional Packaging</h5>
+                        <p class="card-text text-muted">Watch our team carefully preparing packages for delivery</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video 4: Team Coordination -->
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="ratio ratio-16x9">
+                        <iframe src="https://www.youtube.com/embed/WXcHEdwB79s" 
+                                title="Team Coordination"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="card-body text-center">
+                        <h5 class="card-title">🤝 Team Coordination</h5>
+                        <p class="card-text text-muted">See how our team works together seamlessly</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video 5: Careful Package Handling -->
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="ratio ratio-16x9">
+                        <iframe src="https://www.youtube.com/embed/grVYxPHnitA" 
+                                title="Package Handling"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="card-body text-center">
+                        <h5 class="card-title">✋ Careful Package Handling</h5>
+                        <p class="card-text text-muted">Attention to detail in every shipment</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video 6: Customer Service -->
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="ratio ratio-16x9">
+                        <iframe src="https://www.youtube.com/embed/-pqlJJlGlss" 
+                                title="Customer Service"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="card-body text-center">
+                        <h5 class="card-title">💬 Customer Service</h5>
+                        <p class="card-text text-muted">Our support team ready to assist you</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video 7: Team in Action -->
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="ratio ratio-16x9">
+                        <iframe src="https://www.youtube.com/embed/pwr7t05C3mM" 
+                                title="Team in Action"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="card-body text-center">
+                        <h5 class="card-title">👥 Team in Action</h5>
+                        <p class="card-text text-muted">Montage of our dedicated team working hard</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- FAQ Section -->
 <section id="faq" class="py-5 bg-light">
     <div class="container">
@@ -1861,7 +2211,7 @@
                     </div>
                     <div class="d-flex mb-3">
                         <div class="me-3"><i class="fas fa-envelope fa-2x" style="color: var(--navy-medium);"></i></div>
-                        <div><strong>Email</strong><br>deejohnsonnigerialimited@gmail.com<br>deejohnsonnigerialimited@gmail.com</div>
+                        <div><strong>Email</strong><br>deejohnsonnigerialimited@gmail.com<br></div>
                     </div>
                     <div class="d-flex mb-3">
                         <div class="me-3"><i class="fas fa-clock fa-2x" style="color: var(--navy-medium);"></i></div>

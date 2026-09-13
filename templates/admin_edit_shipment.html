@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% block title %}Edit Shipment - DeeJohnson Admin{% endblock %}
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow">
+                <div class="card-header" style="background: linear-gradient(135deg, #0A192F, #0F3B5C); color: white;">
+                    <h4 class="mb-0">
+                        <i class="fas fa-edit"></i> Edit Shipment
+                        <small class="text-white-50">Tracking: {{ shipment.tracking_code }}</small>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <!-- Customer Information -->
+                            <div class="col-12">
+                                <h5 class="mb-3" style="color: #0A192F;">
+                                    <i class="fas fa-user"></i> Customer Information
+                                </h5>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label>Customer Name *</label>
+                                <input type="text" name="customer_name" class="form-control" value="{{ shipment.customer_name }}" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label>Customer Email</label>
+                                <input type="email" name="customer_email" class="form-control" value="{{ shipment.customer_email or '' }}">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label>Customer Phone</label>
+                                <input type="text" name="customer_phone" class="form-control" value="{{ shipment.customer_phone or '' }}">
+                            </div>
+
+                            <!-- Shipment Details -->
+                            <div class="col-12 mt-3">
+                                <h5 class="mb-3" style="color: #0A192F;">
+                                    <i class="fas fa-box"></i> Shipment Details
+                                </h5>
+                            </div>
+                            
+                            <!-- For Incoming Shipments - Origin Country and City -->
+                            <div class="col-md-3 mb-3">
+                                <label>Origin Country</label>
+                                <select name="origin_country" class="form-control">
+                                    <option value="">-- Select Country --</option>
+                                    <option value="NG" {% if shipment.origin_country == 'NG' %}selected{% endif %}>🇳🇬 Ibadan, Nigeria</option>
+                                    <option value="UK" {% if shipment.origin_country == 'UK' %}selected{% endif %}>🇬🇧 United Kingdom</option>
+                                    <option value="USA" {% if shipment.origin_country == 'USA' %}selected{% endif %}>🇺🇸 United States</option>
+                                    <option value="Canada" {% if shipment.origin_country == 'Canada' %}selected{% endif %}>🇨🇦 Canada</option>
+                                    <option value="China" {% if shipment.origin_country == 'China' %}selected{% endif %}>🇨🇳 China</option>
+                                    <option value="Germany" {% if shipment.origin_country == 'Germany' %}selected{% endif %}>🇩🇪 Germany</option>
+                                    <option value="France" {% if shipment.origin_country == 'France' %}selected{% endif %}>🇫🇷 France</option>
+                                    <option value="Italy" {% if shipment.origin_country == 'Italy' %}selected{% endif %}>🇮🇹 Italy</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>Origin City</label>
+                                <input type="text" name="origin_city" class="form-control" value="{{ shipment.origin_city or '' }}" placeholder="e.g., London, New York">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>Destination in Nigeria</label>
+                                <input type="text" name="destination" class="form-control" value="{{ shipment.destination or '' }}" placeholder="e.g., Lagos, Ibadan">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>Package Type</label>
+                                <select name="package_type" class="form-control">
+                                    <option {% if shipment.package_type == 'Documents' %}selected{% endif %}>Documents</option>
+                                    <option {% if shipment.package_type == 'Parcel' %}selected{% endif %}>Parcel</option>
+                                    <option {% if shipment.package_type == 'Pallet' %}selected{% endif %}>Pallet</option>
+                                    <option {% if shipment.package_type == 'Container' %}selected{% endif %}>Container</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>Weight (kg)</label>
+                                <input type="number" name="package_weight" class="form-control" step="0.1" value="{{ shipment.package_weight }}">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>Expected Arrival Date</label>
+                                <input type="date" name="expected_arrival_date" class="form-control" value="{{ shipment.expected_arrival_date or '' }}">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>Customs Status</label>
+                                <select name="customs_status" class="form-control">
+                                    <option value="pending" {% if shipment.customs_status == 'pending' %}selected{% endif %}>Pending</option>
+                                    <option value="cleared" {% if shipment.customs_status == 'cleared' %}selected{% endif %}>Cleared</option>
+                                    <option value="held" {% if shipment.customs_status == 'held' %}selected{% endif %}>Held - Documentation needed</option>
+                                </select>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label>Delivery Address</label>
+                                <input type="text" name="delivery_address" class="form-control" value="{{ shipment.delivery_address or '' }}" placeholder="Full delivery address in Nigeria">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label>Status</label>
+                                <select name="status" class="form-control" required>
+                                    <option value="Package registered - Awaiting pickup" {% if shipment.status == 'Package registered - Awaiting pickup' %}selected{% endif %}>Package registered - Awaiting pickup</option>
+                                    <option value="Picked up from customer" {% if shipment.status == 'Picked up from customer' %}selected{% endif %}>Picked up from customer</option>
+                                    <option value="In transit to Lagos" {% if shipment.status == 'In transit to Lagos' %}selected{% endif %}>In transit to Lagos</option>
+                                    <option value="Arrived at Lagos Airport" {% if shipment.status == 'Arrived at Lagos Airport' %}selected{% endif %}>Arrived at Lagos Airport</option>
+                                    <option value="Customs clearance in progress" {% if shipment.status == 'Customs clearance in progress' %}selected{% endif %}>Customs clearance in progress</option>
+                                    <option value="Cleared - Awaiting international flight" {% if shipment.status == 'Cleared - Awaiting international flight' %}selected{% endif %}>Cleared - Awaiting international flight</option>
+                                    <option value="Handed over to partner courier" {% if shipment.status == 'Handed over to partner courier' %}selected{% endif %}>Handed over to partner courier</option>
+                                    <option value="In transit internationally" {% if shipment.status == 'In transit internationally' %}selected{% endif %}>In transit internationally</option>
+                                    <option value="Arrived at destination" {% if shipment.status == 'Arrived at destination' %}selected{% endif %}>Arrived at destination</option>
+                                    <option value="Out for delivery" {% if shipment.status == 'Out for delivery' %}selected{% endif %}>Out for delivery</option>
+                                    <option value="Delivered successfully" {% if shipment.status == 'Delivered successfully' %}selected{% endif %}>Delivered successfully</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label>Current Location</label>
+                                <input type="text" name="current_location" class="form-control" value="{{ shipment.current_location or '' }}">
+                            </div>
+
+                            <!-- Original Courier Information (For Incoming Shipments) -->
+                            <div class="col-12 mt-3">
+                                <h5 class="mb-3" style="color: #0A192F;">
+                                    <i class="fas fa-globe"></i> Original Courier (For Incoming Shipments)
+                                </h5>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label>Original Courier</label>
+                                <select name="partner_courier_original" class="form-control">
+                                    <option value="">-- None --</option>
+                                    <option value="Royal Mail" {% if shipment.partner_courier_original == 'Royal Mail' %}selected{% endif %}>🇬🇧 Royal Mail (UK)</option>
+                                    <option value="USPS" {% if shipment.partner_courier_original == 'USPS' %}selected{% endif %}>🇺🇸 USPS (USA)</option>
+                                    <option value="Canada Post" {% if shipment.partner_courier_original == 'Canada Post' %}selected{% endif %}>🇨🇦 Canada Post</option>
+                                    <option value="China Post" {% if shipment.partner_courier_original == 'China Post' %}selected{% endif %}>🇨🇳 China Post</option>
+                                    <option value="FedEx" {% if shipment.partner_courier_original == 'FedEx' %}selected{% endif %}>📦 FedEx</option>
+                                    <option value="DHL" {% if shipment.partner_courier_original == 'DHL' %}selected{% endif %}>✈️ DHL</option>
+                                    <option value="UPS" {% if shipment.partner_courier_original == 'UPS' %}selected{% endif %}>🚚 UPS</option>
+                                    <option value="DPD" {% if shipment.partner_courier_original == 'DPD' %}selected{% endif %}>📮 DPD</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label>Original Tracking Number</label>
+                                <input type="text" name="partner_tracking_original" class="form-control" value="{{ shipment.partner_tracking_original or '' }}">
+                            </div>
+
+                            <!-- Partner Courier Information (For Outgoing Shipments) -->
+                            <div class="col-12 mt-3">
+                                <h5 class="mb-3" style="color: #0A192F;">
+                                    <i class="fas fa-truck"></i> Partner Courier (For Outgoing International)
+                                </h5>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label>Partner Courier</label>
+                                <select name="partner_courier" class="form-control">
+                                    <option value="">-- None --</option>
+                                    <option value="FedEx" {% if shipment.partner_courier == 'FedEx' %}selected{% endif %}>FedEx</option>
+                                    <option value="DHL" {% if shipment.partner_courier == 'DHL' %}selected{% endif %}>DHL</option>
+                                    <option value="UPS" {% if shipment.partner_courier == 'UPS' %}selected{% endif %}>UPS</option>
+                                    <option value="Royal Mail" {% if shipment.partner_courier == 'Royal Mail' %}selected{% endif %}>Royal Mail</option>
+                                    <option value="DPD UK" {% if shipment.partner_courier == 'DPD UK' %}selected{% endif %}>DPD UK</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label>Partner Tracking Code</label>
+                                <input type="text" name="partner_tracking" class="form-control" value="{{ shipment.partner_tracking or '' }}">
+                            </div>
+
+                            <!-- Notes -->
+                            <div class="col-12 mt-3">
+                                <h5 class="mb-3" style="color: #0A192F;">
+                                    <i class="fas fa-sticky-note"></i> Internal Notes
+                                </h5>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <textarea name="notes" rows="3" class="form-control" placeholder="Any additional notes about this shipment...">{{ shipment.notes or '' }}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('admin') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Dashboard
+                            </a>
+                            <div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Save Changes
+                                </button>
+                                <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+                                    <i class="fas fa-trash"></i> Delete Shipment
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmDelete() {
+    if (confirm('⚠️ Are you sure you want to delete this shipment?\n\nThis action cannot be undone!')) {
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = "{{ url_for('admin') }}";
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'action';
+        input.value = 'delete_shipment';
+        var input2 = document.createElement('input');
+        input2.type = 'hidden';
+        input2.name = 'tracking_code';
+        input2.value = '{{ shipment.tracking_code }}';
+        form.appendChild(input);
+        form.appendChild(input2);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+{% endblock %}

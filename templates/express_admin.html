@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Express Admin - DeeJohnson Logistics</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --navy-deep: #0A192F;
+            --navy-dark: #0B2B4D;
+            --navy-medium: #0F3B5C;
+            --gold-accent: #C9A03D;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f9;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--navy-deep), var(--navy-medium));
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .express-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            max-width: 800px;
+            margin: 40px auto;
+            border-top: 5px solid var(--gold-accent);
+        }
+        
+        .express-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .express-header h2 {
+            color: var(--navy-deep);
+            font-weight: 800;
+        }
+        
+        .express-header .badge-express {
+            background: var(--gold-accent);
+            color: var(--navy-deep);
+            padding: 8px 25px;
+            border-radius: 30px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            padding: 12px 15px;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--gold-accent);
+            box-shadow: 0 0 0 0.25rem rgba(201, 160, 61, 0.25);
+        }
+        
+        .btn-express {
+            background: linear-gradient(135deg, var(--navy-deep), var(--navy-medium));
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        
+        .btn-express:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(15, 59, 92, 0.3);
+            color: white;
+        }
+        
+        .tracking-preview {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+            border: 2px dashed var(--gold-accent);
+            display: none;
+        }
+        
+        .tracking-preview.show {
+            display: block;
+        }
+        
+        .tracking-code-display {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--navy-deep);
+            letter-spacing: 2px;
+            margin: 10px 0;
+        }
+        
+        .tracking-code-display small {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #888;
+        }
+        
+        .delivery-badge {
+            display: inline-block;
+            background: #d4edda;
+            color: #155724;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: var(--navy-medium);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .back-link:hover {
+            color: var(--navy-deep);
+        }
+        
+        @media (max-width: 768px) {
+            .express-card {
+                padding: 25px;
+                margin: 20px;
+            }
+            .tracking-code-display {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="fas fa-shipping-fast me-2"></i>DeeJohnson Logistics</a>
+            <div class="ms-auto">
+                <span class="text-white me-3"><i class="fas fa-user-shield"></i> {{ session.get('admin_username', 'Admin') }}</span>
+                <a href="/admin/logout" class="btn btn-outline-light btn-sm"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="express-card">
+            <div class="express-header">
+                <div class="badge-express">
+                    <i class="fas fa-bolt"></i> EXPRESS SHIPMENT
+                </div>
+                <h2><i class="fas fa-rocket" style="color: var(--gold-accent);"></i> Create Express Package</h2>
+                <p class="text-muted">Generate an express tracking code with a dedicated 6-step timeline</p>
+            </div>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" id="expressForm">
+                <input type="hidden" name="action" value="create_express_shipment">
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Customer Name *</label>
+                        <input type="text" name="customer_name" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Customer Phone *</label>
+                        <input type="text" name="customer_phone" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Customer Email</label>
+                        <input type="email" name="customer_email" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Package Weight (kg)</label>
+                        <input type="number" name="package_weight" class="form-control" step="0.1" value="1.0">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Origin *</label>
+                        <input type="text" name="origin" class="form-control" value="Ibadan" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Destination *</label>
+                        <select name="destination" class="form-select" required>
+                            <option value="">-- Select Destination --</option>
+                            <optgroup label="International Destinations">
+                                <option>United Kingdom</option>
+                                <option>United States</option>
+                                <option>Canada</option>
+                                <option>Germany</option>
+                                <option>France</option>
+                                <option>Dubai, UAE</option>
+                                <option>Italy</option>
+                                <option>Spain</option>
+                                <option>South Africa</option>
+                                <option>China</option>
+                            </optgroup>
+                            <optgroup label="South West Nigeria">
+                                <option>Lagos, Lagos State</option>
+                                <option>Ibadan, Oyo State</option>
+                                <option>Abeokuta, Ogun State</option>
+                                <option>Akure, Ondo State</option>
+                                <option>Osogbo, Osun State</option>
+                                <option>Ado-Ekiti, Ekiti State</option>
+                            </optgroup>
+                            <optgroup label="South East Nigeria">
+                                <option>Enugu, Enugu State</option>
+                                <option>Owerri, Imo State</option>
+                                <option>Awka, Anambra State</option>
+                                <option>Aba, Abia State</option>
+                                <option>Umuahia, Abia State</option>
+                            </optgroup>
+                            <optgroup label="South South Nigeria">
+                                <option>Port Harcourt, Rivers State</option>
+                                <option>Benin City, Edo State</option>
+                                <option>Warri, Delta State</option>
+                                <option>Calabar, Cross River State</option>
+                                <option>Uyo, Akwa Ibom State</option>
+                                <option>Yenagoa, Bayelsa State</option>
+                            </optgroup>
+                            <optgroup label="North Central Nigeria">
+                                <option>Abuja, FCT</option>
+                                <option>Jos, Plateau State</option>
+                                <option>Lokoja, Kogi State</option>
+                                <option>Makurdi, Benue State</option>
+                                <option>Minna, Niger State</option>
+                                <option>Ilorin, Kwara State</option>
+                            </optgroup>
+                            <optgroup label="North East Nigeria">
+                                <option>Maiduguri, Borno State</option>
+                                <option>Bauchi, Bauchi State</option>
+                                <option>Yola, Adamawa State</option>
+                                <option>Gombe, Gombe State</option>
+                                <option>Damaturu, Yobe State</option>
+                            </optgroup>
+                            <optgroup label="North West Nigeria">
+                                <option>Kano, Kano State</option>
+                                <option>Kaduna, Kaduna State</option>
+                                <option>Sokoto, Sokoto State</option>
+                                <option>Katsina, Katsina State</option>
+                                <option>Zamfara, Zamfara State</option>
+                                <option>Birnin Kebbi, Kebbi State</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Package Type</label>
+                        <select name="package_type" class="form-select">
+                            <option>Documents</option>
+                            <option selected>Parcel</option>
+                            <option>Pallet</option>
+                            <option>Container</option>
+                        </select>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Notes (Optional)</label>
+                        <textarea name="notes" rows="2" class="form-control" placeholder="Any special instructions for express delivery..."></textarea>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn-express">
+                        <i class="fas fa-bolt"></i> Generate Express Tracking Code
+                    </button>
+                </div>
+            </form>
+
+            <!-- Tracking Code Preview (shows after creation) -->
+            {% if new_tracking_code %}
+            <div class="tracking-preview show">
+                <h5 class="mb-2"><i class="fas fa-check-circle" style="color: #28a745;"></i> Express Shipment Created!</h5>
+                <div class="tracking-code-display">
+                    {{ new_tracking_code }}
+                    <small>
+                        <button class="btn btn-sm btn-outline-primary ms-2" onclick="copyCode()">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </small>
+                </div>
+                <div class="mb-2">
+                    <span class="delivery-badge"><i class="fas fa-clock"></i> Express Timeline (6 Steps)</span>
+                </div>
+                <p class="text-muted mb-0">Customer: <strong>{{ new_customer_name }}</strong> → {{ new_destination }}</p>
+                <a href="/track" class="btn btn-primary btn-sm mt-3" style="background-color: var(--navy-medium);">
+                    <i class="fas fa-search"></i> Track This Package
+                </a>
+                <a href="/express-admin" class="btn btn-outline-secondary btn-sm mt-3 ms-2">
+                    <i class="fas fa-plus"></i> Create Another
+                </a>
+            </div>
+            {% endif %}
+
+            <div class="text-center mt-4">
+                <a href="/admin" class="back-link"><i class="fas fa-arrow-left"></i> Back to Admin Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function copyCode() {
+            const code = document.querySelector('.tracking-code-display').innerText.replace('Copy', '').trim();
+            navigator.clipboard.writeText(code).then(() => {
+                alert('✅ Tracking code copied to clipboard!');
+            });
+        }
+    </script>
+</body>
+</html>

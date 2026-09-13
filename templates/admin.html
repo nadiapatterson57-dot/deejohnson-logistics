@@ -39,168 +39,154 @@
         .status-delivered { background-color: #d4edda; color: #155724; }
         .status-transit { background-color: #fff3cd; color: #856404; }
         .status-pending { background-color: #f8d7da; color: #721c24; }
-        .nav-pills .nav-link.active {
-            background-color: var(--navy-medium);
-        }
-        .nav-pills .nav-link {
-            color: white;
-        }
-        .nav-pills .nav-link:hover {
-            background-color: var(--navy-medium);
-            opacity: 0.8;
-        }
-
-        /* Success Modal Styles */
-        .tracking-code-box {
-            background: linear-gradient(135deg, #0A192F, #0F3B5C);
-            border-radius: 20px;
-            padding: 25px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .tracking-code-box::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(201,160,61,0.1) 0%, transparent 70%);
-            animation: rotate 10s linear infinite;
-        }
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .tracking-code-display {
-            font-family: 'Courier New', monospace;
-            font-size: 2rem;
-            font-weight: bold;
-            letter-spacing: 2px;
-            color: #C9A03D;
-            margin: 10px 0;
-            position: relative;
-            z-index: 1;
-        }
-        .customer-info-card {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .info-row {
-            padding: 8px 0;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .info-row:last-child { border-bottom: none; }
-        .info-label { font-weight: 600; color: #0A192F; width: 80px; display: inline-block; }
-        .info-value { color: #555; margin-left: 10px; }
-        .btn-copy-tracking {
-            background: linear-gradient(135deg, #0A192F, #0F3B5C);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 10px;
-            transition: all 0.3s;
-        }
-        .btn-copy-tracking:hover { transform: translateY(-2px); color: white; }
-        .btn-print { background: #6c757d; color: white; border: none; padding: 12px; border-radius: 10px; transition: all 0.3s; }
-        .btn-print:hover { background: #5a6268; transform: translateY(-2px); color: white; }
-        .btn-whatsapp { background: #25D366; color: white; border: none; padding: 12px; border-radius: 10px; transition: all 0.3s; }
-        .btn-whatsapp:hover { background: #128C7E; transform: translateY(-2px); color: white; }
-        .confetti { position: fixed; width: 10px; height: 10px; background: #C9A03D; pointer-events: none; z-index: 9999; border-radius: 50%; }
-        .confetti-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; }
-        @keyframes slideInUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .modal-content { animation: slideInUp 0.5s ease; }
+        .nav-pills .nav-link.active { background-color: var(--navy-medium); }
+        .nav-pills .nav-link { color: white; }
+        .nav-pills .nav-link:hover { background-color: var(--navy-medium); opacity: 0.8; }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">
-                <i class="fas fa-shipping-fast me-2"></i>DeeJohnson Admin
-            </a>
+            <a class="navbar-brand" href="/"><i class="fas fa-shipping-fast me-2"></i>DeeJohnson Admin</a>
             <div class="ms-auto">
-                <span class="text-white me-3">
-                    <i class="fas fa-user-shield"></i> {{ session.get('admin_username', 'Admin') }}
-                </span>
-                <a href="/admin/logout" class="btn btn-outline-light btn-sm">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
+                <span class="text-white me-3"><i class="fas fa-user-shield"></i> {{ session.get('admin_username', 'Admin') }}</span>
+                <a href="/admin/logout" class="btn btn-outline-light btn-sm"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </div>
         </div>
     </nav>
 
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
             <div class="col-md-2 sidebar p-3">
-                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
-                    <button class="nav-link text-white active" data-bs-toggle="pill" data-bs-target="#dashboard" type="button">
-                        <i class="fas fa-tachometer-alt"></i> Dashboard
-                    </button>
-                    <button class="nav-link text-white" data-bs-toggle="pill" data-bs-target="#create" type="button">
-                        <i class="fas fa-plus-circle"></i> Create Shipment
-                    </button>
-                    <button class="nav-link text-white" data-bs-toggle="pill" data-bs-target="#update" type="button">
-                        <i class="fas fa-edit"></i> Update Status
-                    </button>
-                    <button class="nav-link text-white" data-bs-toggle="pill" data-bs-target="#reviews" type="button">
-                        <i class="fas fa-star"></i> Add Reviews
-                    </button>
-                    <button class="nav-link text-white" data-bs-toggle="pill" data-bs-target="#shipments" type="button">
-                        <i class="fas fa-list"></i> All Shipments
-                    </button>
-                    <button class="nav-link text-white" data-bs-toggle="pill" data-bs-target="#settings" type="button">
-                        <i class="fas fa-cog"></i> Settings
-                    </button>
+                <div class="nav flex-column nav-pills" role="tablist">
+                    <button class="nav-link text-white active" data-bs-toggle="pill" data-bs-target="#dashboard" type="button"><i class="fas fa-tachometer-alt"></i> Dashboard</button>
+                    <button class="nav-link text-white" data-bs-toggle="pill" data-bs-target="#incoming" type="button"><i class="fas fa-download"></i> Incoming Shipments</button>
+                    <button class="nav-link text-white" data-bs-toggle="pill" data-bs-target="#create" type="button"><i class="fas fa-plus-circle"></i> Create Shipment</button>
+                    <button class="nav-link text-white" data-bs-toggle="pill" data-bs-target="#update" type="button"><i class="fas fa-edit"></i> Update Status</button>
+                    <button class="nav-link text-white" data-bs-toggle="pill" data-bs-target="#reviews" type="button"><i class="fas fa-star"></i> Add Reviews</button>
+                    <button class="nav-link text-white" data-bs-toggle="pill" data-bs-target="#shipments" type="button"><i class="fas fa-list"></i> All Shipments</button>
+                    <button class="nav-link text-white" data-bs-toggle="pill" data-bs-target="#reports" type="button"><i class="fas fa-download"></i> Reports</button>
+                    <button class="nav-link text-white" data-bs-toggle="pill" data-bs-target="#settings" type="button"><i class="fas fa-cog"></i> Settings</button>
                 </div>
             </div>
 
-            <!-- Main Content -->
             <div class="col-md-10 p-4">
                 <div class="tab-content">
                     <!-- Dashboard Tab -->
                     <div class="tab-pane fade show active" id="dashboard">
                         <h3 class="mb-4"><i class="fas fa-chart-line"></i> Dashboard Overview</h3>
                         <div class="row mb-4">
-                            <div class="col-md-3">
-                                <div class="stat-card">
-                                    <i class="fas fa-box fa-2x text-primary mb-2"></i>
-                                    <div class="stat-number" id="totalShipments">{{ stats.total }}</div>
-                                    <div>Total Shipments</div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-card">
-                                    <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
-                                    <div class="stat-number">{{ stats.delivered }}</div>
-                                    <div>Delivered</div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-card">
-                                    <i class="fas fa-truck fa-2x text-warning mb-2"></i>
-                                    <div class="stat-number">{{ stats.in_transit }}</div>
-                                    <div>In Transit</div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-card">
-                                    <i class="fas fa-star fa-2x text-warning mb-2"></i>
-                                    <div class="stat-number">{{ stats.avg_rating }}/5.0</div>
-                                    <div>Average Rating</div>
-                                </div>
-                            </div>
+                            <div class="col-md-3"><div class="stat-card"><i class="fas fa-box fa-2x text-primary mb-2"></i><div class="stat-number">{{ stats.total }}</div><div>Total Shipments</div></div></div>
+                            <div class="col-md-3"><div class="stat-card"><i class="fas fa-check-circle fa-2x text-success mb-2"></i><div class="stat-number">{{ stats.delivered }}</div><div>Delivered</div></div></div>
+                            <div class="col-md-3"><div class="stat-card"><i class="fas fa-truck fa-2x text-warning mb-2"></i><div class="stat-number">{{ stats.in_transit }}</div><div>In Transit</div></div></div>
+                            <div class="col-md-3"><div class="stat-card"><i class="fas fa-star fa-2x text-warning mb-2"></i><div class="stat-number">{{ stats.avg_rating }}/5.0</div><div>Average Rating</div></div></div>
                         </div>
-                        
-                        <div class="card">
-                            <div class="card-header bg-primary text-white">
-                                <h5><i class="fas fa-chart-bar"></i> Shipment Trends</h5>
+                        <div class="card"><div class="card-header bg-primary text-white"><h5><i class="fas fa-chart-bar"></i> Shipment Trends</h5></div><div class="card-body"><canvas id="shipmentChart" height="100"></canvas></div></div>
+                    </div>
+
+                    <!-- Incoming Shipment Tab -->
+                    <div class="tab-pane fade" id="incoming">
+                        <div class="card shadow">
+                            <div class="card-header" style="background: linear-gradient(135deg, #0A192F, #0F3B5C); color: white;">
+                                <h4><i class="fas fa-globe"></i> Register Incoming International Package</h4>
                             </div>
                             <div class="card-body">
-                                <canvas id="shipmentChart" height="100"></canvas>
+                                <form method="POST">
+                                    <input type="hidden" name="action" value="create_incoming_shipment">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label>Origin Country *</label>
+                                            <select name="origin_country" class="form-control" required>
+                                                <option value="">Select Country</option>
+                                                <option value="UK">🇬🇧 United Kingdom</option>
+                                                <option value="USA">🇺🇸 United States</option>
+                                                <option value="Canada">🇨🇦 Canada</option>
+                                                <option value="China">🇨🇳 China</option>
+                                                <option value="Germany">🇩🇪 Germany</option>
+                                                <option value="France">🇫🇷 France</option>
+                                                <option value="Italy">🇮🇹 Italy</option>
+                                                <option value="Spain">🇪🇸 Spain</option>
+                                                <option value="UAE">🇦🇪 UAE</option>
+                                                <option value="South Africa">🇿🇦 South Africa</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label>Origin City</label>
+                                            <input type="text" name="origin_city" class="form-control" placeholder="e.g., London, New York">
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label>Destination in Nigeria *</label>
+                                            <input type="text" name="destination" class="form-control" value="Ibadan" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label>Customer Name *</label>
+                                            <input type="text" name="customer_name" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label>Customer Phone *</label>
+                                            <input type="text" name="customer_phone" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label>Customer Email</label>
+                                            <input type="email" name="customer_email" class="form-control">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label>Delivery Address in Nigeria</label>
+                                            <input type="text" name="delivery_address" class="form-control" placeholder="Full delivery address">
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label>Partner Courier (Original) *</label>
+                                            <select name="partner_courier_original" class="form-control">
+                                                <option value="">Select Courier</option>
+                                                <option value="Royal Mail">🇬🇧 Royal Mail (UK)</option>
+                                                <option value="USPS">🇺🇸 USPS (USA)</option>
+                                                <option value="Canada Post">🇨🇦 Canada Post</option>
+                                                <option value="China Post">🇨🇳 China Post</option>
+                                                <option value="FedEx">📦 FedEx</option>
+                                                <option value="DHL">✈️ DHL</option>
+                                                <option value="UPS">🚚 UPS</option>
+                                                <option value="DPD">📮 DPD</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label>Original Tracking Number *</label>
+                                            <input type="text" name="partner_tracking_original" class="form-control" placeholder="Tracking number from origin courier">
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label>Expected Arrival Date</label>
+                                            <input type="date" name="expected_arrival_date" class="form-control">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label>Package Type</label>
+                                            <select name="package_type" class="form-control">
+                                                <option>Documents</option><option>Parcel</option><option>Pallet</option><option>Container</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label>Weight (kg)</label>
+                                            <input type="number" name="package_weight" class="form-control" step="0.1">
+                                        </div>
+                                        <div class="col-md-12 mb-3">
+                                            <label>Current Status</label>
+                                            <select name="status" class="form-control" required>
+                                                <option>Shipped from origin country</option>
+                                                <option>In transit to Nigeria</option>
+                                                <option>Arrived at Lagos Airport</option>
+                                                <option>Customs clearance in progress</option>
+                                                <option>Customs cleared - Awaiting pickup</option>
+                                                <option>Out for delivery in Nigeria</option>
+                                                <option>Delivered successfully</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-12 mb-3">
+                                            <label>Internal Notes</label>
+                                            <textarea name="notes" rows="2" class="form-control" placeholder="Special instructions, package contents, etc."></textarea>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-save"></i> Register Incoming Package
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -208,46 +194,82 @@
                     <!-- Create Shipment Tab -->
                     <div class="tab-pane fade" id="create">
                         <div class="card shadow">
-                            <div class="card-header bg-primary text-white">
-                                <h4><i class="fas fa-plus-circle"></i> Generate New Tracking Code</h4>
-                            </div>
+                            <div class="card-header bg-primary text-white"><h4><i class="fas fa-plus-circle"></i> Generate New Tracking Code</h4></div>
                             <div class="card-body">
                                 <form method="POST" id="createShipmentForm">
                                     <input type="hidden" name="action" value="create_shipment">
                                     <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label>Customer Name *</label>
-                                            <input type="text" name="customer_name" class="form-control" required>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label>Customer Email *</label>
-                                            <input type="email" name="customer_email" class="form-control" required>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label>Customer Phone *</label>
-                                            <input type="text" name="customer_phone" class="form-control" required>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label>Package Weight (kg)</label>
-                                            <input type="number" name="package_weight" class="form-control" step="0.1">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label>From (Origin) *</label>
-                                            <input type="text" name="origin" class="form-control" value="Ibadan" required>
-                                        </div>
+                                        <div class="col-md-6 mb-3"><label>Customer Name *</label><input type="text" name="customer_name" class="form-control" required></div>
+                                        <div class="col-md-6 mb-3"><label>Customer Email *</label><input type="email" name="customer_email" class="form-control" required></div>
+                                        <div class="col-md-6 mb-3"><label>Customer Phone *</label><input type="text" name="customer_phone" class="form-control" required></div>
+                                        <div class="col-md-6 mb-3"><label>Package Weight (kg)</label><input type="number" name="package_weight" class="form-control" step="0.1"></div>
+                                        <div class="col-md-6 mb-3"><label>From (Origin) *</label><input type="text" name="origin" class="form-control" value="Ibadan" required></div>
                                         <div class="col-md-6 mb-3">
                                             <label>To (Destination) *</label>
-                                            <input type="text" name="destination" class="form-control" required>
-                                        </div>
-                                        <div class="col-12 mb-3">
-                                            <label>Package Type</label>
-                                            <select name="package_type" class="form-control">
-                                                <option>Documents</option>
-                                                <option>Parcel</option>
-                                                <option>Pallet</option>
-                                                <option>Container</option>
+                                            <select name="destination" class="form-control" required>
+                                                <option value="">-- Select Destination --</option>
+                                                <optgroup label="South West Nigeria">
+                                                    <option>Ibadan, Oyo State</option>
+                                                    <option>Lagos, Lagos State</option>
+                                                    <option>Abeokuta, Ogun State</option>
+                                                    <option>Akure, Ondo State</option>
+                                                    <option>Osogbo, Osun State</option>
+                                                    <option>Ado-Ekiti, Ekiti State</option>
+                                                </optgroup>
+                                                <optgroup label="South East Nigeria">
+                                                    <option>Enugu, Enugu State</option>
+                                                    <option>Owerri, Imo State</option>
+                                                    <option>Awka, Anambra State</option>
+                                                    <option>Aba, Abia State</option>
+                                                    <option>Umuahia, Abia State</option>
+                                                </optgroup>
+                                                <optgroup label="South South Nigeria">
+                                                    <option>Port Harcourt, Rivers State</option>
+                                                    <option>Benin City, Edo State</option>
+                                                    <option>Warri, Delta State</option>
+                                                    <option>Calabar, Cross River State</option>
+                                                    <option>Uyo, Akwa Ibom State</option>
+                                                    <option>Yenagoa, Bayelsa State</option>
+                                                </optgroup>
+                                                <optgroup label="North Central Nigeria">
+                                                    <option>Abuja, FCT</option>
+                                                    <option>Jos, Plateau State</option>
+                                                    <option>Lokoja, Kogi State</option>
+                                                    <option>Makurdi, Benue State</option>
+                                                    <option>Minna, Niger State</option>
+                                                    <option>Ilorin, Kwara State</option>
+                                                </optgroup>
+                                                <optgroup label="North East Nigeria">
+                                                    <option>Maiduguri, Borno State</option>
+                                                    <option>Bauchi, Bauchi State</option>
+                                                    <option>Yola, Adamawa State</option>
+                                                    <option>Gombe, Gombe State</option>
+                                                    <option>Damaturu, Yobe State</option>
+                                                </optgroup>
+                                                <optgroup label="North West Nigeria">
+                                                    <option>Kano, Kano State</option>
+                                                    <option>Kaduna, Kaduna State</option>
+                                                    <option>Sokoto, Sokoto State</option>
+                                                    <option>Katsina, Katsina State</option>
+                                                    <option>Zamfara, Zamfara State</option>
+                                                    <option>Birnin Kebbi, Kebbi State</option>
+                                                </optgroup>
+                                                <optgroup label="International">
+                                                    <option>United Kingdom</option>
+                                                    <option>United States</option>
+                                                    <option>Canada</option>
+                                                    <option>China</option>
+                                                    <option>Germany</option>
+                                                    <option>France</option>
+                                                    <option>Italy</option>
+                                                    <option>Spain</option>
+                                                    <option>UAE</option>
+                                                    <option>South Africa</option>
+                                                </optgroup>
                                             </select>
+                                            <small class="text-muted">Select destination city and state</small>
                                         </div>
+                                        <div class="col-12 mb-3"><label>Package Type</label><select name="package_type" class="form-control"><option>Documents</option><option>Parcel</option><option>Pallet</option><option>Container</option></select></div>
                                     </div>
                                     <button type="submit" class="btn btn-primary w-100">Generate Tracking Code →</button>
                                 </form>
@@ -255,88 +277,145 @@
                         </div>
                     </div>
 
-                    <!-- Update Status Tab -->
-                    <div class="tab-pane fade" id="update">
-                        <div class="card shadow">
-                            <div class="card-header bg-success text-white">
-                                <h4><i class="fas fa-edit"></i> Update Shipment Status</h4>
-                            </div>
-                            <div class="card-body">
-                                <form method="POST">
-                                    <input type="hidden" name="action" value="update_status">
-                                    <div class="mb-3">
-                                        <label>Tracking Code *</label>
-                                        <input type="text" name="tracking_code" class="form-control" placeholder="DJL-2024-XXXXX" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label>Current Status *</label>
-                                        <select name="status" class="form-control" required>
-                                            <option>Package registered - Awaiting pickup</option>
-                                            <option>Picked up from customer</option>
-                                            <option>In transit to Lagos</option>
-                                            <option>Arrived at Lagos Airport</option>
-                                            <option>Customs clearance in progress</option>
-                                            <option>Cleared - Awaiting international flight</option>
-                                            <option>Handed over to partner courier</option>
-                                            <option>In transit internationally</option>
-                                            <option>Arrived at destination</option>
-                                            <option>Out for delivery</option>
-                                            <option>Delivered successfully</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label>Current Location</label>
-                                        <input type="text" name="current_location" class="form-control">
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label>Partner Courier</label>
-                                            <input type="text" name="partner_courier" class="form-control" placeholder="FedEx, DHL, UPS">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label>Partner Tracking Code</label>
-                                            <input type="text" name="partner_tracking" class="form-control">
-                                        </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label>Internal Notes</label>
-                                        <textarea name="notes" rows="3" class="form-control" placeholder="Any additional notes about this shipment..."></textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-success w-100">Update Status</button>
-                                </form>
-                            </div>
-                        </div>
+<!-- Update Status Tab -->
+<div class="tab-pane fade" id="update">
+    <div class="card shadow">
+        <div class="card-header bg-success text-white">
+            <h4><i class="fas fa-edit"></i> Update Shipment Status</h4>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                <input type="hidden" name="action" value="update_status">
+                
+                <!-- Shipment Type Selection -->
+                <div class="mb-3">
+                    <label>Shipment Type</label>
+                    <select name="shipment_type" id="shipmentTypeSelect" class="form-control" onchange="toggleExpressStatus()">
+                        <option value="outgoing">Outgoing (DJL-...)</option>
+                        <option value="incoming">Incoming (INT-...)</option>
+                        <option value="express">Express (EXPDJL...)</option>
+                    </select>
+                </div>
+                
+                <!-- Tracking Code -->
+                <div class="mb-3">
+                    <label>Tracking Code *</label>
+                    <input type="text" name="tracking_code" class="form-control" placeholder="DJL-2024-XXXXX or INT-UK-2024-XXXXXX" required>
+                </div>
+                
+                <!-- Status -->
+                <div class="mb-3">
+                    <label>Current Status *</label>
+                    <select name="status" class="form-control" required>
+                        <optgroup label="Outgoing Shipment Status">
+                            <option>Package registered - Awaiting pickup</option>
+                            <option>Picked up from customer</option>
+                            <option>In transit to Lagos</option>
+                            <option>Arrived at Lagos Airport</option>
+                            <option>Customs clearance in progress</option>
+                            <option>Cleared - Awaiting international flight</option>
+                            <option>Handed over to partner courier</option>
+                            <option>In transit internationally</option>
+                            <option>Arrived at destination</option>
+                            <option>Out for delivery</option>
+                            <option>Delivered successfully</option>
+                        </optgroup>
+                        <optgroup label="Incoming Shipment Status">
+                            <option>Shipped from origin country</option>
+                            <option>In transit to Nigeria</option>
+                            <option>Arrived at Lagos Airport</option>
+                            <option>Customs clearance in progress</option>
+                            <option>Customs cleared - Awaiting pickup</option>
+                            <option>Out for delivery in Nigeria</option>
+                            <option>Delivered successfully</option>
+                            <option>Held at customs - Documentation needed</option>
+                        </optgroup>
+                        <optgroup label="Express Shipment Status" id="expressStatusGroup" style="display:none;">
+                            <option>Label Created</option>
+                            <option>Received by Courier</option>
+                            <option>Departed Facility</option>
+                            <option>Arrived at Local Sorting Center</option>
+                            <option>Out for Delivery</option>
+                            <option>Delivered</option>
+                        </optgroup>
+                    </select>
+                </div>
+                
+                <!-- Current Location -->
+                <div class="mb-3">
+                    <label>Current Location</label>
+                    <input type="text" name="current_location" class="form-control" placeholder="e.g., London Heathrow, Lagos Airport, etc.">
+                </div>
+                
+                <!-- ========================================== -->
+                <!-- PARTNER COURIER FIELDS - MAKE SURE THESE EXIST -->
+                <!-- ========================================== -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Partner Courier</label>
+                        <select name="partner_courier" class="form-control">
+                            <option value="">-- Select Courier --</option>
+                            <option value="FedEx">📦 FedEx</option>
+                            <option value="DHL">✈️ DHL</option>
+                            <option value="UPS">🚚 UPS</option>
+                            <option value="Royal Mail">👑 Royal Mail</option>
+                            <option value="DPD">📮 DPD</option>
+                            <option value="USPS">📬 USPS</option>
+                        </select>
+                        <small class="text-muted">Select the courier for international tracking</small>
                     </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Partner Tracking Code</label>
+                        <input type="text" name="partner_tracking" class="form-control" placeholder="e.g., 123456789012">
+                        <small class="text-muted">Enter the tracking number from the courier</small>
+                    </div>
+                </div>
+                
+                <!-- Original Courier for Incoming -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Original Courier (For Incoming)</label>
+                        <select name="partner_courier_original" class="form-control">
+                            <option value="">-- Select Courier --</option>
+                            <option value="Royal Mail">🇬🇧 Royal Mail (UK)</option>
+                            <option value="USPS">🇺🇸 USPS (USA)</option>
+                            <option value="Canada Post">🇨🇦 Canada Post</option>
+                            <option value="China Post">🇨🇳 China Post</option>
+                            <option value="FedEx">📦 FedEx</option>
+                            <option value="DHL">✈️ DHL</option>
+                            <option value="UPS">🚚 UPS</option>
+                            <option value="DPD">📮 DPD</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Original Tracking Number</label>
+                        <input type="text" name="partner_tracking_original" class="form-control" placeholder="Original courier tracking number">
+                    </div>
+                </div>
+                
+                <!-- Internal Notes -->
+                <div class="mb-3">
+                    <label>Internal Notes</label>
+                    <textarea name="notes" rows="3" class="form-control" placeholder="Any additional notes about this shipment..."></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-success w-100">Update Status</button>
+            </form>
+        </div>
+    </div>
+</div>
 
                     <!-- Add Reviews Tab -->
                     <div class="tab-pane fade" id="reviews">
                         <div class="card shadow">
-                            <div class="card-header" style="background-color: var(--gold-accent); color: var(--navy-deep);">
-                                <h4><i class="fas fa-star"></i> Add Customer Review</h4>
-                            </div>
+                            <div class="card-header" style="background-color: var(--gold-accent); color: var(--navy-deep);"><h4><i class="fas fa-star"></i> Add Customer Review</h4></div>
                             <div class="card-body">
                                 <form method="POST">
                                     <input type="hidden" name="action" value="add_review">
-                                    <div class="mb-3">
-                                        <label>Customer Name</label>
-                                        <input type="text" name="customer_name" class="form-control" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label>Location</label>
-                                        <input type="text" name="location" class="form-control" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label>Rating</label>
-                                        <select name="rating" class="form-control">
-                                            <option value="5">5 Stars - Excellent</option>
-                                            <option value="4">4 Stars - Good</option>
-                                            <option value="3">3 Stars - Average</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label>Review Comment</label>
-                                        <textarea name="comment" rows="3" class="form-control" required></textarea>
-                                    </div>
+                                    <div class="mb-3"><label>Customer Name</label><input type="text" name="customer_name" class="form-control" required></div>
+                                    <div class="mb-3"><label>Location</label><input type="text" name="location" class="form-control" required></div>
+                                    <div class="mb-3"><label>Rating</label><select name="rating" class="form-control"><option value="5">5 Stars - Excellent</option><option value="4">4 Stars - Good</option><option value="3">3 Stars - Average</option></select></div>
+                                    <div class="mb-3"><label>Review Comment</label><textarea name="comment" rows="3" class="form-control" required></textarea></div>
                                     <button type="submit" class="btn w-100" style="background-color: var(--gold-accent); color: var(--navy-deep); font-weight: bold;">Add Review</button>
                                 </form>
                             </div>
@@ -344,90 +423,177 @@
                     </div>
 
                     <!-- All Shipments Tab -->
-                    <div class="tab-pane fade" id="shipments">
-                        <div class="card shadow">
-                            <div class="card-header bg-info text-white">
-                                <h4><i class="fas fa-list"></i> All Shipments</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>Tracking Code</th>
-                                                <th>Customer</th>
-                                                <th>Route</th>
-                                                <th>Status</th>
-                                                <th>Last Update</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for ship in shipments %}
-                                            <tr>
-                                                <td><strong>{{ ship.tracking_code }}</strong></td>
-                                                <td>{{ ship.customer_name }}</td>
-                                                <td>{{ ship.origin }} → {{ ship.destination }}</td>
-                                                <td>
-                                                    {% if 'Delivered' in ship.status %}
-                                                        <span class="status-badge status-delivered">✓ {{ ship.status[:30] }}</span>
-                                                    {% elif 'transit' in ship.status.lower() %}
-                                                        <span class="status-badge status-transit">🚚 {{ ship.status[:30] }}</span>
-                                                    {% else %}
-                                                        <span class="status-badge status-pending">⏳ {{ ship.status[:30] }}</span>
-                                                    {% endif %}
-                                                </td>
-                                                <td>{{ ship.last_update.strftime('%Y-%m-%d') }}</td>
-                                                <td>
-                                                    <form method="POST" style="display: inline;" onsubmit="return confirm('Delete this shipment?');">
-                                                        <input type="hidden" name="action" value="delete_shipment">
-                                                        <input type="hidden" name="tracking_code" value="{{ ship.tracking_code }}">
-                                                        <button type="submit" class="btn btn-danger btn-sm">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                 </td>
-                                             </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
+<div class="tab-pane fade" id="shipments">
+    <div class="card shadow">
+        <div class="card-header bg-info text-white"><h4><i class="fas fa-list"></i> All Shipments</h4></div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Tracking Code</th>
+                            <th>Customer</th>
+                            <th>Route</th>
+                            <th>Partner Courier</th>
+                            <th>Partner Tracking</th>
+                            <th>Status</th>
+                            <th>Last Update</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ship in shipments %}
+                        <tr>
+                            <td><strong>{{ ship.tracking_code }}</strong></td>
+                            <td>{{ ship.customer_name }}</td>
+                            <td>{{ ship.origin }} → {{ ship.destination }}</td>
+                            <td>
+                                {% if ship.partner_courier %}
+                                    <span class="badge bg-primary">{{ ship.partner_courier }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if ship.partner_tracking %}
+                                    <span class="badge bg-secondary">{{ ship.partner_tracking }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if 'Delivered' in ship.status %}
+                                    <span class="status-badge status-delivered">✓ {{ ship.status[:30] }}</span>
+                                {% elif 'transit' in ship.status.lower() %}
+                                    <span class="status-badge status-transit">🚚 {{ ship.status[:30] }}</span>
+                                {% else %}
+                                    <span class="status-badge status-pending">⏳ {{ ship.status[:30] }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ ship.last_update.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ url_for('admin_edit_shipment', shipment_id=ship.id) }}" 
+                                       class="btn btn-primary btn-sm">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <form method="POST" style="display: inline;" onsubmit="return confirm('Delete this shipment?');">
+                                        <input type="hidden" name="action" value="delete_shipment">
+                                        <input type="hidden" name="tracking_code" value="{{ ship.tracking_code }}">
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
                     <!-- Settings Tab -->
                     <div class="tab-pane fade" id="settings">
                         <div class="card shadow">
-                            <div class="card-header" style="background-color: var(--navy-medium); color: white;">
-                                <h4><i class="fas fa-cog"></i> Admin Settings</h4>
-                            </div>
+                            <div class="card-header" style="background-color: var(--navy-medium); color: white;"><h4><i class="fas fa-cog"></i> Admin Settings</h4></div>
                             <div class="card-body">
                                 <h5>Change Password</h5>
                                 <form method="POST">
                                     <input type="hidden" name="action" value="change_password">
-                                    <div class="mb-3">
-                                        <label>Current Password</label>
-                                        <input type="password" name="old_password" class="form-control" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label>New Password</label>
-                                        <input type="password" name="new_password" class="form-control" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label>Confirm New Password</label>
-                                        <input type="password" name="confirm_password" class="form-control" required>
-                                    </div>
+                                    <div class="mb-3"><label>Current Password</label><input type="password" name="old_password" class="form-control" required></div>
+                                    <div class="mb-3"><label>New Password</label><input type="password" name="new_password" class="form-control" required></div>
+                                    <div class="mb-3"><label>Confirm New Password</label><input type="password" name="confirm_password" class="form-control" required></div>
                                     <button type="submit" class="btn btn-primary">Update Password</button>
                                 </form>
-                                
-                                <hr>
-                                
-                                <h5>Security Information</h5>
-                                <div class="alert alert-info">
-                                    <i class="fas fa-info-circle"></i> 
-                                    <strong>Logged in as:</strong> {{ session.get('admin_username') }}<br>
-                                    <strong>Session active:</strong> Your session is secure
+                                <hr><h5>Security Information</h5>
+                                <div class="alert alert-info"><i class="fas fa-info-circle"></i> <strong>Logged in as:</strong> {{ session.get('admin_username') }}<br><strong>Session active:</strong> Your session is secure</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reports Tab -->
+                    <div class="tab-pane fade" id="reports">
+                        <div class="card shadow">
+                            <div class="card-header bg-primary text-white">
+                                <h4><i class="fas fa-download"></i> Export Reports</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card text-center">
+                                            <div class="card-body">
+                                                <i class="fas fa-tasks fa-3x text-primary mb-2"></i>
+                                                <h5>All Shipments</h5>
+                                                <p>Export complete shipment history</p>
+                                                <a href="{{ url_for('export_all') }}" class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-download"></i> Export
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card text-center">
+                                            <div class="card-body">
+                                                <i class="fas fa-upload fa-3x text-success mb-2"></i>
+                                                <h5>Outgoing Only</h5>
+                                                <p>Export outgoing shipments from Nigeria</p>
+                                                <a href="{{ url_for('export_outgoing') }}" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-download"></i> Export
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card text-center">
+                                            <div class="card-body">
+                                                <i class="fas fa-download fa-3x text-info mb-2"></i>
+                                                <h5>Incoming Only</h5>
+                                                <p>Export incoming international packages</p>
+                                                <a href="{{ url_for('export_incoming') }}" class="btn btn-info btn-sm">
+                                                    <i class="fas fa-download"></i> Export
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card text-center">
+                                            <div class-card-body>
+                                                <i class="fas fa-check-circle fa-3x text-success mb-2"></i>
+                                                <h5>Delivered</h5>
+                                                <p>Export only delivered shipments</p>
+                                                <a href="{{ url_for('export_delivered') }}" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-download"></i> Export
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card text-center">
+                                            <div class="card-body">
+                                                <i class="fas fa-hourglass-half fa-3x text-warning mb-2"></i>
+                                                <h5>Pending</h5>
+                                                <p>Export active/in-transit shipments</p>
+                                                <a href="{{ url_for('export_pending') }}" class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-download"></i> Export
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card text-center">
+                                            <div class="card-body">
+                                                <i class="fas fa-users fa-3x text-primary mb-2"></i>
+                                                <h5>Customers</h5>
+                                                <p>Export customer database</p>
+                                                <a href="{{ url_for('export_customers_list') }}" class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-download"></i> Export
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -437,221 +603,41 @@
         </div>
     </div>
 
-    <!-- Beautiful Success Modal -->
-    <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #0A192F, #0F3B5C); border: none;">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-check-circle fa-3x" style="color: #C9A03D;"></i>
-                        <div class="ms-3">
-                            <h4 class="modal-title text-white mb-0">Shipment Created Successfully!</h4>
-                            <p class="text-white-50 mb-0">Your tracking code has been generated</p>
-                        </div>
-                    </div>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body" style="padding: 30px;">
-                    <div class="confetti-container" id="confettiContainer"></div>
-                    
-                    <div class="text-center mb-4">
-                        <div class="tracking-code-box">
-                            <small class="text-muted text-white-50">TRACKING CODE</small>
-                            <h2 class="tracking-code-display" id="modalTrackingCode">DJL-2024-XXXXX</h2>
-                        </div>
-                    </div>
-
-                    <div class="customer-info-card">
-                        <h5 class="mb-3" style="color: #0A192F;">
-                            <i class="fas fa-user-check"></i> Customer Information
-                        </h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="info-row"><span class="info-label">Name:</span><span class="info-value" id="modalCustomerName">-</span></div>
-                                <div class="info-row"><span class="info-label">Email:</span><span class="info-value" id="modalCustomerEmail">-</span></div>
-                                <div class="info-row"><span class="info-label">Phone:</span><span class="info-value" id="modalCustomerPhone">-</span></div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="info-row"><span class="info-label">From:</span><span class="info-value" id="modalOrigin">-</span></div>
-                                <div class="info-row"><span class="info-label">To:</span><span class="info-value" id="modalDestination">-</span></div>
-                                <div class="info-row"><span class="info-label">Package:</span><span class="info-value" id="modalPackageType">-</span></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row g-3 mt-2">
-                        <div class="col-md-4">
-                            <button class="btn btn-copy-tracking w-100" onclick="copyTrackingCode()">
-                                <i class="fas fa-copy"></i> Copy Code
-                            </button>
-                        </div>
-                        <div class="col-md-4">
-                            <button class="btn btn-print w-100" onclick="printTrackingInfo()">
-                                <i class="fas fa-print"></i> Print
-                            </button>
-                        </div>
-                        <div class="col-md-4">
-                            <a href="#" class="btn btn-whatsapp w-100" id="whatsappShareBtn" target="_blank">
-                                <i class="fab fa-whatsapp"></i> Share on WhatsApp
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="alert alert-info mt-4 mb-0">
-                        <i class="fas fa-info-circle"></i>
-                        <strong>Next Steps:</strong> You can now update this shipment's status from the "Update Status" tab.
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="resetCreateForm()">
-                        <i class="fas fa-plus-circle"></i> Create Another Shipment
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var totalElement = document.getElementById('totalShipments');
+        var totalValue = totalElement ? parseInt(totalElement.innerText) || 0 : 0;
+        var canvas = document.getElementById('shipmentChart');
+        if (canvas) {
+            new Chart(canvas.getContext('2d'), {
+                type: 'line',
+                data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], datasets: [{ label: 'Shipments', data: [12, 19, 15, 17, 14, totalValue], borderColor: '#0F3B5C', backgroundColor: 'rgba(15, 59, 92, 0.1)', tension: 0.4, fill: true }] },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+        }
+    </script>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show m-3 position-fixed bottom-0 end-0" style="z-index: 9999;">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+                <div class="alert alert-{{ category }} alert-dismissible fade show m-3 position-fixed bottom-0 end-0">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
             {% endfor %}
         {% endif %}
     {% endwith %}
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Store tracking info for modal
-        let lastTrackingInfo = {};
-        
-        // Chart initialization
-        window.addEventListener('load', function() {
-            var totalElement = document.getElementById('totalShipments');
-            var totalValue = totalElement ? parseInt(totalElement.innerText) || 0 : 0;
-            
-            var canvas = document.getElementById('shipmentChart');
-            if (canvas) {
-                new Chart(canvas.getContext('2d'), {
-                    type: 'line',
-                    data: {
-                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                        datasets: [{
-                            label: 'Shipments',
-                            data: [12, 19, 15, 17, 14, totalValue],
-                            borderColor: '#0F3B5C',
-                            backgroundColor: 'rgba(15, 59, 92, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: true }
-                });
-            }
-        });
-
-        // Form submission handler
-        document.getElementById('createShipmentForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const form = e.target;
-            const formData = new FormData(form);
-            
-            // Generate tracking code
-            const year = new Date().getFullYear();
-            const randomChars = Math.random().toString(36).substring(2, 7).toUpperCase();
-            const trackingCode = 'DJL-' + year + '-' + randomChars;
-            
-            // Prepare shipment data
-            const shipmentData = {
-                tracking_code: trackingCode,
-                customer_name: formData.get('customer_name'),
-                customer_email: formData.get('customer_email'),
-                customer_phone: formData.get('customer_phone'),
-                origin: formData.get('origin'),
-                destination: formData.get('destination'),
-                package_type: formData.get('package_type')
-            };
-            
-            // Show modal with data
-            showSuccessModal(shipmentData);
-            
-            // Submit to server
-            fetch('/admin', { method: 'POST', body: formData });
-            
-            // Reset form
-            form.reset();
-            form.querySelector('input[name="origin"]').value = 'Ibadan';
-        });
-        
-        // Show success modal
-        function showSuccessModal(data) {
-            lastTrackingInfo = data;
-            
-            document.getElementById('modalTrackingCode').textContent = data.tracking_code;
-            document.getElementById('modalCustomerName').textContent = data.customer_name;
-            document.getElementById('modalCustomerEmail').textContent = data.customer_email;
-            document.getElementById('modalCustomerPhone').textContent = data.customer_phone;
-            document.getElementById('modalOrigin').textContent = data.origin;
-            document.getElementById('modalDestination').textContent = data.destination;
-            document.getElementById('modalPackageType').textContent = data.package_type;
-            
-            const msg = `🎉 *DeeJohnson Logistics* 🎉\n\nDear ${data.customer_name},\n\nYour shipment has been registered successfully!\n\n📦 *Tracking Code:* ${data.tracking_code}\n📍 *From:* ${data.origin}\n📍 *To:* ${data.destination}\n📦 *Package:* ${data.package_type}\n\n🔗 Track here: ${window.location.origin}/track\n\nThank you! 🚚`;
-            const phone = data.customer_phone.replace(/[^0-9]/g, '');
-            document.getElementById('whatsappShareBtn').href = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
-            
-            new bootstrap.Modal(document.getElementById('successModal')).show();
-            triggerConfetti();
-        }
-        
-        // Confetti effect
-        function triggerConfetti() {
-            const container = document.getElementById('confettiContainer');
-            if (!container) return;
-            for (let i = 0; i < 50; i++) {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.left = Math.random() * 100 + '%';
-                confetti.style.top = '-10px';
-                confetti.style.width = (Math.random() * 8 + 4) + 'px';
-                confetti.style.height = confetti.style.width;
-                confetti.style.background = ['#C9A03D', '#0A192F', '#0F3B5C'][Math.floor(Math.random() * 3)];
-                document.body.appendChild(confetti);
-                let pos = -10;
-                const interval = setInterval(() => {
-                    pos += 5;
-                    confetti.style.top = pos + 'px';
-                    if (pos > window.innerHeight) {
-                        clearInterval(interval);
-                        confetti.remove();
-                    }
-                }, 30);
-            }
-        }
-        
-        // Copy tracking code
-        function copyTrackingCode() {
-            const code = document.getElementById('modalTrackingCode').textContent;
-            navigator.clipboard.writeText(code);
-            alert('✓ Tracking code copied: ' + code);
-        }
-        
-        // Print tracking info
-        function printTrackingInfo() {
-            const win = window.open('', '_blank');
-            win.document.write(`<!DOCTYPE html><html><head><title>Tracking Receipt</title><style>body{font-family:Arial;padding:40px;text-align:center;}.container{border:2px solid #0A192F;border-radius:15px;padding:30px;max-width:500px;margin:auto;}.tracking-code{font-size:28px;color:#C9A03D;font-family:monospace;margin:20px 0;}</style></head><body><div class="container"><h2>DeeJohnson Logistics</h2><div class="tracking-code">${document.getElementById('modalTrackingCode').textContent}</div><p><strong>Customer:</strong> ${document.getElementById('modalCustomerName').textContent}</p><p><strong>From:</strong> ${document.getElementById('modalOrigin').textContent}</p><p><strong>To:</strong> ${document.getElementById('modalDestination').textContent}</p><p>Track at: ${window.location.origin}/track</p></div></body></html>`);
-            win.document.close();
-            win.print();
-        }
-        
-        // Reset form
-        function resetCreateForm() {
-            document.getElementById('createShipmentForm').reset();
-            document.getElementById('createShipmentForm').querySelector('input[name="origin"]').value = 'Ibadan';
-        }
-    </script>
+<script>
+function toggleExpressStatus() {
+    const type = document.getElementById('shipmentTypeSelect').value;
+    const expressGroup = document.getElementById('expressStatusGroup');
+    const statusDropdown = document.getElementById('statusDropdown');
+    
+    if (type === 'express') {
+        expressGroup.style.display = 'block';
+        statusDropdown.value = 'Label Created';
+    } else {
+        expressGroup.style.display = 'none';
+    }
+}
+</script>
 </body>
 </html>

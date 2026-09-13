@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeeJohnson Logistics - Premium Logistics Services Nigeria</title>
+    <title>DeeJohnson Company Nigeria Limited - Premium Logistics Services Nigeria</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
@@ -509,21 +509,24 @@
     <div class="loader-inner"></div>
 </div>
 
-<!-- Navigation -->
-<nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="navbar">
+<!-- Navigation - Burger Menu Style -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="navbar" style="padding-top: 8px; padding-bottom: 8px;">
     <div class="container">
-        <a class="navbar-brand d-flex align-items-center" href="#">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" 
-                 alt="DeeJohnson Logistics Logo" 
-                 style="height: 45px; width: auto; margin-right: 12px;"
-                 onerror="this.style.display='none'">
-            <span>DeeJohnson Logistics</span>
+        <!-- Brand / Logo -->
+        <a class="navbar-brand" href="#" id="brandLogo" style="font-size: 1.7rem; font-weight: 700;">
+            <i class="fas fa-shipping-fast me-2"></i>
+            <span class="company-name-mobile">DeeJohnson Company Nig. Ltd.</span>
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        
+        <!-- Burger Button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
+        
+        <!-- Collapsible Menu -->
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav ms-auto" style="font-size: 1.0rem;">
                 <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="#china-shipping">China Shipping</a></li>
                 <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
@@ -532,7 +535,6 @@
                 <li class="nav-item"><a class="nav-link" href="/track">Track</a></li>
                 <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                 <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
-                <!-- <li class="nav-item"><a class="nav-link" href="/admin"><i class="fas fa-user-shield"></i> Admin</a></li> -->
             </ul>
         </div>
     </div>
@@ -874,6 +876,84 @@
     </div>
 </div>
 
+<!-- Our Coverage Map Section -->
+<section id="coverage" class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-5 fw-bold" style="color: var(--navy-deep);">
+                <i class="fas fa-map-marked-alt"></i> Where We Ship
+            </h2>
+            <p class="lead">Serving Nigeria and connecting to the world</p>
+            <div class="divider" style="width: 80px; height: 3px; background: var(--gold-accent); margin: 15px auto;"></div>
+        </div>
+
+        <!-- Google Maps Embed -->
+        <div class="row" data-aos="fade-up">
+            <div class="col-lg-8 mx-auto">
+                <div class="map-container" style="border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d252987.65125852137!2d3.859996972140646!3d7.438469927975076!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x10398d6e82d4c0e3%3A0x3d4e2fd566e0eb10!2sIbadan%2C%20Oyo%20State%2C%20Nigeria!5e0!3m2!1sen!2sng!4v1650000000000!5m2!1sen!2sng" 
+                        width="100%" 
+                        height="400" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coverage List -->
+        <div class="row mt-4 g-3" data-aos="fade-up">
+            <div class="col-md-6">
+                <div class="coverage-card p-3 rounded" style="background: white; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+                    <h5 class="mb-2" style="color: var(--navy-medium);">
+                        <i class="fas fa-map-pin" style="color: var(--gold-accent);"></i> Nigeria Coverage
+                    </h5>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-primary">Ibadan</span>
+                        <span class="badge bg-primary">Lagos</span>
+                        <span class="badge bg-primary">Abuja</span>
+                        <span class="badge bg-primary">Port Harcourt</span>
+                        <span class="badge bg-primary">Kano</span>
+                        <span class="badge bg-primary">Kaduna</span>
+                        <span class="badge bg-primary">Enugu</span>
+                        <span class="badge bg-primary">Benin City</span>
+                        <span class="badge bg-primary">Abeokuta</span>
+                        <span class="badge bg-primary">Warri</span>
+                        <span class="badge bg-primary">Jos</span>
+                        <span class="badge bg-primary">Ilorin</span>
+                        <span class="badge bg-primary">Maiduguri</span>
+                        <span class="badge bg-primary">Sokoto</span>
+                        <span class="badge bg-primary">Osun</span>
+                        <span class="badge bg-primary">Calabar</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="coverage-card p-3 rounded" style="background: white; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+                    <h5 class="mb-2" style="color: var(--navy-medium);">
+                        <i class="fas fa-globe" style="color: var(--gold-accent);"></i> International Coverage
+                    </h5>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-info">United Kingdom</span>
+                        <span class="badge bg-info">USA</span>
+                        <span class="badge bg-info">Canada</span>
+                        <span class="badge bg-info">China</span>
+                        <span class="badge bg-info">Germany</span>
+                        <span class="badge bg-info">France</span>
+                        <span class="badge bg-info">Italy</span>
+                        <span class="badge bg-info">Spain</span>
+                        <span class="badge bg-info">UAE</span>
+                        <span class="badge bg-info">South Africa</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- How It Works Timeline -->
 <section id="process" class="py-5">
     <div class="container">
@@ -1027,7 +1107,7 @@
                         <!-- Container Ship - Working Image -->
                         <div class="col-12">
                             <div class="image-card">
-                                <img src="https://cdn.pixabay.com/photo/2017/05/10/15/09/ship-2301179_640.jpg" 
+                                <img src="https://images.pexels.com/photos/36834653/pexels-photo-36834653.jpeg?w=600" 
                                     alt="Container ship China to Nigeria" 
                                     class="china-image">
                                 <div class="image-caption">
@@ -1749,6 +1829,84 @@
     </div>
 </section>
 
+<!-- Service Process Flow Section -->
+<section id="process-flow" class="py-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-5 fw-bold" style="color: var(--navy-deep);">
+                <i class="fas fa-route"></i> Our Service Process
+            </h2>
+            <p class="lead">Simple 4-step journey from pickup to delivery</p>
+            <div class="divider" style="width: 80px; height: 3px; background: var(--gold-accent); margin: 15px auto;"></div>
+        </div>
+
+        <div class="row g-4" data-aos="fade-up">
+            <!-- Step 1 -->
+            <div class="col-lg-3 col-md-6">
+                <div class="process-step text-center p-4 rounded" style="background: white; box-shadow: 0 5px 20px rgba(0,0,0,0.08); height: 100%; transition: transform 0.3s;">
+                    <div class="process-icon mx-auto mb-3" style="width: 70px; height: 70px; background: linear-gradient(135deg, #0A192F, #0F3B5C); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid var(--gold-accent);">
+                        <i class="fas fa-box fa-2x" style="color: var(--gold-accent);"></i>
+                    </div>
+                    <h5 class="fw-bold" style="color: var(--navy-deep);">1. Package Pickup</h5>
+                    <p class="text-muted">We collect your package from your location in Ibadan or Oyo State</p>
+                    <span class="badge bg-primary">Step 1</span>
+                </div>
+            </div>
+
+            <!-- Arrow -->
+            <div class="col-lg-1 d-none d-lg-flex align-items-center justify-content-center">
+                <i class="fas fa-arrow-right fa-2x" style="color: var(--gold-accent);"></i>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="col-lg-3 col-md-6">
+                <div class="process-step text-center p-4 rounded" style="background: white; box-shadow: 0 5px 20px rgba(0,0,0,0.08); height: 100%; transition: transform 0.3s;">
+                    <div class="process-icon mx-auto mb-3" style="width: 70px; height: 70px; background: linear-gradient(135deg, #0A192F, #0F3B5C); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid var(--gold-accent);">
+                        <i class="fas fa-truck fa-2x" style="color: var(--gold-accent);"></i>
+                    </div>
+                    <h5 class="fw-bold" style="color: var(--navy-deep);">2. Transport to Lagos</h5>
+                    <p class="text-muted">Safe and secure transport to Lagos Airport for customs processing</p>
+                    <span class="badge bg-primary">Step 2</span>
+                </div>
+            </div>
+
+            <!-- Arrow -->
+            <div class="col-lg-1 d-none d-lg-flex align-items-center justify-content-center">
+                <i class="fas fa-arrow-right fa-2x" style="color: var(--gold-accent);"></i>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="col-lg-3 col-md-6">
+                <div class="process-step text-center p-4 rounded" style="background: white; box-shadow: 0 5px 20px rgba(0,0,0,0.08); height: 100%; transition: transform 0.3s;">
+                    <div class="process-icon mx-auto mb-3" style="width: 70px; height: 70px; background: linear-gradient(135deg, #0A192F, #0F3B5C); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid var(--gold-accent);">
+                        <i class="fas fa-file-invoice fa-2x" style="color: var(--gold-accent);"></i>
+                    </div>
+                    <h5 class="fw-bold" style="color: var(--navy-deep);">3. Customs Clearance</h5>
+                    <p class="text-muted">We handle all documentation and customs clearance at Lagos Airport</p>
+                    <span class="badge bg-primary">Step 3</span>
+                </div>
+            </div>
+
+            <!-- Arrow -->
+            <div class="col-lg-1 d-none d-lg-flex align-items-center justify-content-center">
+                <i class="fas fa-arrow-right fa-2x" style="color: var(--gold-accent);"></i>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="col-lg-3 col-md-6">
+                <div class="process-step text-center p-4 rounded" style="background: white; box-shadow: 0 5px 20px rgba(0,0,0,0.08); height: 100%; transition: transform 0.3s;">
+                    <div class="process-icon mx-auto mb-3" style="width: 70px; height: 70px; background: linear-gradient(135deg, #0A192F, #0F3B5C); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid var(--gold-accent);">
+                        <i class="fas fa-plane fa-2x" style="color: var(--gold-accent);"></i>
+                    </div>
+                    <h5 class="fw-bold" style="color: var(--navy-deep);">4. International Delivery</h5>
+                    <p class="text-muted">Package handed to FedEx/DHL for final delivery worldwide</p>
+                    <span class="badge bg-primary">Step 4</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- FAQ Section -->
 <section id="faq" class="py-5 bg-light">
     <div class="container">
@@ -2262,6 +2420,89 @@
     </div>
 </section>
 
+<!-- Payment Options Section -->
+<section id="payment-options" class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-5 fw-bold" style="color: var(--navy-deep);">
+                <i class="fas fa-hand-holding-usd"></i> Payment Methods
+            </h2>
+            <p class="lead">We offer flexible payment options for your convenience</p>
+            <div class="divider" style="width: 80px; height: 3px; background: var(--gold-accent); margin: 15px auto;"></div>
+        </div>
+
+        <!-- Payment Methods Grid -->
+        <div class="row g-4" data-aos="fade-up">
+
+            <!-- Bank Transfer -->
+            <div class="col-md-4">
+                <div class="payment-card text-center p-4 rounded" style="background: white; box-shadow: 0 5px 20px rgba(0,0,0,0.08); height: 100%; transition: transform 0.3s;">
+                    <div class="payment-icon mb-3" style="font-size: 3rem;">
+                        <i class="fas fa-university" style="color: var(--gold-accent);"></i>
+                    </div>
+                    <h5 style="color: var(--navy-deep);">Bank Transfer</h5>
+                    <p class="text-muted">Direct bank transfer to our account</p>
+                    <div class="mt-3">
+                        <span class="badge bg-primary">Zenith Bank</span>
+                    </div>
+                    <p class="mt-2 mb-0">
+                        <small class="text-muted">Contact us for account details</small>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Cash Payment -->
+            <div class="col-md-4">
+                <div class="payment-card text-center p-4 rounded" style="background: white; box-shadow: 0 5px 20px rgba(0,0,0,0.08); height: 100%; transition: transform 0.3s;">
+                    <div class="payment-icon mb-3" style="font-size: 3rem;">
+                        <i class="fas fa-money-bill-wave" style="color: var(--gold-accent);"></i>
+                    </div>
+                    <h5 style="color: var(--navy-deep);">Cash Payment</h5>
+                    <p class="text-muted">Pay with cash at pickup or delivery</p>
+                    <div class="mt-3">
+                        <span class="badge bg-success">✓ Cash on Delivery</span>
+                        <span class="badge bg-info">✓ Cash at Pickup</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- International Transfer -->
+            <div class="col-md-4">
+                <div class="payment-card text-center p-4 rounded" style="background: white; box-shadow: 0 5px 20px rgba(0,0,0,0.08); height: 100%; transition: transform 0.3s;">
+                    <div class="payment-icon mb-3" style="font-size: 3rem;">
+                        <i class="fas fa-globe" style="color: var(--gold-accent);"></i>
+                    </div>
+                    <h5 style="color: var(--navy-deep);">International Transfer</h5>
+                    <p class="text-muted">For international customers</p>
+                    <div class="mt-3">
+                        <span class="badge bg-primary">Wire Transfer</span>
+                        <span class="badge bg-primary">SWIFT</span>
+                    </div>
+                    <p class="mt-2 mb-0">
+                        <small class="text-muted">Contact us for SWIFT details</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact for Payment -->
+        <div class="row mt-4" data-aos="fade-up">
+            <div class="col-12">
+                <div class="alert alert-info text-center" style="border-left: 4px solid var(--gold-accent);">
+                    <i class="fas fa-headset fa-2x" style="color: var(--gold-accent);"></i>
+                    <p class="mb-0 mt-2">
+                        <strong>Need to make a payment?</strong><br>
+                        Contact us for bank details or to arrange payment. We're here to help!
+                    </p>
+                    <a href="#contact" class="btn btn-primary mt-2" style="background-color: var(--navy-medium);">
+                        <i class="fas fa-envelope"></i> Contact Us
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Fixed WhatsApp Chat Widget -->
 <div class="whatsapp-widget">
     <div class="whatsapp-header" id="whatsappToggle">
@@ -2488,7 +2729,6 @@
                     <li><a href="#home" class="text-white-50 text-decoration-none">Home</a></li>
                     <li><a href="#services" class="text-white-50 text-decoration-none">Services</a></li>
                     <li><a href="/track" class="text-white-50 text-decoration-none">Track Package</a></li>
-                    <li><a href="/admin" class="text-white-50 text-decoration-none">Admin Portal</a></li>
                 </ul>
             </div>
             <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
@@ -2507,89 +2747,134 @@
     </div>
 </footer>
 
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script>
-    // Initialize AOS animations
-    AOS.init({
-        duration: 1000,
-        once: true,
-        offset: 100
-    });
+    <!-- ===== SCRIPTS ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS animations
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+        });
 
-    // Hide loader
-    window.addEventListener('load', function() {
-        setTimeout(function() {
-            document.getElementById('loader').style.opacity = '0';
+        // Hide loader
+        window.addEventListener('load', function() {
             setTimeout(function() {
-                document.getElementById('loader').style.display = 'none';
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(function() {
+                    document.getElementById('loader').style.display = 'none';
+                }, 500);
             }, 500);
-        }, 500);
-    });
+        });
 
-    // Navbar scroll effect
-    window.addEventListener('scroll', function() {
-        const navbar = document.getElementById('navbar');
-        if (window.scrollY > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
-    });
-
-    // Counter animation
-    const counters = document.querySelectorAll('.counter');
-    const speed = 200;
-
-    const animateCounter = (counter) => {
-        const target = parseInt(counter.getAttribute('data-target'));
-        let count = 0;
-        const updateCount = () => {
-            const increment = target / speed;
-            if (count < target) {
-                count += increment;
-                counter.innerText = Math.ceil(count);
-                setTimeout(updateCount, 20);
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
             } else {
-                counter.innerText = target;
-            }
-        };
-        updateCount();
-    };
-
-    // Trigger counters when in viewport
-    const observerOptions = {
-        threshold: 0.5
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                animateCounter(entry.target);
-                observer.unobserve(entry.target);
+                navbar.classList.remove('scrolled');
             }
         });
-    }, observerOptions);
 
-    counters.forEach(counter => {
-        observer.observe(counter);
-    });
+        // Counter animation
+        const counters = document.querySelectorAll('.counter');
+        const speed = 200;
 
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
+        const animateCounter = (counter) => {
+            const target = parseInt(counter.getAttribute('data-target'));
+            let count = 0;
+            const updateCount = () => {
+                const increment = target / speed;
+                if (count < target) {
+                    count += increment;
+                    counter.innerText = Math.ceil(count);
+                    setTimeout(updateCount, 20);
+                } else {
+                    counter.innerText = target;
+                }
+            };
+            updateCount();
+        };
+
+        // Trigger counters when in viewport
+        const observerOptions = {
+            threshold: 0.5
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounter(entry.target);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        counters.forEach(counter => {
+            observer.observe(counter);
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // ==========================================
+        // ADD THE NEW JAVASCRIPT HERE (BEFORE THE CLOSING)
+        // ==========================================
+        
+        // Toggle company name on mobile when logo is clicked
+        document.getElementById('brandLogo').addEventListener('click', function(e) {
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
+            const nameSpan = document.querySelector('.company-name-mobile');
+            if (nameSpan) {
+                nameSpan.classList.toggle('show');
+            }
+        });
+        
+    </script>
+    
+    <!-- WhatsApp toggle script (if you have it in your file -->
+    <script>
+        // Fixed toggle functionality
+        (function() {
+            var toggleBtn = document.getElementById('whatsappToggle');
+            var whatsappBody = document.getElementById('whatsappBody');
+            var chevronIcon = toggleBtn ? toggleBtn.querySelector('.fa-chevron-down') : null;
+            
+            if (toggleBtn && whatsappBody) {
+                toggleBtn.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    
+                    if (whatsappBody.classList.contains('show')) {
+                        whatsappBody.classList.remove('show');
+                        if (chevronIcon) chevronIcon.style.transform = 'rotate(0deg)';
+                    } else {
+                        whatsappBody.classList.add('show');
+                        if (chevronIcon) chevronIcon.style.transform = 'rotate(180deg)';
+                    }
+                });
+                
+                document.addEventListener('click', function(event) {
+                    var widget = document.querySelector('.whatsapp-widget');
+                    if (widget && !widget.contains(event.target)) {
+                        whatsappBody.classList.remove('show');
+                        if (chevronIcon) chevronIcon.style.transform = 'rotate(0deg)';
+                    }
                 });
             }
-        });
-    });
- 
-</script>
+        })();
+    </script>
 </body>
 </html>

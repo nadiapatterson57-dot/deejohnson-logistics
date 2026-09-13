@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Express Track - DeeJohnson Logistics</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --navy-deep: #0A192F;
+            --navy-dark: #0B2B4D;
+            --navy-medium: #0F3B5C;
+            --gold-accent: #C9A03D;
+            --express-gold: #FFD700;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0A192F, #0F3B5C);
+            background-image: url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1920');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-blend-mode: overlay;
+        }
+        
+        .page-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 25, 47, 0.85);
+            z-index: 0;
+        }
+        
+        .navbar { 
+            background: rgba(10, 25, 47, 0.95) !important;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+        
+        .tracking-card {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .card-header-custom {
+            background: linear-gradient(135deg, var(--navy-deep), var(--navy-medium));
+            color: white;
+            padding: 25px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-header-custom::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 50%;
+            animation: float 15s ease-in-out infinite;
+        }
+        
+        .card-header-custom h3 {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .express-badge {
+            display: inline-block;
+            background: var(--express-gold);
+            color: var(--navy-deep);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-30px, -20px) scale(1.1); }
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .status-delivered { background: #d4edda; color: #155724; border: 2px solid #28a745; }
+        .status-transit { background: #fff3cd; color: #856404; border: 2px solid #ffc107; }
+        .status-pending { background: #f8d7da; color: #721c24; border: 2px solid #dc3545; }
+        
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--express-gold);
+            transition: transform 0.3s;
+        }
+        .info-card:hover {
+            transform: translateX(5px);
+        }
+        
+        .info-label {
+            font-weight: 700;
+            color: var(--navy-deep);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .info-value {
+            font-size: 1rem;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        /* EXPRESS TIMELINE STYLES */
+        .express-timeline-container {
+            padding: 20px 0;
+            position: relative;
+        }
+        
+        .express-timeline-item {
+            display: flex;
+            margin-bottom: 25px;
+            position: relative;
+            animation: slideIn 0.5s ease forwards;
+            opacity: 0;
+        }
+        
+        .express-timeline-item:nth-child(1) { animation-delay: 0.1s; }
+        .express-timeline-item:nth-child(2) { animation-delay: 0.2s; }
+        .express-timeline-item:nth-child(3) { animation-delay: 0.3s; }
+        .express-timeline-item:nth-child(4) { animation-delay: 0.4s; }
+        .express-timeline-item:nth-child(5) { animation-delay: 0.5s; }
+        .express-timeline-item:nth-child(6) { animation-delay: 0.6s; }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .express-timeline-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            z-index: 2;
+            flex-shrink: 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        .express-timeline-icon.completed {
+            background: var(--navy-medium);
+            color: white;
+        }
+        .express-timeline-icon.active {
+            background: var(--express-gold);
+            color: var(--navy-deep);
+            animation: pulse 1.5s infinite;
+            box-shadow: 0 4px 25px rgba(255, 215, 0, 0.5);
+        }
+        .express-timeline-icon.pending {
+            background: #e0e0e0;
+            color: #999;
+        }
+        
+        .express-timeline-content {
+            flex: 1;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            transition: all 0.3s;
+        }
+        .express-timeline-content:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .express-timeline-title {
+            font-weight: 700;
+            color: var(--navy-deep);
+            margin-bottom: 5px;
+        }
+        .express-timeline-date {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        .express-timeline-description {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .express-timeline-connector {
+            position: absolute;
+            left: 24px;
+            top: 50px;
+            width: 2px;
+            height: calc(100% + 10px);
+            z-index: 1;
+            transition: all 0.3s;
+        }
+        .express-timeline-connector.completed {
+            background: var(--navy-medium);
+        }
+        .express-timeline-connector.active {
+            background: var(--express-gold);
+            animation: pulseConnector 1.5s infinite;
+        }
+        .express-timeline-connector.pending {
+            background: #e0e0e0;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes pulseConnector {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+        
+        .help-section {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255,255,255,0.8);
+            position: relative;
+            z-index: 1;
+        }
+        .help-section a {
+            color: var(--express-gold);
+        }
+        
+        .form-control-lg {
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            padding: 14px 20px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .form-control-lg:focus {
+            border-color: var(--express-gold);
+            box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25);
+        }
+        
+        .btn-express-track {
+            background-color: var(--navy-medium);
+            border: none;
+            border-radius: 12px;
+            padding: 14px 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-express-track:hover {
+            background-color: var(--navy-deep);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .express-timeline-item {
+                flex-direction: column;
+            }
+            .express-timeline-icon {
+                margin-bottom: 10px;
+            }
+            .express-timeline-connector {
+                display: none;
+            }
+            .card-header-custom h3 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-overlay"></div>
+    
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="fas fa-shipping-fast me-2"></i>DeeJohnson Logistics</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link text-white" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="/track">Track</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5 pt-4" style="position: relative; z-index: 1;">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="tracking-card">
+                    <div class="card-header-custom">
+                        <div class="express-badge"><i class="fas fa-bolt"></i> EXPRESS</div>
+                        <h3 class="mb-0"><i class="fas fa-search"></i> Track Express Shipment</h3>
+                        <p class="mb-0 mt-2 opacity-75">Enter your EXPDJL tracking code</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="POST">
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Tracking Code</label>
+                                <div class="input-group input-group-lg">
+                                    <input type="text" name="tracking_code" class="form-control" 
+                                           placeholder="e.g., EXPDJL482901" required>
+                                    <button type="submit" class="btn btn-express-track px-4">
+                                        <i class="fas fa-search"></i> Track
+                                    </button>
+                                </div>
+                                <small class="text-muted"><i class="fas fa-info-circle"></i> Express codes start with EXPDJL</small>
+                            </div>
+                        </form>
+
+                        {% if shipment %}
+                        <div class="mt-4">
+                            <div class="express-badge mb-2" style="background: #28a745; color: white;">
+                                <i class="fas fa-bolt"></i> EXPRESS PACKAGE
+                            </div>
+                            
+                            <div class="info-card">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="info-label">Tracking Code</div>
+                                        <div class="info-value"><strong>{{ shipment.tracking_code }}</strong></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-label">Current Status</div>
+                                        <div class="info-value">
+                                            {% if 'Delivered' in shipment.status %}
+                                                <span class="status-badge status-delivered"><i class="fas fa-check-circle"></i> {{ shipment.status }}</span>
+                                            {% elif 'transit' in shipment.status.lower() or 'departed' in shipment.status.lower() %}
+                                                <span class="status-badge status-transit"><i class="fas fa-truck"></i> {{ shipment.status }}</span>
+                                            {% else %}
+                                                <span class="status-badge status-pending"><i class="fas fa-clock"></i> {{ shipment.status }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ========================================== -->
+                            <!-- EXPRESS 6-STEP TIMELINE                     -->
+                            <!-- ========================================== -->
+                            <h5 class="mb-3 mt-4"><i class="fas fa-bolt" style="color: var(--express-gold);"></i> Express Timeline</h5>
+                            <div class="express-timeline-container">
+                                
+                                {% set status_text = shipment.status %}
+
+                                <!-- Fuzzy matching for Express 6-step order (BULLETPROOF) -->
+                                {% set status_clean = shipment.status.lower().strip() %}
+
+                                {% if 'delivered' in status_clean %}
+                                    {% set active_stage = 6 %}
+                                {% elif 'out for delivery' in status_clean or 'out for' in status_clean %}
+                                    {% set active_stage = 5 %}
+                                {% elif 'local sorting' in status_clean or 'arrived at local' in status_clean or 'sorting center' in status_clean %}
+                                    {% set active_stage = 4 %}
+                                {% elif 'departed' in status_clean %}
+                                    {% set active_stage = 3 %}
+                                {% elif 'received' in status_clean or 'courier' in status_clean %}
+                                    {% set active_stage = 2 %}
+                                {% else %}
+                                    {% set active_stage = 1 %}
+                                {% endif %}
+
+                                <!-- Step 1: Label Created -->
+                                <div class="express-timeline-item">
+                                    <div class="express-timeline-icon {% if active_stage > 1 %}completed{% elif active_stage == 1 %}active{% else %}pending{% endif %}">
+                                        {% if active_stage > 1 %}<i class="fas fa-check"></i>{% elif active_stage == 1 %}<i class="fas fa-tag"></i>{% else %}<i class="fas fa-circle"></i>{% endif %}
+                                    </div>
+                                    <div class="express-timeline-content">
+                                        <div class="express-timeline-title">Label Created</div>
+                                        <div class="express-timeline-date">
+                                            {% if active_stage >= 1 %}{{ shipment.last_update.strftime('%B %d, %Y - %I:%M %p') }}{% else %}Pending{% endif %}
+                                        </div>
+                                        <div class="express-timeline-description">
+                                            {% if active_stage > 1 %}Express label has been generated{% elif active_stage == 1 %}Label is being created{% else %}Awaiting label creation{% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="express-timeline-connector {% if active_stage > 1 %}completed{% elif active_stage == 1 %}active{% else %}pending{% endif %}"></div>
+                                </div>
+
+                                <!-- Step 2: Received by Courier -->
+                                <div class="express-timeline-item">
+                                    <div class="express-timeline-icon {% if active_stage > 2 %}completed{% elif active_stage == 2 %}active{% else %}pending{% endif %}">
+                                        {% if active_stage > 2 %}<i class="fas fa-check"></i>{% elif active_stage == 2 %}<i class="fas fa-user-check"></i>{% else %}<i class="fas fa-circle"></i>{% endif %}
+                                    </div>
+                                    <div class="express-timeline-content">
+                                        <div class="express-timeline-title">Received by Courier</div>
+                                        <div class="express-timeline-date">
+                                            {% if active_stage > 2 %}{{ shipment.last_update.strftime('%B %d, %Y') }}{% elif active_stage == 2 %}In progress...{% else %}Pending{% endif %}
+                                        </div>
+                                        <div class="express-timeline-description">
+                                            {% if active_stage > 2 %}Package scanned by courier{% elif active_stage == 2 %}Courier is receiving the package{% else %}Awaiting courier pickup{% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="express-timeline-connector {% if active_stage > 2 %}completed{% elif active_stage == 2 %}active{% else %}pending{% endif %}"></div>
+                                </div>
+
+                                <!-- Step 3: Departed Facility -->
+                                <div class="express-timeline-item">
+                                    <div class="express-timeline-icon {% if active_stage > 3 %}completed{% elif active_stage == 3 %}active{% else %}pending{% endif %}">
+                                        {% if active_stage > 3 %}<i class="fas fa-check"></i>{% elif active_stage == 3 %}<i class="fas fa-plane-departure"></i>{% else %}<i class="fas fa-circle"></i>{% endif %}
+                                    </div>
+                                    <div class="express-timeline-content">
+                                        <div class="express-timeline-title">Departed Facility</div>
+                                        <div class="express-timeline-date">
+                                            {% if active_stage > 3 %}{{ shipment.last_update.strftime('%B %d, %Y') }}{% elif active_stage == 3 %}In progress...{% else %}Pending{% endif %}
+                                        </div>
+                                        <div class="express-timeline-description">
+                                            {% if active_stage > 3 %}Package has left the facility{% elif active_stage == 3 %}Package is departing the facility{% else %}Awaiting departure{% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="express-timeline-connector {% if active_stage > 3 %}completed{% elif active_stage == 3 %}active{% else %}pending{% endif %}"></div>
+                                </div>
+
+                                <!-- Step 4: Arrived at Local Sorting Center -->
+                                <div class="express-timeline-item">
+                                    <div class="express-timeline-icon {% if active_stage > 4 %}completed{% elif active_stage == 4 %}active{% else %}pending{% endif %}">
+                                        {% if active_stage > 4 %}<i class="fas fa-check"></i>{% elif active_stage == 4 %}<i class="fas fa-warehouse"></i>{% else %}<i class="fas fa-circle"></i>{% endif %}
+                                    </div>
+                                    <div class="express-timeline-content">
+                                        <div class="express-timeline-title">Arrived at Local Sorting Center</div>
+                                        <div class="express-timeline-date">
+                                            {% if active_stage > 4 %}{{ shipment.last_update.strftime('%B %d, %Y') }}{% elif active_stage == 4 %}In progress...{% else %}Pending{% endif %}
+                                        </div>
+                                        <div class="express-timeline-description">
+                                            {% if active_stage > 4 %}Package sorted at local facility{% elif active_stage == 4 %}Package has arrived at sorting center{% else %}Awaiting arrival at sorting center{% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="express-timeline-connector {% if active_stage > 4 %}completed{% elif active_stage == 4 %}active{% else %}pending{% endif %}"></div>
+                                </div>
+
+                                <!-- Step 5: Out for Delivery -->
+                                <div class="express-timeline-item">
+                                    <div class="express-timeline-icon {% if active_stage > 5 %}completed{% elif active_stage == 5 %}active{% else %}pending{% endif %}">
+                                        {% if active_stage > 5 %}<i class="fas fa-check"></i>{% elif active_stage == 5 %}<i class="fas fa-truck-fast"></i>{% else %}<i class="fas fa-circle"></i>{% endif %}
+                                    </div>
+                                    <div class="express-timeline-content">
+                                        <div class="express-timeline-title">Out for Delivery</div>
+                                        <div class="express-timeline-date">
+                                            {% if active_stage > 5 %}{{ shipment.last_update.strftime('%B %d, %Y') }}{% elif active_stage == 5 %}In progress...{% else %}Pending{% endif %}
+                                        </div>
+                                        <div class="express-timeline-description">
+                                            {% if active_stage > 5 %}Package has been delivered{% elif active_stage == 5 %}Package is currently out for delivery{% else %}Awaiting delivery dispatch{% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="express-timeline-connector {% if active_stage > 5 %}completed{% elif active_stage == 5 %}active{% else %}pending{% endif %}"></div>
+                                </div>
+
+                                <!-- Step 6: Delivered -->
+                                <div class="express-timeline-item">
+                                    <div class="express-timeline-icon {% if active_stage >= 6 %}completed{% else %}pending{% endif %}">
+                                        {% if active_stage >= 6 %}<i class="fas fa-check"></i>{% else %}<i class="fas fa-circle"></i>{% endif %}
+                                    </div>
+                                    <div class="express-timeline-content">
+                                        <div class="express-timeline-title">Delivered</div>
+                                        <div class="express-timeline-date">
+                                            {% if active_stage >= 6 %}{{ shipment.last_update.strftime('%B %d, %Y - %I:%M %p') }}{% else %}Pending{% endif %}
+                                        </div>
+                                        <div class="express-timeline-description">
+                                            {% if active_stage >= 6 %}
+                                                ✅ Package delivered to {{ shipment.destination }}
+                                            {% else %}
+                                                Package is still in transit
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Shipment Details Card -->
+                            <div class="card mt-4" style="border-radius: 15px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+                                <div class="card-header bg-light" style="border-bottom: 2px solid var(--express-gold);">
+                                    <h6 class="mb-0"><i class="fas fa-info-circle"></i> Express Shipment Details</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <table class="table table-sm table-borderless">
+                                                <tr><th width="40%">Customer Name:</th><td>{{ shipment.customer_name }}</td></tr>
+                                                <tr><th>Customer Phone:</th><td>{{ shipment.customer_phone or '-' }}</td></tr>
+                                                <tr><th>Customer Email:</th><td>{{ shipment.customer_email or '-' }}</td></tr>
+                                                <tr><th>Package Type:</th><td>{{ shipment.package_type }}</td></tr>
+                                                <tr><th>Weight:</th><td>{{ shipment.package_weight }} kg</td></tr>
+                                            </table>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <table class="table table-sm table-borderless">
+                                                <tr><th width="40%">Origin:</th><td>{{ shipment.origin }}</td></tr>
+                                                <tr><th>Destination:</th><td>{{ shipment.destination }}</td></tr>
+                                                <tr><th>Last Update:</th><td>{{ shipment.last_update.strftime('%Y-%m-%d %H:%M') }}</td></tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% elif request.method == 'POST' %}
+                        <div class="alert alert-danger mt-4">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            <strong>Express tracking code not found!</strong> Please check the code and try again.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="help-section">
+                    <p>
+                        <i class="fas fa-question-circle"></i> Need help with your express package? 
+                        <a href="/#contact">Contact our support team</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

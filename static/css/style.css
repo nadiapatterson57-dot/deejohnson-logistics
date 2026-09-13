@@ -192,3 +192,204 @@ video {
 .modal-footer .btn-success:hover {
     background-color: #128C7E;
 }
+
+/* Payment Options Styles */
+.payment-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.payment-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+}
+.payment-card .badge {
+    font-size: 0.7rem;
+    padding: 5px 10px;
+}
+#bankDetails .table {
+    margin-bottom: 0;
+}
+#bankDetails .table th {
+    background: var(--navy-deep);
+    color: white;
+}
+
+/* Coverage Map Styles */
+.map-container {
+    position: relative;
+    overflow: hidden;
+}
+.map-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+.coverage-card .badge {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+}
+
+/* Process Flow Styles */
+.process-step:hover {
+    transform: translateY(-5px);
+}
+.process-icon {
+    transition: transform 0.3s ease;
+}
+.process-step:hover .process-icon {
+    transform: scale(1.1);
+}
+
+/* Responsive arrows */
+@media (max-width: 992px) {
+    .process-step {
+        margin-bottom: 20px;
+    }
+}
+
+/* Custom Burger Menu Styles */
+.burger-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 22px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1001;
+}
+
+.burger-line {
+    width: 100%;
+    height: 3px;
+    background: white;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    transform-origin: center;
+}
+
+.burger-btn.active .burger-line:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+}
+
+.burger-btn.active .burger-line:nth-child(2) {
+    opacity: 0;
+}
+
+.burger-btn.active .burger-line:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+}
+
+.mobile-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #0A192F, #0F3B5C);
+    padding: 20px;
+    margin-top: 8px;
+    border-radius: 0 0 15px 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    z-index: 1000;
+}
+
+.mobile-menu.open {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mobile-nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.mobile-nav .nav-item {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.mobile-nav .nav-item:last-child {
+    border-bottom: none;
+}
+
+.mobile-nav .nav-link {
+    color: white;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 500;
+    display: block;
+    transition: all 0.3s;
+}
+
+.mobile-nav .nav-link:hover {
+    color: #C9A03D;
+    padding-left: 10px;
+}
+
+/* Show burger on tablet/mobile */
+@media (max-width: 991.98px) {
+    .burger-btn {
+        display: flex;
+    }
+    
+    .navbar .navbar-brand {
+        font-size: 1.2rem !important;
+    }
+}
+
+@media (min-width: 992px) {
+    .mobile-menu {
+        display: none !important;
+    }
+}
+
+/* Desktop nav - show links inline */
+@media (min-width: 992px) {
+    .navbar .container .d-flex {
+        flex-wrap: wrap;
+    }
+}
+
+/* ===== NAVBAR MOBILE FIXES ===== */
+@media (max-width: 991px) {
+    .navbar-collapse {
+        background: linear-gradient(135deg, var(--navy-deep), var(--navy-dark));
+        padding: 20px;
+        border-radius: 16px;
+        margin-top: 15px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    .navbar-nav .nav-link {
+        padding: 12px 15px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .navbar-nav .nav-link:last-child {
+        border-bottom: none;
+    }
+    .navbar-brand {
+        font-size: 1.4rem;
+    }
+    /* Hide the long company name on mobile by default */
+    .company-name-mobile {
+        display: none;
+    }
+    /* When toggled, show it */
+    .company-name-mobile.show {
+        display: inline;
+    }
+}

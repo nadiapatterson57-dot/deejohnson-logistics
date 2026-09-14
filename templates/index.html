@@ -80,15 +80,20 @@
             width: 80%;
         }
 
-        /* Hero Section with Parallax */
+        /* ===== HERO SECTION - CINEMATIC ===== */
         .hero {
-            background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy-dark) 50%, var(--navy-medium) 100%);
+            position: relative;
             min-height: 100vh;
             display: flex;
             align-items: center;
-            position: relative;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 20px;
             overflow: hidden;
+            background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy-dark) 50%, var(--navy-medium) 100%);
         }
+
+        /* Background Image Layer */
         .hero::before {
             content: '';
             position: absolute;
@@ -96,25 +101,139 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1920') center/cover;
-            opacity: 0.08;
-            animation: zoomIn 20s ease infinite;
+            background: url('{{ url_for("static", filename="images/hero-bg.jpg") }}') center/cover no-repeat;
+            /* FALLBACK URL (until you save the image locally): */
+            /* background: url('https://images.pexels.com/photos/28482154/pexels-photo-28482154.jpeg?auto=compress&cs=tinysrgb&w=1920') center/cover no-repeat; */
+            z-index: 1;
+            animation: slowZoom 20s ease-in-out infinite alternate;
         }
-        .hero-content {
-            position: relative;
+
+        /* Dark Navy Overlay */
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(10, 25, 47, 0.85) 0%,
+                rgba(11, 43, 77, 0.80) 50%,
+                rgba(15, 59, 92, 0.75) 100%
+            );
             z-index: 2;
         }
-        .floating {
-            animation: float 3s ease-in-out infinite;
+
+        /* Slow Zoom Animation for Cinematic Feel */
+        @keyframes slowZoom {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.08); }
         }
+
+        /* Hero Content (on top of everything) */
+        .hero-content {
+            position: relative;
+            z-index: 3;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
         .hero h1 {
-            animation: slideInUp 0.8s ease;
-        }
-        .hero p {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: white;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
             animation: slideInUp 1s ease;
         }
-        .hero-buttons {
+
+        .hero h1 span {
+            color: var(--gold-accent);
+        }
+
+        .hero p.lead {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.95);
+            max-width: 700px;
+            margin: 0 auto 30px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
             animation: slideInUp 1.2s ease;
+        }
+
+        /* Buttons */
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: slideInUp 1.4s ease;
+        }
+
+        /* Stats Row */
+        .hero-stats-row {
+            display: flex;
+            gap: 50px;
+            justify-content: center;
+            margin-top: 50px;
+            flex-wrap: wrap;
+            animation: slideInUp 1.6s ease;
+        }
+
+        .hero-stats-row .stat-item {
+            text-align: center;
+            color: white;
+        }
+
+        .hero-stats-row .stat-item h3 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--gold-accent);
+            margin: 0;
+        }
+
+        .hero-stats-row .stat-item p {
+            margin: 5px 0 0;
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+
+        /* Trust Badges */
+        .hero-trust {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            animation: slideInUp 1.8s ease;
+        }
+
+        .hero-trust div i {
+            color: var(--gold-accent);
+            margin-right: 8px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            .hero p.lead {
+                font-size: 1rem;
+            }
+            .hero-stats-row {
+                gap: 25px;
+            }
+            .hero-stats-row .stat-item h3 {
+                font-size: 1.4rem;
+            }
+            .hero-trust {
+                gap: 15px;
+                font-size: 0.85rem;
+            }
         }
 
         /* Premium Services Section - UPDATED */
@@ -540,33 +659,46 @@
     </div>
 </nav>
 
-<!-- Hero Section -->
+<!-- ===== HERO SECTION - CINEMATIC ===== -->
 <section id="home" class="hero">
     <div class="container hero-content">
-        <div class="row align-items-center">
-            <div class="col-lg-7 text-white" data-aos="fade-right">
-                <h1 class="display-3 fw-bold mb-4">Fast & Reliable Logistics<br>From Ibadan to <span style="color: var(--gold-accent);">Worldwide</span></h1>
-                <p class="lead mb-4">Professional package clearance at Lagos Airport and international shipping with FedEx, DHL, and UPS. Track your package in real-time from pickup to delivery.</p>
-                <div class="hero-buttons">
-                    <a href="/track" class="btn btn-light btn-lg px-4 me-3 cta-button">
-                        <i class="fas fa-search"></i> Track Package
-                    </a>
-                    <a href="#contact" class="btn btn-outline-light btn-lg px-4">
-                        <i class="fas fa-envelope"></i> Get Quote
-                    </a>
+        <div class="text-white" data-aos="fade-up">
+            
+            <h1>Fast & Reliable Logistics<br>From Ibadan to <span>Worldwide</span></h1>
+            
+            <p class="lead">
+                Professional package clearance at Lagos Airport and international shipping 
+                with FedEx, DHL, and UPS. Track your package in real-time from pickup to delivery.
+            </p>
+            
+            <div class="hero-buttons">
+                <a href="/track" class="btn btn-primary btn-lg px-5">
+                    <i class="fas fa-search me-2"></i> Track Package
+                </a>
+                <a href="#contact" class="btn btn-outline-light btn-lg px-5">
+                    <i class="fas fa-envelope me-2"></i> Get Quote
+                </a>
+            </div>
+
+            <div class="hero-stats-row">
+                <div class="stat-item">
+                    <h3>500+</h3>
+                    <p>Packages Delivered</p>
                 </div>
-                <div class="mt-5">
-                    <div class="d-flex gap-4">
-                        <div><i class="fas fa-check-circle"></i> 24/7 Support</div>
-                        <div><i class="fas fa-check-circle"></i> Real-time Tracking</div>
-                        <div><i class="fas fa-check-circle"></i> Insurance Available</div>
-                    </div>
+                <div class="stat-item">
+                    <h3>98%</h3>
+                    <p>On-Time Rate</p>
+                </div>
+                <div class="stat-item">
+                    <h3>24/7</h3>
+                    <p>Support</p>
                 </div>
             </div>
-            <div class="col-lg-5 text-center" data-aos="fade-left">
-                <div class="floating">
-                    <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=500" alt="Logistics" class="img-fluid rounded shadow-lg" style="border-radius: 30px;">
-                </div>
+
+            <div class="hero-trust">
+                <div><i class="fas fa-check-circle"></i> 24/7 Support</div>
+                <div><i class="fas fa-check-circle"></i> Real-time Tracking</div>
+                <div><i class="fas fa-check-circle"></i> Insurance Available</div>
             </div>
         </div>
     </div>

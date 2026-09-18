@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0F3B5C">
+    <title>My Deliveries - DeeJohnson Rider</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f4f6f9;
+            color: #0A192F;
+            padding-bottom: 80px;
+            min-height: 100vh;
+        }
+
+        /* ===== TOP BAR ===== */
+        .top-bar {
+            background: linear-gradient(135deg, #0A192F, #0F3B5C);
+            color: white;
+            padding: 20px 20px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(10, 25, 47, 0.15);
+        }
+
+        .top-bar .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .greeting h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin: 0 0 2px;
+            letter-spacing: -0.3px;
+        }
+
+        .greeting p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin: 0;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .offline-badge {
+            display: none;
+            background: #dc3545;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-top: 8px;
+            width: fit-content;
+        }
+
+        .offline-badge.show { display: inline-block; }
+
+        /* ===== STATS STRIP ===== */
+        .stats-strip {
+            display: flex;
+            background: white;
+            margin: -12px 16px 0;
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 8px 24px rgba(10, 25, 47, 0.08);
+            position: relative;
+            z-index: 5;
+            gap: 12px;
+        }
+
+        .stat-item {
+            flex: 1;
+            text-align: center;
+            border-right: 1px solid #f0f2f5;
+        }
+
+        .stat-item:last-child {
+            border-right: none;
+        }
+
+        .stat-number {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: #0F3B5C;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        /* ===== SECTIONS ===== */
+        .section {
+            padding: 24px 16px 0;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ===== DELIVERY CARD ===== */
+        .delivery-card {
+            background: white;
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+            border: 1px solid #eef0f4;
+            border-left: 4px solid #C9A03D;
+            transition: all 0.2s;
+        }
+
+        .delivery-card.in_transit { border-left-color: #0F3B5C; }
+        .delivery-card.picked_up { border-left-color: #0d6efd; }
+        .delivery-card.assigned { border-left-color: #C9A03D; }
+
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 14px;
+            gap: 10px;
+        }
+
+        .tracking-code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #0F3B5C;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pill {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .status-assigned { background: #fef3c7; color: #92400e; }
+        .status-picked_up { background: #dbeafe; color: #1e40af; }
+        .status-in_transit { background: #cffafe; color: #155e75; }
+        .status-delivered { background: #d1fae5; color: #065f46; }
+        .status-failed { background: #fee2e2; color: #991b1b; }
+
+        .info-block {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 5px 0;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .info-row i {
+            width: 18px;
+            color: #C9A03D;
+            font-size: 0.9rem;
+            padding-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .info-row .label {
+            color: #6b7280;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            display: block;
+            margin-bottom: 1px;
+        }
+
+        .info-row .value {
+            color: #0A192F;
+            font-weight: 600;
+        }
+
+        /* ===== ACTION BUTTONS ===== */
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px 8px;
+            border-radius: 12px;
+            border: none;
+            font-family: inherit;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .action-btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-call {
+            background: #25D366;
+            color: white;
+        }
+
+        .btn-call:active { background: #1ea952; }
+
+        .btn-map {
+            background: #0F3B5C;
+            color: white;
+        }
+
+        .btn-map:active { background: #0A192F; }
+
+        .btn-update {
+            background: #C9A03D;
+            color: #0A192F;
+        }
+
+        .btn-update:active { background: #b8912f; }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+        }
+
+        .empty-state i {
+            font-size: 3.5rem;
+            color: #d1d5db;
+            margin-bottom: 14px;
+        }
+
+        .empty-state h3 {
+            color: #0A192F;
+            font-weight: 800;
+            font-size: 1.15rem;
+            margin-bottom: 6px;
+        }
+
+        .empty-state p {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* ===== LOADER ===== */
+        .loader {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .loader .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e5e7eb;
+            border-top-color: #0F3B5C;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            border-top: 1px solid #e5e7eb;
+            box-shadow: 0 -4px 20px rgba(10, 25, 47, 0.08);
+            z-index: 100;
+        }
+
+        .bottom-nav a {
+            flex: 1;
+            padding: 12px 6px;
+            text-align: center;
+            color: #9ca3af;
+            text-decoration: none;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            transition: color 0.15s;
+        }
+
+        .bottom-nav a i {
+            display: block;
+            font-size: 1.25rem;
+            margin-bottom: 4px;
+        }
+
+        .bottom-nav a.active,
+        .bottom-nav a:hover {
+            color: #0F3B5C;
+        }
+
+        /* ===== MODAL (PLACEHOLDER FOR PART C) ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 25, 47, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 9999;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal-box {
+            background: white;
+            border-radius: 20px;
+            padding: 28px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .modal-box h3 {
+            color: #0A192F;
+            font-weight: 800;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .modal-box p {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .modal-box button {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            background: #0F3B5C;
+            color: white;
+        }
+
+        /* ===== REFRESH INDICATOR ===== */
+        .refresh-bar {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #9ca3af;
+            padding: 12px 16px 24px;
+        }
+
+                /* ===== UPDATE MODAL STYLES ===== */
+        .update-box {
+            text-align: left;
+            max-height: 92vh;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .modal-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .modal-header-row h3 {
+            margin: 0;
+            color: #0A192F;
+            font-weight: 800;
+            font-size: 1.15rem;
+        }
+
+        .close-x {
+            background: #f0f2f5;
+            border: none;
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            color: #6b7280;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shipment-info {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 18px;
+            font-size: 0.85rem;
+            color: #0A192F;
+        }
+
+        .shipment-info .code {
+            font-family: 'Courier New', monospace;
+            font-weight: 800;
+            color: #0F3B5C;
+            letter-spacing: 0.5px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #0A192F;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            margin-top: 14px;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-textarea:focus {
+            border-color: #0F3B5C;
+            box-shadow: 0 0 0 3px rgba(15, 59, 92, 0.08);
+        }
+
+        .status-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .status-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 14px 8px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: white;
+        }
+
+        .status-option input { display: none; }
+
+        .status-option i {
+            font-size: 1.3rem;
+            color: #9ca3af;
+        }
+
+        .status-option span {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #6b7280;
+        }
+
+        .status-option.selected {
+            border-color: #0F3B5C;
+            background: rgba(15, 59, 92, 0.05);
+        }
+
+        .status-option.selected i,
+        .status-option.selected span {
+            color: #0F3B5C;
+        }
+
+        .photo-upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fafbfc;
+        }
+
+        .photo-upload-area:hover {
+            border-color: #0F3B5C;
+            background: #f0f4f8;
+        }
+
+        #photoPlaceholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: #6b7280;
+        }
+
+        #photoPlaceholder i {
+            font-size: 1.8rem;
+            color: #0F3B5C;
+        }
+
+        #photoPlaceholder span {
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        #photoPreview {
+            width: 100%;
+            border-radius: 12px;
+            max-height: 220px;
+            object-fit: cover;
+        }
+
+        .modal-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-cancel, .btn-save {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .btn-cancel {
+            background: #f0f2f5;
+            color: #0A192F;
+        }
+
+        .btn-save {
+            background: #0F3B5C;
+            color: white;
+        }
+
+        .btn-save:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .update-error {
+            margin-top: 12px;
+            padding: 12px 14px;
+            background: #fee2e2;
+            color: #991b1b;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== TOP BAR ===== -->
+    <div class="top-bar">
+        <div class="row">
+            <div class="greeting">
+                <h1>Hi, {{ rider.full_name.split()[0] }} 👋</h1>
+                <p>Here are your deliveries for today</p>
+                <span class="offline-badge" id="offlineBadge">
+                    <i class="fas fa-wifi"></i> Offline
+                </span>
+            </div>
+            <a href="/dispatch_riders/logout" class="logout-btn" title="Log Out">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- ===== STATS STRIP ===== -->
+    <div class="stats-strip">
+        <div class="stat-item">
+            <div class="stat-number" id="activeCount">—</div>
+            <div class="stat-label">Active</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" id="deliveredCount">—</div>
+            <div class="stat-label">Delivered</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" id="totalCount">—</div>
+            <div class="stat-label">Total</div>
+        </div>
+    </div>
+
+    <!-- ===== ACTIVE DELIVERIES ===== -->
+    <div class="section">
+        <div class="section-title">
+            <i class="fas fa-box" style="color: #C9A03D;"></i>
+            Active Deliveries
+        </div>
+
+        <div id="activeDeliveries">
+            <div class="loader">
+                <div class="spinner"></div>
+                <div style="color: #6b7280; font-size: 0.85rem;">Loading your deliveries…</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== REFRESH BAR ===== -->
+    <div class="refresh-bar">
+        <span id="lastUpdated">Auto-refreshing every 30 seconds</span>
+    </div>
+
+    <!-- ===== BOTTOM NAV ===== -->
+    <div class="bottom-nav">
+        <a href="/dispatch_riders/dashboard" class="active">
+            <i class="fas fa-home"></i>
+            Deliveries
+        </a>
+        <a href="#" onclick="showComingSoon('History'); return false;">
+            <i class="fas fa-history"></i>
+            History
+        </a>
+        <a href="#" onclick="showComingSoon('Profile'); return false;">
+            <i class="fas fa-user"></i>
+            Profile
+        </a>
+        <a href="/dispatch_riders/logout">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </a>
+    </div>
+
+    <!-- ===== COMING SOON MODAL ===== -->
+    <div class="modal-overlay" id="comingSoonModal">
+        <div class="modal-box">
+            <i class="fas fa-tools" style="font-size: 2.5rem; color: #C9A03D; margin-bottom: 15px;"></i>
+            <h3 id="comingSoonTitle">Coming Soon</h3>
+            <p>This feature is being built and will be available soon. Check back later!</p>
+            <button onclick="closeComingSoon()">Got It</button>
+        </div>
+    </div>
+
+        <!-- ===== UPDATE MODAL ===== -->
+    <div class="modal-overlay" id="updateModal">
+        <div class="modal-box update-box">
+            <div class="modal-header-row">
+                <h3>Update Delivery</h3>
+                <button class="close-x" onclick="closeUpdateModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div id="updateShipmentInfo" class="shipment-info"></div>
+
+            <form id="updateForm" onsubmit="submitUpdate(event)">
+
+                <label class="form-label">What's the status?</label>
+                <div class="status-options">
+                    <label class="status-option" data-status="picked_up">
+                        <input type="radio" name="status" value="picked_up" required>
+                        <i class="fas fa-box"></i>
+                        <span>Picked Up</span>
+                    </label>
+                    <label class="status-option" data-status="in_transit">
+                        <input type="radio" name="status" value="in_transit">
+                        <i class="fas fa-truck"></i>
+                        <span>In Transit</span>
+                    </label>
+                    <label class="status-option" data-status="delivered">
+                        <input type="radio" name="status" value="delivered">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Delivered</span>
+                    </label>
+                    <label class="status-option" data-status="failed">
+                        <input type="radio" name="status" value="failed">
+                        <i class="fas fa-times-circle"></i>
+                        <span>Failed</span>
+                    </label>
+                </div>
+
+                <label class="form-label">Notes (optional)</label>
+                <textarea id="updateNotes" class="form-textarea" rows="3" placeholder="e.g., Left with security guard"></textarea>
+
+                <label class="form-label">Photo Proof (optional)</label>
+                <div class="photo-upload-area" onclick="document.getElementById('photoInput').click()">
+                    <input type="file" id="photoInput" accept="image/*" capture="environment" style="display: none;" onchange="handlePhoto(event)">
+                    <div id="photoPlaceholder">
+                        <i class="fas fa-camera"></i>
+                        <span>Tap to take or upload a photo</span>
+                    </div>
+                    <img id="photoPreview" style="display: none;">
+                </div>
+
+                <div class="modal-btns">
+                    <button type="button" class="btn-cancel" onclick="closeUpdateModal()">Cancel</button>
+                    <button type="submit" class="btn-save" id="submitBtn">
+                        <span id="submitText">Save Update</span>
+                    </button>
+                </div>
+
+                <div id="updateError" class="update-error" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // STATE
+        // ============================================
+        let currentTaskId = null;
+
+        // ============================================
+        // LOAD TASKS
+        // ============================================
+        async function loadTasks() {
+            try {
+                const res = await fetch('/api/rider/tasks');
+                if (!res.ok) throw new Error('Failed to load');
+                const data = await res.json();
+
+                renderStats(data);
+                renderActiveDeliveries(data.active || []);
+
+                const now = new Date();
+                document.getElementById('lastUpdated').textContent =
+                    'Last updated: ' + now.toLocaleTimeString();
+
+            } catch (err) {
+                console.error('Load error:', err);
+                document.getElementById('activeDeliveries').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i>
+                        <h3>Could not load deliveries</h3>
+                        <p>Please check your connection and try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // ============================================
+        // RENDER STATS
+        // ============================================
+        function renderStats(data) {
+            const active = data.active ? data.active.length : 0;
+            const completed = data.counts ? data.counts.completed_today : 0;
+            const total = active + completed;
+
+            document.getElementById('activeCount').textContent = active;
+            document.getElementById('deliveredCount').textContent = completed;
+            document.getElementById('totalCount').textContent = total;
+        }
+
+        // ============================================
+        // RENDER ACTIVE DELIVERIES
+        // ============================================
+        function renderActiveDeliveries(tasks) {
+            const container = document.getElementById('activeDeliveries');
+
+            if (!tasks.length) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-check-circle" style="color: #10b981;"></i>
+                        <h3>All caught up! 🎉</h3>
+                        <p>You have no active deliveries right now.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = tasks.map(task => `
+                <div class="delivery-card ${task.status}">
+                    <div class="card-header-row">
+                        <div class="tracking-code">${task.tracking_code}</div>
+                        <span class="status-pill status-${task.status}">${formatStatus(task.status)}</span>
+                    </div>
+
+                    <div class="info-block">
+                        <div class="info-row">
+                            <i class="fas fa-user"></i>
+                            <div>
+                                <span class="label">Customer</span>
+                                <span class="value">${escapeHtml(task.customer_name || 'N/A')}</span>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <span class="label">Deliver to</span>
+                                <span class="value">${escapeHtml(task.delivery_address || 'N/A')}</span>
+                            </div>
+                        </div>
+                        ${task.customer_phone ? `
+                        <div class="info-row">
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <span class="label">Phone</span>
+                                <span class="value">${escapeHtml(task.customer_phone)}</span>
+                            </div>
+                        </div>
+                        ` : ''}
+                        <div class="info-row">
+                            <i class="fas fa-box"></i>
+                            <div>
+                                <span class="label">Package</span>
+                                <span class="value">${escapeHtml(task.package_type || 'Parcel')} • ${task.weight || 0} kg</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-actions">
+                        ${task.customer_phone ? `
+                        <a href="tel:${task.customer_phone}" class="action-btn btn-call">
+                            <i class="fas fa-phone"></i> Call
+                        </a>
+                        ` : `
+                        <button class="action-btn" style="background: #e5e7eb; color: #9ca3af; cursor: not-allowed;" disabled>
+                            <i class="fas fa-phone"></i> No Phone
+                        </button>
+                        `}
+                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(task.delivery_address || task.destination || '')}"
+                           target="_blank" class="action-btn btn-map">
+                            <i class="fas fa-map"></i> Map
+                        </a>
+                        <button class="action-btn btn-update" onclick="openUpdateModal(${task.task_id})">
+                            <i class="fas fa-edit"></i> Update
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ============================================
+        // HELPERS
+        // ============================================
+        function formatStatus(status) {
+            const map = {
+                'assigned': 'Assigned',
+                'picked_up': 'Picked Up',
+                'in_transit': 'In Transit',
+                'delivered': 'Delivered',
+                'failed': 'Failed'
+            };
+            return map[status] || status;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+                // ============================================
+        // UPDATE MODAL
+        // ============================================
+        let selectedPhoto = null;
+        let currentTask = null;
+
+        function openUpdateModal(taskId) {
+            currentTaskId = taskId;
+
+            // Find the task data
+            fetch('/api/rider/tasks')
+                .then(r => r.json())
+                .then(data => {
+                    currentTask = (data.active || []).find(t => t.task_id === taskId);
+                    if (currentTask) {
+                        document.getElementById('updateShipmentInfo').innerHTML =
+                            '<span class="code">' + currentTask.tracking_code + '</span>' +
+                            ' — ' + (currentTask.customer_name || 'N/A') +
+                            '<br><small style="color: #6b7280;">' + (currentTask.delivery_address || '') + '</small>';
+                    }
+                });
+
+            // Reset form
+            document.getElementById('updateForm').reset();
+            document.getElementById('updateNotes').value = '';
+            document.getElementById('photoPreview').style.display = 'none';
+            document.getElementById('photoPlaceholder').style.display = 'flex';
+            document.getElementById('updateError').style.display = 'none';
+            document.querySelectorAll('.status-option').forEach(o => o.classList.remove('selected'));
+            selectedPhoto = null;
+
+            document.getElementById('updateModal').classList.add('show');
+        }
+
+        function closeUpdateModal() {
+            document.getElementById('updateModal').classList.remove('show');
+        }
+
+        // Status option click handler
+        document.addEventListener('click', function(e) {
+            const option = e.target.closest('.status-option');
+            if (option) {
+                document.querySelectorAll('.status-option').forEach(o => o.classList.remove('selected'));
+                option.classList.add('selected');
+                option.querySelector('input').checked = true;
+            }
+        });
+
+        // Photo handler
+        function handlePhoto(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                selectedPhoto = e.target.result; // base64
+                document.getElementById('photoPreview').src = e.target.result;
+                document.getElementById('photoPreview').style.display = 'block';
+                document.getElementById('photoPlaceholder').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Submit update
+        async function submitUpdate(event) {
+            event.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const submitText = document.getElementById('submitText');
+            const errorEl = document.getElementById('updateError');
+
+            errorEl.style.display = 'none';
+
+            const selectedStatus = document.querySelector('input[name="status"]:checked');
+            if (!selectedStatus) {
+                errorEl.textContent = 'Please select a status.';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            const payload = {
+                status: selectedStatus.value,
+                notes: document.getElementById('updateNotes').value.trim(),
+                photo_data: selectedPhoto
+            };
+
+            submitBtn.disabled = true;
+            submitText.textContent = 'Saving…';
+
+            try {
+                const res = await fetch('/api/rider/task/' + currentTaskId + '/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+
+                if (!res.ok || !data.success) {
+                    throw new Error(data.error || 'Failed to update');
+                }
+
+                // Success
+                closeUpdateModal();
+                submitText.textContent = 'Saved!';
+                setTimeout(() => {
+                    loadTasks();
+                    submitBtn.disabled = false;
+                    submitText.textContent = 'Save Update';
+                }, 500);
+
+            } catch (err) {
+                errorEl.textContent = err.message || 'Something went wrong. Please try again.';
+                errorEl.style.display = 'block';
+                submitBtn.disabled = false;
+                submitText.textContent = 'Save Update';
+            }
+        }
+
+        // ============================================
+        // ONLINE / OFFLINE
+        // ============================================
+        window.addEventListener('online', () => {
+            document.getElementById('offlineBadge').classList.remove('show');
+            loadTasks();
+        });
+        window.addEventListener('offline', () => {
+            document.getElementById('offlineBadge').classList.add('show');
+        });
+
+        // ============================================
+        // AUTO REFRESH
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTasks();
+            setInterval(loadTasks, 30000);
+        });
+    </script>
+
+</body>
+</html>

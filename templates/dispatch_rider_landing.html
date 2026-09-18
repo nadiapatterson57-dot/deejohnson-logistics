@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0F3B5C">
+    <title>Dispatch Riders - DeeJohnson Logistics</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow: hidden;
+        }
+
+        /* ===== FULL-SCREEN BACKGROUND ===== */
+        .rider-hero {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            min-height: 100dvh;
+
+            /* Local image (preferred) */
+            background-image: url("{{ url_for('static', filename='images/rider-hero.jpg') }}");
+            
+            /* Fallback URL in case the local file isn't saved yet */
+            background-image: url("{{ url_for('static', filename='images/rider-hero.jpg') }}"),
+                              url('https://images.pexels.com/photos/18240431/pexels-photo-18240431.jpeg?auto=compress&cs=tinysrgb&w=1600');
+
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 30px 24px 40px;
+            overflow: hidden;
+        }
+
+        /* ===== NAVY GRADIENT OVERLAY ===== */
+        .rider-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(10, 25, 47, 0.55) 0%,
+                rgba(10, 25, 47, 0.35) 35%,
+                rgba(10, 25, 47, 0.80) 65%,
+                rgba(10, 25, 47, 0.95) 100%
+            );
+            z-index: 1;
+        }
+
+        /* ===== CONTENT WRAPPER ===== */
+        .rider-hero > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ===== LOGO / BRAND ===== */
+        .brand {
+            text-align: center;
+            color: white;
+        }
+
+        .brand .brand-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 70px;
+            height: 70px;
+            background: #0F3B5C;                      /* Navy blue (lighter variant) */
+            border-radius: 20px;
+            margin-bottom: 14px;
+            box-shadow: 0 8px 24px rgba(15, 59, 92, 0.5);
+            border: 1px solid rgba(201, 160, 61, 0.35);
+        }
+
+        .brand .brand-icon i {
+            font-size: 2rem;
+            color: white;
+        }
+
+        .brand h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .brand .brand-sub {
+            font-size: 0.75rem;
+            letter-spacing: 4px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.75);
+            text-transform: uppercase;
+        }
+
+        /* ===== BOTTOM TEXT BLOCK ===== */
+        .hero-text {
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .hero-text h2 {
+            font-size: 2.6rem;
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: -1.2px;
+            margin-bottom: 14px;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-text .tagline {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #C9A03D;                            /* Gold accent */
+            margin-bottom: 12px;
+        }
+
+        .hero-text .desc {
+            font-size: 0.95rem;
+            line-height: 1.55;
+            color: rgba(255, 255, 255, 0.85);
+            max-width: 340px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .hero-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .btn-navy,
+        .btn-outline-white {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 18px 24px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+        }
+
+        .btn-navy {
+            background: #0F3B5C;                        /* Navy blue (lighter) */
+            color: #ffffff;
+            box-shadow: 0 8px 24px rgba(15, 59, 92, 0.55);
+            border: 1px solid rgba(201, 160, 61, 0.4);
+        }
+
+        .btn-navy:hover {
+            transform: translateY(-2px);
+            background: #0A192F;                        /* Deeper navy on hover */
+            box-shadow: 0 12px 30px rgba(10, 25, 47, 0.7);
+        }
+
+        .btn-navy:active {
+            transform: translateY(0);
+        }
+
+        .btn-outline-white {
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+        }
+
+        .btn-outline-white:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: white;
+        }
+
+        /* ===== DESKTOP TWEAKS ===== */
+        @media (min-width: 768px) {
+            .rider-hero {
+                padding: 50px 60px 60px;
+                align-items: center;
+            }
+
+            .rider-hero > * {
+                width: 100%;
+                max-width: 480px;
+            }
+
+            .hero-text h2 {
+                font-size: 3.4rem;
+            }
+
+            .hero-text .desc {
+                max-width: 100%;
+                font-size: 1.05rem;
+            }
+
+            .btn-navy,
+            .btn-outline-white {
+                padding: 20px 28px;
+                font-size: 1.05rem;
+            }
+        }
+
+        /* ===== SMALL PHONES ===== */
+        @media (max-height: 700px) {
+            .brand .brand-icon {
+                width: 58px;
+                height: 58px;
+                border-radius: 16px;
+            }
+            .brand .brand-icon i {
+                font-size: 1.6rem;
+            }
+            .brand h1 {
+                font-size: 1.35rem;
+            }
+            .hero-text h2 {
+                font-size: 2.1rem;
+            }
+            .hero-text {
+                margin-bottom: 20px;
+            }
+            .btn-navy,
+            .btn-outline-white {
+                padding: 15px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="rider-hero">
+
+        <!-- ===== BRAND ===== -->
+        <div class="brand">
+            <div class="brand-icon">
+                <i class="fas fa-motorcycle"></i>
+            </div>
+            <h1>DeeJohnson</h1>
+            <div class="brand-sub">Logistics</div>
+        </div>
+
+        <!-- ===== HERO TEXT ===== -->
+        <div class="hero-text">
+            <h2>Delivering<br>Possibilities</h2>
+            <div class="tagline">Fast. Safe. Reliable.</div>
+            <p class="desc">
+                Join our rider network and be part of a team that moves more.
+            </p>
+        </div>
+
+        <!-- ===== ACTIONS ===== -->
+        <div class="hero-actions">
+            <a href="/dispatch_riders/signup" class="btn-navy">
+                Sign Up
+            </a>
+            <a href="/dispatch_riders/login" class="btn-outline-white">
+                Log In
+            </a>
+        </div>
+
+    </div>
+
+</body>
+</html>

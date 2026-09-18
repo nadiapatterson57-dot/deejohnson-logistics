@@ -65,6 +65,12 @@
                     <button class="nav-link text-white" data-bs-toggle="pill" data-bs-target="#update" type="button"><i class="fas fa-edit"></i> Update Status</button>
                     <button class="nav-link text-white" data-bs-toggle="pill" data-bs-target="#reviews" type="button"><i class="fas fa-star"></i> Add Reviews</button>
                     <button class="nav-link text-white" data-bs-toggle="pill" data-bs-target="#shipments" type="button"><i class="fas fa-list"></i> All Shipments</button>
+                    <button class="nav-link text-white" data-bs-toggle="pill" data-bs-target="#riders" type="button">
+                        <i class="fas fa-motorcycle"></i> Riders
+                        {% if rider_counts.pending > 0 %}
+                            <span class="badge bg-warning text-dark ms-1">{{ rider_counts.pending }}</span>
+                        {% endif %}
+                    </button>
                     <button class="nav-link text-white" data-bs-toggle="pill" data-bs-target="#reports" type="button"><i class="fas fa-download"></i> Reports</button>
                     <button class="nav-link text-white" data-bs-toggle="pill" data-bs-target="#settings" type="button"><i class="fas fa-cog"></i> Settings</button>
                 </div>
@@ -277,133 +283,124 @@
                         </div>
                     </div>
 
-<!-- Update Status Tab -->
-<div class="tab-pane fade" id="update">
-    <div class="card shadow">
-        <div class="card-header bg-success text-white">
-            <h4><i class="fas fa-edit"></i> Update Shipment Status</h4>
-        </div>
-        <div class="card-body">
-            <form method="POST">
-                <input type="hidden" name="action" value="update_status">
-                
-                <!-- Shipment Type Selection -->
-                <div class="mb-3">
-                    <label>Shipment Type</label>
-                    <select name="shipment_type" id="shipmentTypeSelect" class="form-control" onchange="toggleExpressStatus()">
-                        <option value="outgoing">Outgoing (DJL-...)</option>
-                        <option value="incoming">Incoming (INT-...)</option>
-                        <option value="express">Express (EXPDJL...)</option>
-                    </select>
-                </div>
-                
-                <!-- Tracking Code -->
-                <div class="mb-3">
-                    <label>Tracking Code *</label>
-                    <input type="text" name="tracking_code" class="form-control" placeholder="DJL-2024-XXXXX or INT-UK-2024-XXXXXX" required>
-                </div>
-                
-                <!-- Status -->
-                <div class="mb-3">
-                    <label>Current Status *</label>
-                    <select name="status" class="form-control" required>
-                        <optgroup label="Outgoing Shipment Status">
-                            <option>Package registered - Awaiting pickup</option>
-                            <option>Picked up from customer</option>
-                            <option>In transit to Lagos</option>
-                            <option>Arrived at Lagos Airport</option>
-                            <option>Customs clearance in progress</option>
-                            <option>Cleared - Awaiting international flight</option>
-                            <option>Handed over to partner courier</option>
-                            <option>In transit internationally</option>
-                            <option>Arrived at destination</option>
-                            <option>Out for delivery</option>
-                            <option>Delivered successfully</option>
-                        </optgroup>
-                        <optgroup label="Incoming Shipment Status">
-                            <option>Shipped from origin country</option>
-                            <option>In transit to Nigeria</option>
-                            <option>Arrived at Lagos Airport</option>
-                            <option>Customs clearance in progress</option>
-                            <option>Customs cleared - Awaiting pickup</option>
-                            <option>Out for delivery in Nigeria</option>
-                            <option>Delivered successfully</option>
-                            <option>Held at customs - Documentation needed</option>
-                        </optgroup>
-                        <optgroup label="Express Shipment Status" id="expressStatusGroup" style="display:none;">
-                            <option>Label Created</option>
-                            <option>Received by Courier</option>
-                            <option>Departed Facility</option>
-                            <option>Arrived at Local Sorting Center</option>
-                            <option>Out for Delivery</option>
-                            <option>Delivered</option>
-                        </optgroup>
-                    </select>
-                </div>
-                
-                <!-- Current Location -->
-                <div class="mb-3">
-                    <label>Current Location</label>
-                    <input type="text" name="current_location" class="form-control" placeholder="e.g., London Heathrow, Lagos Airport, etc.">
-                </div>
-                
-                <!-- ========================================== -->
-                <!-- PARTNER COURIER FIELDS - MAKE SURE THESE EXIST -->
-                <!-- ========================================== -->
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label>Partner Courier</label>
-                        <select name="partner_courier" class="form-control">
-                            <option value="">-- Select Courier --</option>
-                            <option value="FedEx">📦 FedEx</option>
-                            <option value="DHL">✈️ DHL</option>
-                            <option value="UPS">🚚 UPS</option>
-                            <option value="Royal Mail">👑 Royal Mail</option>
-                            <option value="DPD">📮 DPD</option>
-                            <option value="USPS">📬 USPS</option>
-                        </select>
-                        <small class="text-muted">Select the courier for international tracking</small>
+                    <!-- Update Status Tab -->
+                    <div class="tab-pane fade" id="update">
+                        <div class="card shadow">
+                            <div class="card-header bg-success text-white">
+                                <h4><i class="fas fa-edit"></i> Update Shipment Status</h4>
+                            </div>
+                            <div class="card-body">
+                                <form method="POST">
+                                    <input type="hidden" name="action" value="update_status">
+                                    
+                                    <div class="mb-3">
+                                        <label>Shipment Type</label>
+                                        <select name="shipment_type" id="shipmentTypeSelect" class="form-control" onchange="toggleExpressStatus()">
+                                            <option value="outgoing">Outgoing (DJL-...)</option>
+                                            <option value="incoming">Incoming (INT-...)</option>
+                                            <option value="express">Express (EXPDJL...)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label>Tracking Code *</label>
+                                        <input type="text" name="tracking_code" class="form-control" placeholder="DJL-2024-XXXXX or INT-UK-2024-XXXXXX" required>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label>Current Status *</label>
+                                        <select name="status" class="form-control" required id="statusDropdown">
+                                            <optgroup label="Outgoing Shipment Status">
+                                                <option>Package registered - Awaiting pickup</option>
+                                                <option>Picked up from customer</option>
+                                                <option>In transit to Lagos</option>
+                                                <option>Arrived at Lagos Airport</option>
+                                                <option>Customs clearance in progress</option>
+                                                <option>Cleared - Awaiting international flight</option>
+                                                <option>Handed over to partner courier</option>
+                                                <option>In transit internationally</option>
+                                                <option>Arrived at destination</option>
+                                                <option>Out for delivery</option>
+                                                <option>Delivered successfully</option>
+                                            </optgroup>
+                                            <optgroup label="Incoming Shipment Status">
+                                                <option>Shipped from origin country</option>
+                                                <option>In transit to Nigeria</option>
+                                                <option>Arrived at Lagos Airport</option>
+                                                <option>Customs clearance in progress</option>
+                                                <option>Customs cleared - Awaiting pickup</option>
+                                                <option>Out for delivery in Nigeria</option>
+                                                <option>Delivered successfully</option>
+                                                <option>Held at customs - Documentation needed</option>
+                                            </optgroup>
+                                            <optgroup label="Express Shipment Status" id="expressStatusGroup" style="display:none;">
+                                                <option>Label Created</option>
+                                                <option>Received by Courier</option>
+                                                <option>Departed Facility</option>
+                                                <option>Arrived at Local Sorting Center</option>
+                                                <option>Out for Delivery</option>
+                                                <option>Delivered</option>
+                                            </optgroup>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label>Current Location</label>
+                                        <input type="text" name="current_location" class="form-control" placeholder="e.g., London Heathrow, Lagos Airport, etc.">
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label>Partner Courier</label>
+                                            <select name="partner_courier" class="form-control">
+                                                <option value="">-- Select Courier --</option>
+                                                <option value="FedEx">📦 FedEx</option>
+                                                <option value="DHL">✈️ DHL</option>
+                                                <option value="UPS">🚚 UPS</option>
+                                                <option value="Royal Mail">👑 Royal Mail</option>
+                                                <option value="DPD">📮 DPD</option>
+                                                <option value="USPS">📬 USPS</option>
+                                            </select>
+                                            <small class="text-muted">Select the courier for international tracking</small>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label>Partner Tracking Code</label>
+                                            <input type="text" name="partner_tracking" class="form-control" placeholder="e.g., 123456789012">
+                                            <small class="text-muted">Enter the tracking number from the courier</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label>Original Courier (For Incoming)</label>
+                                            <select name="partner_courier_original" class="form-control">
+                                                <option value="">-- Select Courier --</option>
+                                                <option value="Royal Mail">🇬🇧 Royal Mail (UK)</option>
+                                                <option value="USPS">🇺🇸 USPS (USA)</option>
+                                                <option value="Canada Post">🇨🇦 Canada Post</option>
+                                                <option value="China Post">🇨🇳 China Post</option>
+                                                <option value="FedEx">📦 FedEx</option>
+                                                <option value="DHL">✈️ DHL</option>
+                                                <option value="UPS">🚚 UPS</option>
+                                                <option value="DPD">📮 DPD</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label>Original Tracking Number</label>
+                                            <input type="text" name="partner_tracking_original" class="form-control" placeholder="Original courier tracking number">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label>Internal Notes</label>
+                                        <textarea name="notes" rows="3" class="form-control" placeholder="Any additional notes about this shipment..."></textarea>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-success w-100">Update Status</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label>Partner Tracking Code</label>
-                        <input type="text" name="partner_tracking" class="form-control" placeholder="e.g., 123456789012">
-                        <small class="text-muted">Enter the tracking number from the courier</small>
-                    </div>
-                </div>
-                
-                <!-- Original Courier for Incoming -->
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label>Original Courier (For Incoming)</label>
-                        <select name="partner_courier_original" class="form-control">
-                            <option value="">-- Select Courier --</option>
-                            <option value="Royal Mail">🇬🇧 Royal Mail (UK)</option>
-                            <option value="USPS">🇺🇸 USPS (USA)</option>
-                            <option value="Canada Post">🇨🇦 Canada Post</option>
-                            <option value="China Post">🇨🇳 China Post</option>
-                            <option value="FedEx">📦 FedEx</option>
-                            <option value="DHL">✈️ DHL</option>
-                            <option value="UPS">🚚 UPS</option>
-                            <option value="DPD">📮 DPD</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label>Original Tracking Number</label>
-                        <input type="text" name="partner_tracking_original" class="form-control" placeholder="Original courier tracking number">
-                    </div>
-                </div>
-                
-                <!-- Internal Notes -->
-                <div class="mb-3">
-                    <label>Internal Notes</label>
-                    <textarea name="notes" rows="3" class="form-control" placeholder="Any additional notes about this shipment..."></textarea>
-                </div>
-                
-                <button type="submit" class="btn btn-success w-100">Update Status</button>
-            </form>
-        </div>
-    </div>
-</div>
 
                     <!-- Add Reviews Tab -->
                     <div class="tab-pane fade" id="reviews">
@@ -423,77 +420,378 @@
                     </div>
 
                     <!-- All Shipments Tab -->
-<div class="tab-pane fade" id="shipments">
-    <div class="card shadow">
-        <div class="card-header bg-info text-white"><h4><i class="fas fa-list"></i> All Shipments</h4></div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Tracking Code</th>
-                            <th>Customer</th>
-                            <th>Route</th>
-                            <th>Partner Courier</th>
-                            <th>Partner Tracking</th>
-                            <th>Status</th>
-                            <th>Last Update</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for ship in shipments %}
-                        <tr>
-                            <td><strong>{{ ship.tracking_code }}</strong></td>
-                            <td>{{ ship.customer_name }}</td>
-                            <td>{{ ship.origin }} → {{ ship.destination }}</td>
-                            <td>
-                                {% if ship.partner_courier %}
-                                    <span class="badge bg-primary">{{ ship.partner_courier }}</span>
-                                {% else %}
-                                    <span class="text-muted">-</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if ship.partner_tracking %}
-                                    <span class="badge bg-secondary">{{ ship.partner_tracking }}</span>
-                                {% else %}
-                                    <span class="text-muted">-</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if 'Delivered' in ship.status %}
-                                    <span class="status-badge status-delivered">✓ {{ ship.status[:30] }}</span>
-                                {% elif 'transit' in ship.status.lower() %}
-                                    <span class="status-badge status-transit">🚚 {{ ship.status[:30] }}</span>
-                                {% else %}
-                                    <span class="status-badge status-pending">⏳ {{ ship.status[:30] }}</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ ship.last_update.strftime('%Y-%m-%d') }}</td>
-                            <td>
-                                <div class="btn-group" role="group">
-                                    <a href="{{ url_for('admin_edit_shipment', shipment_id=ship.id) }}" 
-                                       class="btn btn-primary btn-sm">
-                                        <i class="fas fa-edit"></i> Edit
-                                    </a>
-                                    <form method="POST" style="display: inline;" onsubmit="return confirm('Delete this shipment?');">
-                                        <input type="hidden" name="action" value="delete_shipment">
-                                        <input type="hidden" name="tracking_code" value="{{ ship.tracking_code }}">
-                                        <button type="submit" class="btn btn-danger btn-sm">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+                    <div class="tab-pane fade" id="shipments">
+                        <div class="card shadow">
+                            <div class="card-header bg-info text-white"><h4><i class="fas fa-list"></i> All Shipments</h4></div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Tracking Code</th>
+                                                <th>Customer</th>
+                                                <th>Route</th>
+                                                <th>Partner Courier</th>
+                                                <th>Partner Tracking</th>
+                                                <th>Status</th>
+                                                <th>Last Update</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for ship in shipments %}
+                                            <tr>
+                                                <td><strong>{{ ship.tracking_code }}</strong></td>
+                                                <td>{{ ship.customer_name }}</td>
+                                                <td>{{ ship.origin }} → {{ ship.destination }}</td>
+                                                <td>
+                                                    {% if ship.partner_courier %}
+                                                        <span class="badge bg-primary">{{ ship.partner_courier }}</span>
+                                                    {% else %}
+                                                        <span class="text-muted">-</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if ship.partner_tracking %}
+                                                        <span class="badge bg-secondary">{{ ship.partner_tracking }}</span>
+                                                    {% else %}
+                                                        <span class="text-muted">-</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if 'Delivered' in ship.status %}
+                                                        <span class="status-badge status-delivered">✓ {{ ship.status[:30] }}</span>
+                                                    {% elif 'transit' in ship.status.lower() %}
+                                                        <span class="status-badge status-transit">🚚 {{ ship.status[:30] }}</span>
+                                                    {% else %}
+                                                        <span class="status-badge status-pending">⏳ {{ ship.status[:30] }}</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ ship.last_update.strftime('%Y-%m-%d') }}</td>
+                                                <td>
+                                                    <div class="btn-group" role="group">
+                                                        <a href="{{ url_for('admin_edit_shipment', shipment_id=ship.id) }}" 
+                                                           class="btn btn-primary btn-sm">
+                                                            <i class="fas fa-edit"></i> Edit
+                                                        </a>
+                                                        <form method="POST" style="display: inline;" onsubmit="return confirm('Delete this shipment?');">
+                                                            <input type="hidden" name="action" value="delete_shipment">
+                                                            <input type="hidden" name="tracking_code" value="{{ ship.tracking_code }}">
+                                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
                                 </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Riders Tab -->
+                    <div class="tab-pane fade" id="riders">
+                        <div class="card shadow">
+                            <div class="card-header" style="background: linear-gradient(135deg, #0A192F, #0F3B5C); color: white;">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <h4 class="mb-0"><i class="fas fa-motorcycle"></i> Rider Management</h4>
+                                    <div>
+                                        <a href="{{ url_for('admin') }}#riders" class="btn btn-sm btn-light">🔄 Refresh</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+
+                                <!-- Filter tabs -->
+                                <div class="d-flex flex-wrap gap-2 mb-4">
+                                    <a href="{{ url_for('admin') }}#riders" class="btn btn-sm {% if not request.args.get('status') %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                                        All <span class="badge bg-light text-dark">{{ rider_counts.all }}</span>
+                                    </a>
+                                    <a href="{{ url_for('admin') }}?status=pending#riders" class="btn btn-sm {% if request.args.get('status') == 'pending' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+                                        Pending <span class="badge bg-light text-dark">{{ rider_counts.pending }}</span>
+                                    </a>
+                                    <a href="{{ url_for('admin') }}?status=approved#riders" class="btn btn-sm {% if request.args.get('status') == 'approved' %}btn-success{% else %}btn-outline-success{% endif %}">
+                                        Approved <span class="badge bg-light text-dark">{{ rider_counts.approved }}</span>
+                                    </a>
+                                    <a href="{{ url_for('admin') }}?status=rejected#riders" class="btn btn-sm {% if request.args.get('status') == 'rejected' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                                        Rejected <span class="badge bg-light text-dark">{{ rider_counts.rejected }}</span>
+                                    </a>
+                                </div>
+
+                                {% if riders %}
+                                <div class="row g-3">
+                                    {% for rider in riders %}
+                                    <div class="col-lg-4 col-md-6">
+                                        <div class="card h-100" style="border-radius: 16px; border: 1px solid #eef0f4; box-shadow: 0 4px 16px rgba(0,0,0,0.05);">
+                                            <div class="card-body">
+
+                                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                                    <div class="d-flex align-items-center gap-3">
+                                                        <div style="width: 50px; height: 50px; background: #0F3B5C; color: white; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 700;">
+                                                            {{ rider.full_name[0]|upper }}
+                                                        </div>
+                                                        <div>
+                                                            <div style="font-weight: 700; color: #0A192F; font-size: 1rem;">{{ rider.full_name }}</div>
+                                                            <div style="font-size: 0.82rem; color: #6b7280;">
+                                                                <i class="fas fa-phone"></i> {{ rider.phone }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <span class="badge {% if rider.status == 'pending' %}bg-warning text-dark{% elif rider.status == 'approved' %}bg-success{% else %}bg-danger{% endif %}">
+                                                        {{ rider.status|upper }}
+                                                    </span>
+                                                </div>
+
+                                                <div style="background: #f8fafc; border-radius: 12px; padding: 12px 14px; font-size: 0.85rem; margin-bottom: 14px;">
+                                                    <div class="d-flex justify-content-between py-1">
+                                                        <span style="color: #6b7280;">Vehicle</span>
+                                                        <span style="color: #0A192F; font-weight: 600;">{{ rider.vehicle_type }}</span>
+                                                    </div>
+                                                    {% if rider.email %}
+                                                    <div class="d-flex justify-content-between py-1">
+                                                        <span style="color: #6b7280;">Email</span>
+                                                        <span style="color: #0A192F; font-weight: 600;">{{ rider.email }}</span>
+                                                    </div>
+                                                    {% endif %}
+                                                    <div class="d-flex justify-content-between py-1">
+                                                        <span style="color: #6b7280;">Signed Up</span>
+                                                        <span style="color: #0A192F; font-weight: 600;">
+                                                            {{ rider.created_at.strftime('%d %b %Y') if rider.created_at else '-' }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    {% if rider.status == 'pending' %}
+                                                        <form method="POST" action="{{ url_for('admin_approve_rider', rider_id=rider.id) }}" style="flex: 1;">
+                                                            <button type="submit" class="btn btn-success btn-sm w-100">
+                                                                <i class="fas fa-check"></i> Approve
+                                                            </button>
+                                                        </form>
+                                                        <form method="POST" action="{{ url_for('admin_reject_rider', rider_id=rider.id) }}" style="flex: 1;"
+                                                              onsubmit="return confirm('Reject {{ rider.full_name }}?');">
+                                                            <button type="submit" class="btn btn-danger btn-sm w-100">
+                                                                <i class="fas fa-times"></i> Reject
+                                                            </button>
+                                                        </form>
+                                                    {% else %}
+                                                        <button type="button" class="btn btn-primary btn-sm"
+                                                                style="flex: 1;"
+                                                                onclick="openResetModal({{ rider.id }}, '{{ rider.full_name }}')">
+                                                            <i class="fas fa-key"></i> Reset Pwd
+                                                        </button>
+                                                        <form method="POST" action="{{ url_for('admin_toggle_rider_active', rider_id=rider.id) }}" style="flex: 1;">
+                                                            <button type="submit" class="btn btn-secondary btn-sm w-100">
+                                                                <i class="fas fa-{{ 'pause' if rider.is_active else 'play' }}"></i>
+                                                                {{ 'Deactivate' if rider.is_active else 'Activate' }}
+                                                            </button>
+                                                        </form>
+                                                        <form method="POST" action="{{ url_for('admin_delete_rider', rider_id=rider.id) }}" style="flex: 0 0 auto;"
+                                                              onsubmit="return confirm('Delete {{ rider.full_name }}? This cannot be undone.');">
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    {% endif %}
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <div class="text-center py-5">
+                                    <i class="fas fa-motorcycle" style="font-size: 3.5rem; color: #d1d5db;"></i>
+                                    <h4 style="color: #0A192F; font-weight: 700; margin-top: 15px;">No riders yet</h4>
+                                    <p style="color: #6b7280;">Riders will appear here once they sign up.</p>
+                                </div>
+                                {% endif %}
+
+                                
+                            <!-- ============================================ -->
+                            <!-- ASSIGN DELIVERY CARD -->
+                            <!-- ============================================ -->
+                            <div class="card mt-4" style="border-radius: 16px; border: 1px solid #eef0f4; box-shadow: 0 4px 16px rgba(0,0,0,0.05);">
+                                <div class="card-header" style="background: linear-gradient(135deg, #0A192F, #0F3B5C); color: white; border-radius: 16px 16px 0 0;">
+                                    <h5 class="mb-0"><i class="fas fa-tasks"></i> Assign Delivery to Rider</h5>
+                                </div>
+                                <div class="card-body">
+                                    {% if approved_riders %}
+                                    <form method="POST" action="{{ url_for('admin_assign_task') }}">
+                                        <div class="row g-3">
+                                            <div class="col-md-5">
+                                                <label class="form-label fw-bold">Tracking Code *</label>
+                                                <input type="text" name="tracking_code" class="form-control"
+                                                       placeholder="e.g., DJL-2026-ZOEAY" required>
+                                                <small class="text-muted">Paste or type the shipment's tracking code</small>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <label class="form-label fw-bold">Assign to Rider *</label>
+                                                <select name="rider_id" class="form-control" required>
+                                                    <option value="">-- Select Rider --</option>
+                                                    {% for r in approved_riders %}
+                                                        <option value="{{ r.id }}">
+                                                            {{ r.full_name }} ({{ r.phone }}) — {{ r.vehicle_type }}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="col-md-2 d-flex align-items-end">
+                                                <button type="submit" class="btn btn-primary w-100">
+                                                    <i class="fas fa-plus"></i> Assign
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    {% else %}
+                                    <div class="alert alert-warning mb-0">
+                                        <i class="fas fa-info-circle"></i>
+                                        You need to <strong>approve at least one rider</strong> before you can assign deliveries.
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- ============================================ -->
+                            <!-- ACTIVE ASSIGNMENTS CARD -->
+                            <!-- ============================================ -->
+                            <div class="card mt-4" style="border-radius: 16px; border: 1px solid #eef0f4; box-shadow: 0 4px 16px rgba(0,0,0,0.05);">
+                                <div class="card-header" style="background: white; border-bottom: 2px solid #C9A03D; border-radius: 16px 16px 0 0;">
+                                    <h5 class="mb-0" style="color: #0A192F;">
+                                        <i class="fas fa-truck" style="color: #C9A03D;"></i>
+                                        Active Assignments
+                                        {% if active_tasks %}
+                                            <span class="badge bg-primary ms-2">{{ active_tasks|length }}</span>
+                                        {% endif %}
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    {% if active_tasks %}
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle">
+                                            <thead>
+                                                <tr>
+                                                    <th>Tracking Code</th>
+                                                    <th>Shipment</th>
+                                                    <th>Assigned To</th>
+                                                    <th>Status</th>
+                                                    <th>Assigned</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for task in active_tasks %}
+                                                <tr>
+                                                    <td>
+                                                        <strong style="color: #0F3B5C;">{{ task.shipment.tracking_code }}</strong>
+                                                    </td>
+                                                    <td>
+                                                        <div style="font-size: 0.9rem;">
+                                                            {{ task.shipment.customer_name }}<br>
+                                                            <small class="text-muted">
+                                                                {{ task.shipment.origin }} → {{ task.shipment.destination }}
+                                                            </small>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div style="font-size: 0.9rem;">
+                                                            <strong>{{ task.rider.full_name }}</strong><br>
+                                                            <small class="text-muted">
+                                                                <i class="fas fa-phone"></i> {{ task.rider.phone }}
+                                                            </small>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        {% if task.status == 'assigned' %}
+                                                            <span class="badge bg-warning text-dark">ASSIGNED</span>
+                                                        {% elif task.status == 'picked_up' %}
+                                                            <span class="badge bg-info">PICKED UP</span>
+                                                        {% elif task.status == 'in_transit' %}
+                                                            <span class="badge bg-primary">IN TRANSIT</span>
+                                                        {% elif task.status == 'delivered' %}
+                                                            <span class="badge bg-success">DELIVERED</span>
+                                                        {% elif task.status == 'failed' %}
+                                                            <span class="badge bg-danger">FAILED</span>
+                                                        {% else %}
+                                                            <span class="badge bg-secondary">{{ task.status|upper }}</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <small class="text-muted">
+                                                            {{ task.assigned_at.strftime('%d %b, %H:%M') if task.assigned_at else '-' }}
+                                                        </small>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex gap-1 flex-wrap">
+                                                            <button type="button" class="btn btn-outline-primary btn-sm"
+                                                                    data-bs-toggle="modal" data-bs-target="#reassignModal{{ task.id }}">
+                                                                <i class="fas fa-exchange-alt"></i> Reassign
+                                                            </button>
+                                                            <form method="POST" action="{{ url_for('admin_unassign_task', task_id=task.id) }}"
+                                                                  onsubmit="return confirm('Unassign this delivery?');">
+                                                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                                    <i class="fas fa-times"></i> Unassign
+                                                                </button>
+                                                            </form>
+                                                        </div>
+
+                                                        <!-- Reassign Modal -->
+                                                        <div class="modal fade" id="reassignModal{{ task.id }}" tabindex="-1">
+                                                            <div class="modal-dialog">
+                                                                <div class="modal-content" style="border-radius: 16px;">
+                                                                    <div class="modal-header" style="background: linear-gradient(135deg, #0A192F, #0F3B5C); color: white;">
+                                                                        <h5 class="modal-title">Reassign Delivery</h5>
+                                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                                    </div>
+                                                                    <form method="POST" action="{{ url_for('admin_reassign_task', task_id=task.id) }}">
+                                                                        <div class="modal-body">
+                                                                            <p>
+                                                                                <strong>{{ task.shipment.tracking_code }}</strong><br>
+                                                                                Currently with: {{ task.rider.full_name }}
+                                                                            </p>
+                                                                            <label class="form-label fw-bold">Reassign to:</label>
+                                                                            <select name="new_rider_id" class="form-control" required>
+                                                                                <option value="">-- Select new rider --</option>
+                                                                                {% for r in approved_riders %}
+                                                                                    {% if r.id != task.rider.id %}
+                                                                                        <option value="{{ r.id }}">
+                                                                                            {{ r.full_name }} ({{ r.phone }})
+                                                                                        </option>
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                            <button type="submit" class="btn btn-primary" style="background: #0F3B5C;">Reassign</button>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% else %}
+                                    <div class="text-center py-4">
+                                        <i class="fas fa-tasks" style="font-size: 3rem; color: #d1d5db;"></i>
+                                        <h5 style="color: #0A192F; font-weight: 700; margin-top: 12px;">No active assignments</h5>
+                                        <p class="text-muted mb-0">Assign a shipment to a rider using the form above.</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Settings Tab -->
                     <div class="tab-pane fade" id="settings">
@@ -560,7 +858,7 @@
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <div class="card text-center">
-                                            <div class-card-body>
+                                            <div class="card-body">
                                                 <i class="fas fa-check-circle fa-3x text-success mb-2"></i>
                                                 <h5>Delivered</h5>
                                                 <p>Export only delivered shipments</p>
@@ -625,19 +923,61 @@
         {% endif %}
     {% endwith %}
 
-<script>
-function toggleExpressStatus() {
-    const type = document.getElementById('shipmentTypeSelect').value;
-    const expressGroup = document.getElementById('expressStatusGroup');
-    const statusDropdown = document.getElementById('statusDropdown');
-    
-    if (type === 'express') {
-        expressGroup.style.display = 'block';
-        statusDropdown.value = 'Label Created';
-    } else {
-        expressGroup.style.display = 'none';
-    }
-}
-</script>
+    <script>
+        function toggleExpressStatus() {
+            const type = document.getElementById('shipmentTypeSelect').value;
+            const expressGroup = document.getElementById('expressStatusGroup');
+            const statusDropdown = document.getElementById('statusDropdown');
+            
+            if (type === 'express') {
+                expressGroup.style.display = 'block';
+                statusDropdown.value = 'Label Created';
+            } else {
+                expressGroup.style.display = 'none';
+            }
+        }
+
+        // Reset Password Modal
+        function openResetModal(riderId, riderName) {
+            document.getElementById('resetRiderName').textContent = riderName;
+            document.getElementById('resetForm').action = '/admin/riders/' + riderId + '/reset_password';
+            var modal = new bootstrap.Modal(document.getElementById('resetModal'));
+            modal.show();
+        }
+
+        // Auto-open Riders tab if URL has #riders
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.location.hash === '#riders') {
+                var ridersTab = document.querySelector('button[data-bs-target="#riders"]');
+                if (ridersTab) {
+                    var tab = new bootstrap.Tab(ridersTab);
+                    tab.show();
+                }
+            }
+        });
+    </script>
+
+    <!-- Reset Password Modal -->
+    <div class="modal fade" id="resetModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border-radius: 16px;">
+                <div class="modal-header" style="background: linear-gradient(135deg, #0A192F, #0F3B5C); color: white;">
+                    <h5 class="modal-title">Reset Password</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST" id="resetForm">
+                    <div class="modal-body">
+                        <p>Set a new password for <strong id="resetRiderName"></strong></p>
+                        <input type="password" name="new_password" class="form-control" placeholder="New password (min 6 chars)" required minlength="6">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" style="background: #0F3B5C;">Save Password</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

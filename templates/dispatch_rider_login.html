@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0F3B5C">
+    <title>Rider Login - DeeJohnson Logistics</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            color: #0A192F;
+        }
+
+        /* ===== TOP BAR ===== */
+        .top-bar {
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: #f4f6f9;
+            color: #0A192F;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: #e8ecf1;
+        }
+
+        /* ===== FORM WRAPPER ===== */
+        .form-wrapper {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 0 24px 40px;
+        }
+
+        /* ===== LOGO ===== */
+        .logo-block {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-block .brand-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            background: #0F3B5C;
+            border-radius: 18px;
+            margin-bottom: 12px;
+            box-shadow: 0 8px 24px rgba(15, 59, 92, 0.25);
+        }
+
+        .logo-block .brand-icon i {
+            font-size: 1.7rem;
+            color: white;
+        }
+
+        .logo-block h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: -0.4px;
+            margin-bottom: 2px;
+        }
+
+        .logo-block .brand-sub {
+            font-size: 0.7rem;
+            letter-spacing: 3.5px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+        }
+
+        /* ===== TITLES ===== */
+        h2.page-title {
+            font-size: 1.7rem;
+            font-weight: 800;
+            letter-spacing: -0.6px;
+            margin-bottom: 6px;
+            color: #0A192F;
+        }
+
+        p.page-sub {
+            font-size: 0.95rem;
+            color: #6b7280;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        /* ===== FLASH & ERROR BOXES ===== */
+        .flash {
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .flash.success {
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .flash.danger {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .error-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+        }
+
+        .error-box ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #b91c1c;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* ===== FORM FIELDS ===== */
+        .field {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .field .field-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 1rem;
+            pointer-events: none;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 16px 48px 16px 48px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-family: inherit;
+            color: #0A192F;
+            background: #ffffff;
+            transition: all 0.2s;
+        }
+
+        .field input:focus {
+            outline: none;
+            border-color: #0F3B5C;
+            box-shadow: 0 0 0 4px rgba(15, 59, 92, 0.10);
+        }
+
+        .field input::placeholder {
+            color: #9ca3af;
+        }
+
+        .field.phone-field .country-prefix {
+            position: absolute;
+            left: 46px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #0A192F;
+            font-weight: 600;
+            font-size: 1rem;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .field.phone-field .country-prefix i {
+            font-size: 0.6rem;
+            color: #9ca3af;
+        }
+
+        .field.phone-field input {
+            padding-left: 100px;
+        }
+
+        .field .toggle-password {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px;
+        }
+
+        .field .toggle-password:hover {
+            color: #0F3B5C;
+        }
+
+        /* ===== REMEMBER / FORGOT ROW ===== */
+        .row-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            font-size: 0.9rem;
+        }
+
+        .remember-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #0A192F;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .remember-row input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #0F3B5C;
+            cursor: pointer;
+        }
+
+        .forgot-link {
+            color: #0F3B5C;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== SUBMIT BUTTON ===== */
+        .btn-submit {
+            width: 100%;
+            padding: 18px;
+            background: #0F3B5C;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(15, 59, 92, 0.35);
+            transition: all 0.2s;
+        }
+
+        .btn-submit:hover {
+            background: #0A192F;
+            transform: translateY(-1px);
+            box-shadow: 0 12px 28px rgba(10, 25, 47, 0.45);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        /* ===== BOTTOM LINK ===== */
+        .bottom-link {
+            text-align: center;
+            margin-top: 22px;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .bottom-link a {
+            color: #0F3B5C;
+            font-weight: 700;
+            text-decoration: none;
+            margin-left: 4px;
+        }
+
+        .bottom-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== TOP BAR ===== -->
+    <div class="top-bar">
+        <a href="/dispatch_riders" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+    <!-- ===== FORM WRAPPER ===== -->
+    <div class="form-wrapper">
+
+        <!-- Logo -->
+        <div class="logo-block">
+            <div class="brand-icon">
+                <i class="fas fa-motorcycle"></i>
+            </div>
+            <h1>DeeJohnson</h1>
+            <div class="brand-sub">Logistics</div>
+        </div>
+
+        <!-- Title -->
+        <h2 class="page-title">Welcome Back</h2>
+        <p class="page-sub">Login to your rider account</p>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Errors -->
+        {% if errors %}
+            <div class="error-box">
+                <ul>
+                    {% for err in errors %}
+                        <li>{{ err }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <!-- Form -->
+        <form method="POST" autocomplete="off">
+
+            <!-- Phone -->
+            <div class="field phone-field">
+                <i class="fas fa-phone field-icon"></i>
+                <span class="country-prefix">+234 <i class="fas fa-chevron-down"></i></span>
+                <input type="tel" name="phone" placeholder="Phone Number"
+                       value="{{ phone or '' }}" required pattern="[0-9]{10,11}">
+            </div>
+
+            <!-- Password -->
+            <div class="field">
+                <i class="fas fa-lock field-icon"></i>
+                <input type="password" name="password" id="password"
+                       placeholder="Password" required>
+                <button type="button" class="toggle-password" onclick="togglePwd('password', this)">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+
+            <!-- Remember / Forgot -->
+            <div class="row-options">
+                <label class="remember-row">
+                    <input type="checkbox" name="remember">
+                    <span>Remember Me</span>
+                </label>
+                <a href="/dispatch_riders/forgot_password" class="forgot-link">Forgot Password?</a>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn-submit">
+                Log In
+            </button>
+
+        </form>
+
+        <!-- Bottom link -->
+        <div class="bottom-link">
+            Don't have an account?
+            <a href="/dispatch_riders/signup">Sign Up</a>
+        </div>
+
+    </div>
+
+    <script>
+        function togglePwd(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
+
+</body>
+</html>

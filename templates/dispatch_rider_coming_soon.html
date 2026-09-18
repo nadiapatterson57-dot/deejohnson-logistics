@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0F3B5C">
+    <title>Coming Soon - DeeJohnson Riders</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0A192F 0%, #0F3B5C 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            color: white;
+        }
+
+        .card {
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 24px;
+            padding: 40px 28px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .card .brand-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 72px;
+            height: 72px;
+            background: #0F3B5C;
+            border: 1px solid rgba(201, 160, 61, 0.4);
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(15, 59, 92, 0.5);
+        }
+
+        .card .brand-icon i {
+            font-size: 2rem;
+            color: white;
+        }
+
+        .welcome {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.75);
+            margin-bottom: 8px;
+        }
+
+        .welcome strong {
+            color: #C9A03D;
+        }
+
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 800;
+            letter-spacing: -0.6px;
+            margin-bottom: 14px;
+        }
+
+        p.desc {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .badge-coming {
+            display: inline-block;
+            padding: 8px 18px;
+            background: rgba(201, 160, 61, 0.15);
+            color: #C9A03D;
+            border: 1px solid rgba(201, 160, 61, 0.4);
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+
+        .btn-logout {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 50px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: white;
+        }
+
+        .rider-details {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 24px;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .rider-details .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+        }
+
+        .rider-details .row .lbl {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .rider-details .row .val {
+            color: white;
+            font-weight: 600;
+        }
+
+        .rider-details .row .val.status-approved {
+            color: #34d399;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+
+        <div class="brand-icon">
+            <i class="fas fa-motorcycle"></i>
+        </div>
+
+        <div class="welcome">
+            Welcome, <strong>{{ rider.full_name }}</strong>
+        </div>
+
+        <h1>You're In! 🎉</h1>
+
+        <div class="badge-coming">Coming Soon</div>
+
+        <div class="rider-details">
+            <div class="row">
+                <span class="lbl">Phone</span>
+                <span class="val">{{ rider.phone }}</span>
+            </div>
+            <div class="row">
+                <span class="lbl">Vehicle</span>
+                <span class="val">{{ rider.vehicle_type }}</span>
+            </div>
+            <div class="row">
+                <span class="lbl">Status</span>
+                <span class="val status-approved">{{ rider.status|capitalize }}</span>
+            </div>
+        </div>
+
+        <p class="desc">
+            We're building your rider dashboard. You'll soon be able to view
+            assigned deliveries, update statuses, and upload delivery proof —
+            all from your phone.
+        </p>
+
+        <a href="/dispatch_riders/logout" class="btn-logout">
+            <i class="fas fa-sign-out-alt"></i>
+            Log Out
+        </a>
+
+    </div>
+
+</body>
+</html>

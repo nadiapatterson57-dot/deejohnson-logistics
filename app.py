@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import random
 import string
 import hashlib
@@ -19,15 +19,11 @@ app = Flask(__name__)
 app.secret_key = 'deejohnson_super_secret_key_2024'
 
 # ============================================
-# DATABASE CONFIGURATION - FIXED FOR RENDER
+# DATABASE CONFIGURATION
 # ============================================
-import os
-
-# Check if we're on Render (PostgreSQL) or local (SQLite)
 if os.environ.get('DATABASE_URL'):
-    # Production on Render - Use PostgreSQL (PERSISTENT)
+    # Production on Render - Use PostgreSQL
     database_url = os.environ.get('DATABASE_URL')
-    # Fix for Render's postgres:// vs postgresql://
     if database_url.startswith('postgres://'):
         database_url = database_url.replace('postgres://', 'postgresql://', 1)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
@@ -42,8 +38,8 @@ else:
     print("=" * 50)
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 db = SQLAlchemy(app)
+
 
 # ============================================
 # DATABASE MODELS
@@ -67,7 +63,7 @@ class Shipment(db.Model):
     notes = db.Column(db.Text)
     notification_sent = db.Column(db.Boolean, default=False)
     
-    # NEW FIELDS FOR INCOMING SHIPMENTS
+    # For incoming shipments
     shipment_direction = db.Column(db.String(20), default='outgoing')
     origin_country = db.Column(db.String(50))
     origin_city = db.Column(db.String(100))
@@ -77,6 +73,7 @@ class Shipment(db.Model):
     customs_status = db.Column(db.String(50), default='pending')
     delivery_address = db.Column(db.String(200))
 
+
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     customer_name = db.Column(db.String(100))
@@ -85,11 +82,13 @@ class Review(db.Model):
     comment = db.Column(db.Text)
     date = db.Column(db.DateTime, default=datetime.now(timezone.utc))
 
+
 class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+
 
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -99,6 +98,7 @@ class Notification(db.Model):
     message = db.Column(db.Text)
     sent_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     sent_via = db.Column(db.String(20))
+
 
 class Customer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -113,58 +113,68 @@ class Customer(db.Model):
     notes = db.Column(db.Text)
     first_shipment = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     last_shipment = db.Column(db.DateTime, default=datetime.now(timezone.utc))
-    is_active = db.Column(db.Boolean, default=True)       
+    is_active = db.Column(db.Boolean, default=True)
+
+
+class Rider(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    full_name = db.Column(db.String(100), nullable=False)
+    phone = db.Column(db.String(20), unique=True, nullable=False)
+    email = db.Column(db.String(100))
+    password_hash = db.Column(db.String(200), nullable=False)
+    vehicle_type = db.Column(db.String(50), nullable=False)
+    status = db.Column(db.String(20), default='pending')
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    approved_at = db.Column(db.DateTime)
+
+class DeliveryTask(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    rider_id = db.Column(db.Integer, db.ForeignKey('rider.id'), nullable=False)
+    shipment_id = db.Column(db.Integer, db.ForeignKey('shipment.id'), nullable=False)
+    status = db.Column(db.String(30), default='assigned')  # assigned, picked_up, in_transit, delivered, failed
+    assigned_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    picked_up_at = db.Column(db.DateTime)
+    delivered_at = db.Column(db.DateTime)
+    notes = db.Column(db.Text)
+    photo_proof = db.Column(db.String(300))
+
+    # Relationships
+    rider = db.relationship('Rider', backref='delivery_tasks')
+    shipment = db.relationship('Shipment', backref='delivery_tasks')
 
 # ============================================
 # COURIER INTEGRATION FUNCTIONS
 # ============================================
 
 def detect_courier(tracking_number):
-    """Detect which courier a tracking number belongs to"""
     if not tracking_number:
         return 'Unknown'
-    
     tracking_number = str(tracking_number).upper().strip()
-    
-    # FedEx: usually 12-15 digits
     if len(tracking_number) >= 12 and len(tracking_number) <= 15 and tracking_number.isdigit():
         return 'FedEx'
-    
-    # DHL: 10-11 digits
     if len(tracking_number) >= 10 and len(tracking_number) <= 11 and tracking_number.isdigit():
         return 'DHL'
-    
-    # DPD: starts with 10-12 digits, often starts with 0
     if len(tracking_number) >= 10 and len(tracking_number) <= 12 and tracking_number.isdigit():
         return 'DPD'
-    
-    # USPS: 20-22 digits, or 13 chars starting with 9
     if (len(tracking_number) >= 20 and len(tracking_number) <= 22 and tracking_number.isdigit()) or \
        (len(tracking_number) == 13 and tracking_number.startswith('9')):
         return 'USPS'
-    
-    # Royal Mail: XX123456789GB format (2 letters, 9 digits, 2 letters)
     if (len(tracking_number) == 13 and 
         tracking_number[:2].isalpha() and 
         tracking_number[2:11].isdigit() and 
         tracking_number[11:13].isalpha()):
         return 'Royal Mail'
-    
-    # Royal Mail alternative: 16 digits starting with 8
     if len(tracking_number) == 16 and tracking_number.startswith('8') and tracking_number.isdigit():
         return 'Royal Mail'
-    
-    # UPS: starts with 1Z and total 18 characters
     if tracking_number.startswith('1Z') and len(tracking_number) == 18:
         return 'UPS'
-    
     return 'Unknown'
 
+
 def get_tracking_url(courier, tracking_number):
-    """Return the direct tracking URL for a courier"""
     if not courier or not tracking_number:
         return '#'
-    
     urls = {
         'FedEx': f'https://www.fedex.com/fedextrack/?trknbr={tracking_number}',
         'DHL': f'https://www.dhl.com/global-en/home/tracking.html?tracking-id={tracking_number}',
@@ -175,8 +185,8 @@ def get_tracking_url(courier, tracking_number):
     }
     return urls.get(courier, '#')
 
+
 def get_courier_icon(courier):
-    """Return icon class for each courier"""
     icons = {
         'FedEx': 'fa-solid fa-box',
         'DHL': 'fa-solid fa-truck-fast',
@@ -187,8 +197,8 @@ def get_courier_icon(courier):
     }
     return icons.get(courier, 'fa-solid fa-globe')
 
+
 def get_courier_color(courier):
-    """Return color for each courier"""
     colors = {
         'FedEx': '#4B0082',
         'DHL': '#FFCC00',
@@ -199,6 +209,7 @@ def get_courier_color(courier):
     }
     return colors.get(courier, '#0F3B5C')
 
+
 # ============================================
 # CREATE DATABASE AND SAMPLE DATA
 # ============================================
@@ -206,7 +217,6 @@ def get_courier_color(courier):
 with app.app_context():
     db.create_all()
     
-    # Create default admin account if none exists
     admin_exists = Admin.query.filter_by(username="admin").first()
     if not admin_exists:
         default_password = hashlib.sha256("admin123".encode()).hexdigest()
@@ -215,12 +225,9 @@ with app.app_context():
         db.session.commit()
         print("\n" + "=" * 50)
         print("✅ ADMIN ACCOUNT CREATED SUCCESSFULLY!")
-        print("📝 LOGIN CREDENTIALS:")
-        print("   Username: admin")
-        print("   Password: admin123")
+        print("📝 LOGIN: admin / admin123")
         print("=" * 50 + "\n")
     
-    # Add sample reviews if none exist
     if Review.query.count() == 0:
         sample_reviews = [
             Review(customer_name="Mr. Adebayo Ogunlesi", location="Ibadan", rating=5, 
@@ -236,8 +243,9 @@ with app.app_context():
         db.session.commit()
         print("✅ Sample customer reviews added!")
 
+
 # ============================================
-# AUTHENTICATION DECORATOR
+# AUTH DECORATORS
 # ============================================
 
 def login_required(f):
@@ -249,24 +257,26 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+
 # ============================================
-# HELPER FUNCTIONS
+# HELPERS
 # ============================================
 
 def generate_tracking_code():
-    """Generate unique tracking code like DJL-2024-XXXXX"""
     year = datetime.now().year
     random_chars = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
     return f"DJL-{year}-{random_chars}"
 
+
 # ============================================
-# ROUTES
+# PUBLIC ROUTES
 # ============================================
 
 @app.route('/')
 def index():
     reviews = Review.query.order_by(Review.id.desc()).limit(6).all()
     return render_template('index.html', reviews=reviews)
+
 
 @app.route('/track', methods=['GET', 'POST'])
 def track():
@@ -284,7 +294,6 @@ def track():
             courier_icon = get_courier_icon(shipment.partner_courier)
             courier_color = get_courier_color(shipment.partner_courier)
         
-        # Check if this is an Express shipment (starts with EXPDJL)
         if shipment and shipment.tracking_code.startswith('EXPDJL'):
             return render_template('express_track.html', 
                                  shipment=shipment, 
@@ -304,10 +313,21 @@ def track():
                          get_courier_icon=get_courier_icon,
                          get_courier_color=get_courier_color)
 
+
 @app.route('/google79bcbfa2d09351d4.html')
 def google_verify():
     from flask import send_from_directory
-    return send_from_directory('static', 'google79bcbfa2d09351d4.html')                         
+    return send_from_directory('static', 'google79bcbfa2d09351d4.html')
+
+
+@app.route('/health')
+def health():
+    return "OK", 200
+
+
+# ============================================
+# ADMIN AUTH ROUTES
+# ============================================
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
@@ -321,12 +341,10 @@ def admin_login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        
         admin = Admin.query.filter_by(username=username).first()
         
         if admin:
             password_hash = hashlib.sha256(password.encode()).hexdigest()
-            
             if admin.password_hash == password_hash:
                 session['admin_logged_in'] = True
                 session['admin_username'] = username
@@ -339,11 +357,17 @@ def admin_login():
     
     return render_template('admin_login.html')
 
+
 @app.route('/admin/logout')
 def admin_logout():
     session.clear()
     flash('You have been logged out', 'info')
     return redirect(url_for('admin_login'))
+
+
+# ============================================
+# MAIN ADMIN DASHBOARD
+# ============================================
 
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required
@@ -353,7 +377,6 @@ def admin():
         
         if action == 'create_shipment':
             tracking_code = generate_tracking_code()
-            
             new_shipment = Shipment(
                 tracking_code=tracking_code,
                 customer_name=request.form.get('customer_name'),
@@ -368,10 +391,9 @@ def admin():
             )
             db.session.add(new_shipment)
             db.session.commit()
-            
             flash(f'✅ Shipment created! Tracking Code: {tracking_code}', 'success')
             return redirect(url_for('admin'))
-            
+        
         elif action == 'update_status':
             tracking_code = request.form.get('tracking_code')
             shipment = Shipment.query.filter_by(tracking_code=tracking_code).first()
@@ -382,25 +404,18 @@ def admin():
                 shipment.last_update = datetime.now(timezone.utc)
                 shipment.notes = request.form.get('notes')
                 
-                # Get partner courier fields from form
                 partner = request.form.get('partner_courier', '')
                 partner_code = request.form.get('partner_tracking', '')
-
-                print(f"🔍 Partner from form: '{partner}'")
-                print(f"🔍 Tracking from form: '{partner_code}'")
-
+                
                 if partner and partner_code:
                     shipment.partner_courier = partner
                     shipment.partner_tracking = partner_code
-                    print(f"✅ Saved partner: {partner} - {partner_code}")
-                else:
-                    print("⚠️ No partner courier data received")
                 
                 db.session.commit()
                 flash(f'✅ Status updated for {tracking_code}', 'success')
             else:
                 flash('❌ Tracking code not found!', 'danger')
-                
+        
         elif action == 'add_review':
             new_review = Review(
                 customer_name=request.form.get('customer_name'),
@@ -426,7 +441,6 @@ def admin():
             old_pass = request.form.get('old_password')
             new_pass = request.form.get('new_password')
             confirm_pass = request.form.get('confirm_password')
-            
             admin = Admin.query.filter_by(username=session['admin_username']).first()
             old_hash = hashlib.sha256(old_pass.encode()).hexdigest()
             
@@ -440,7 +454,6 @@ def admin():
             else:
                 flash('❌ Current password is incorrect!', 'danger')
         
-        # INCOMING SHIPMENT ACTION
         elif action == 'create_incoming_shipment':
             country_code = request.form.get('origin_country')[:2].upper()
             year = datetime.now().year
@@ -469,11 +482,9 @@ def admin():
             )
             db.session.add(new_shipment)
             db.session.commit()
-            
             flash(f'✅ Incoming package registered! Tracking: {tracking_code}', 'success')
     
     shipments = Shipment.query.order_by(Shipment.id.desc()).all()
-    
     total_shipments = Shipment.query.count()
     delivered = Shipment.query.filter(Shipment.status.like('%Delivered%')).count()
     in_transit = total_shipments - delivered
@@ -485,477 +496,193 @@ def admin():
         'in_transit': in_transit,
         'avg_rating': round(avg_rating, 1)
     }
-    
-    return render_template('admin.html', shipments=shipments, stats=stats)
 
-@app.route('/api/shipment/<code>')
-def get_shipment(code):
-    shipment = Shipment.query.filter_by(tracking_code=code).first()
-    if shipment:
-        return jsonify({
-            'tracking_code': shipment.tracking_code,
-            'status': shipment.status,
-            'location': shipment.current_location,
-            'last_update': shipment.last_update.strftime('%Y-%m-%d %H:%M'),
-            'partner_courier': shipment.partner_courier,
-            'partner_tracking': shipment.partner_tracking
-        })
-    return jsonify({'error': 'Not found'}), 404
+    # Riders data for the dashboard tab
+    riders = Rider.query.order_by(Rider.created_at.desc()).all()
+    rider_counts = {
+        'all': Rider.query.count(),
+        'pending': Rider.query.filter_by(status='pending').count(),
+        'approved': Rider.query.filter_by(status='approved').count(),
+        'rejected': Rider.query.filter_by(status='rejected').count(),
+    }
 
-@app.route('/api/stats')
-def get_stats():
-    total = Shipment.query.count()
-    delivered = Shipment.query.filter(Shipment.status.like('%Delivered%')).count()
-    return jsonify({
-        'total': total,
-        'delivered': delivered,
-        'in_transit': total - delivered
-    })
+    # Approved riders (for the assign dropdown)
+    approved_riders = Rider.query.filter_by(status='approved', is_active=True)\
+                                 .order_by(Rider.full_name).all()
 
-@app.route('/api/detect-courier', methods=['POST'])
-def detect_courier_ajax():
-    try:
-        data = request.get_json()
-        tracking_number = data.get('tracking_number', '')
-        courier = detect_courier(tracking_number)
-        return jsonify({
-            'success': True,
-            'courier': courier,
-            'detected': courier != 'Unknown',
-            'url': get_tracking_url(courier, tracking_number) if courier != 'Unknown' else '#'
-        })
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+    # Active delivery tasks (not yet delivered)
+    active_tasks = DeliveryTask.query\
+        .filter(DeliveryTask.status != 'delivered')\
+        .order_by(DeliveryTask.assigned_at.desc()).all()
 
-# ============================================
-# EXPORT ROUTES
-# ============================================
-
-@app.route('/admin/export/all')
-@login_required
-def export_all():
-    shipments = Shipment.query.order_by(Shipment.id.desc()).all()
-    return export_all_shipments(shipments)
-
-@app.route('/admin/export/outgoing')
-@login_required
-def export_outgoing():
-    shipments = Shipment.query.all()
-    return export_outgoing_shipments(shipments)
-
-@app.route('/admin/export/incoming')
-@login_required
-def export_incoming():
-    shipments = Shipment.query.all()
-    return export_incoming_shipments(shipments)
-
-@app.route('/admin/export/delivered')
-@login_required
-def export_delivered():
-    shipments = Shipment.query.all()
-    return export_delivered_shipments(shipments)
-
-@app.route('/admin/export/pending')
-@login_required
-def export_pending():
-    shipments = Shipment.query.all()
-    return export_pending_shipments(shipments)
-
-@app.route('/admin/export/customers')
-@login_required
-def export_customers_list():
-    customers = Customer.query.order_by(Customer.last_shipment.desc()).all()
-    return export_customers(customers)
-
-@app.route('/reset-database')
-def reset_database():
-    import hashlib
-    from datetime import datetime
-    
-    db.drop_all()
-    db.create_all()
-    
-    password_hash = hashlib.sha256("admin123".encode()).hexdigest()
-    admin = Admin(username="admin", password_hash=password_hash)
-    db.session.add(admin)
-    
-    sample_reviews = [
-        Review(customer_name="Mr. Adebayo Ogunlesi", location="Ibadan", rating=5, 
-               comment="Excellent service! My package from Ibadan arrived quickly."),
-        Review(customer_name="Mrs. Funmilayo Adeyemi", location="Oyo Town", rating=5, 
-               comment="Best logistics company in Oyo State. Very reliable!"),
-    ]
-    db.session.add_all(sample_reviews)
-    
-    db.session.commit()
-    
-    return "✅ Database reset successful! <br><br>Login: admin / admin123 <br><br><a href='/admin/login'>Go to Admin Login</a>"
-
-@app.route('/restore-shipment')
-def restore_shipment():
-    from datetime import datetime
-    
-    existing = Shipment.query.filter_by(tracking_code="DJL-2026-HXESB").first()
-    if existing:
-        return "✅ Shipment DJL-2026-HXESB already exists in database!"
-    
-    new_shipment = Shipment(
-        tracking_code="DJL-2026-HXESB",
-        customer_name="Areo Tolulope B",
-        customer_email="toluare123@gmail.com",
-        customer_phone="+447833889142",
-        origin="Ibadan",
-        destination="Wolverhampton, United Kingdom",
-        package_type="Parcel",
-        package_weight=10.0,
-        status="Picked up from customer",
-        current_location="Ibadan",
-        last_update=datetime.now(timezone.utc)
+    return render_template(
+        'admin.html',
+        shipments=shipments,
+        stats=stats,
+        riders=riders,
+        rider_counts=rider_counts,
+        approved_riders=approved_riders,
+        active_tasks=active_tasks
     )
-    
-    db.session.add(new_shipment)
-    db.session.commit()
-    
-    return """
-    <h2>✅ Shipment Restored Successfully!</h2>
-    <p><strong>Tracking Code:</strong> DJL-2026-HXESB</p>
-    <p><strong>Customer:</strong> Areo Tolulope B</p>
-    <p><strong>Destination:</strong> Wolverhampton, United Kingdom</p>
-    <p><strong>Status:</strong> Picked up from customer</p>
-    <br>
-    <a href='/track'>Track this package</a><br>
-    <a href='/admin/login'>Go to Admin Panel</a>
-    """
 
-# ============================================
-# RESTORE ALL SHIPMENTS ROUTE (NEW)
-# ============================================
 
-@app.route('/restore-all-shipments')
-def restore_all_shipments():
-    """Restore all 8 shipments from the Excel data"""
-    from datetime import datetime
-    
-    # List of all shipments from your Excel file
-    shipments_data = [
-        # 1. Iyabo Odueyingbo
-        {
-            'tracking_code': 'DJL-2026-ZOEAY',
-            'shipment_direction': 'outgoing',
-            'customer_name': 'Iyabo Odueyingbo',
-            'customer_email': 'emmanueltee@hotmail.com',
-            'customer_phone': '+447943004101',
-            'origin': 'Ibadan',
-            'destination': 'United Kingdom',
-            'package_type': 'Parcel',
-            'package_weight': 14.0,
-            'status': 'Customs clearance in progress',
-            'current_location': 'Lagos Hub',
-            'last_update': datetime(2026, 6, 29, 13, 58, 0),
-            'partner_courier': None,
-            'partner_tracking': None
-        },
-        
-        # 2. Oluwadamilare Oloyede
-        {
-            'tracking_code': 'DJL-2026-6URUQ',
-            'shipment_direction': 'outgoing',
-            'customer_name': 'Oluwadamilare Oloyede',
-            'customer_email': 'kolapastor62@yahoo.co.uk',
-            'customer_phone': '+447950711976',
-            'origin': 'Ibadan',
-            'destination': 'United Kingdom',
-            'package_type': 'Parcel',
-            'package_weight': 14.0,
-            'status': 'Handed over to partner courier',
-            'current_location': 'In transit to United kingdom',
-            'last_update': datetime(2026, 6, 23, 9, 29, 0),
-            'partner_courier': None,
-            'partner_tracking': None
-        },
-        
-        # 3. Olumide Adejumo
-        {
-            'tracking_code': 'DJL-2026-BBZTG',
-            'shipment_direction': 'outgoing',
-            'customer_name': 'Olumide Adejumo',
-            'customer_email': 'molumide74@yahoo.com',
-            'customer_phone': '+447445921438',
-            'origin': 'Ibadan',
-            'destination': 'United Kingdom',
-            'package_type': 'Parcel',
-            'package_weight': 24.4,
-            'status': 'Delivered successfully',
-            'current_location': 'United Kingdom',
-            'last_update': datetime(2026, 6, 26, 12, 4, 0),
-            'partner_courier': None,
-            'partner_tracking': None
-        },
-        
-        # 4. Favour Ibirogba Taiwo
-        {
-            'tracking_code': 'DJL-2026-3CHNJ',
-            'shipment_direction': 'outgoing',
-            'customer_name': 'Favour Ibirogba Taiwo',
-            'customer_email': 'favouribirogba0@gmail.com',
-            'customer_phone': '+447809162523',
-            'origin': '-',
-            'destination': 'United Kingdom',
-            'package_type': 'Parcel',
-            'package_weight': 10.0,
-            'status': 'Delivered successfully',
-            'current_location': 'United Kingdom',
-            'last_update': datetime(2026, 6, 26, 12, 5, 0),
-            'partner_courier': None,
-            'partner_tracking': None
-        },
-        
-        # 5. Ezekiel Rhoda
-        {
-            'tracking_code': 'DJL-2026-Z1J5Q',
-            'shipment_direction': 'outgoing',
-            'customer_name': 'Ezekiel Rhoda',
-            'customer_email': 'ezekielrhoda@gmail.com',
-            'customer_phone': '+447908030466',
-            'origin': 'Ibadan',
-            'destination': 'United Kingdom',
-            'package_type': 'Parcel',
-            'package_weight': 20.0,
-            'status': 'Delivered successfully',
-            'current_location': 'United Kingdom',
-            'last_update': datetime(2026, 6, 26, 15, 35, 0),
-            'partner_courier': None,
-            'partner_tracking': None
-        },
-        
-        # 6. Joseph Loseyi (Incoming from Canada)
-        {
-            'tracking_code': 'INT-CA-2026-457520',
-            'shipment_direction': 'incoming',
-            'customer_name': 'Joseph Loseyi',
-            'customer_email': '-',
-            'customer_phone': '+1 (204) 558-9160',
-            'origin': 'Canada',
-            'destination': 'Lagos',
-            'package_type': 'Parcel',
-            'package_weight': 2.0,
-            'status': 'Shipped from origin country',
-            'current_location': 'Shipped from origin country',
-            'last_update': datetime(2026, 6, 11, 10, 33, 0),
-            'partner_courier': None,
-            'partner_tracking': None,
-            'origin_country': 'Canada',
-            'partner_courier_original': None,
-            'partner_tracking_original': None
-        },
-        
-        # 7. Mr. Chris (Incoming from UK)
-        {
-            'tracking_code': 'INT-UK-2026-479432',
-            'shipment_direction': 'incoming',
-            'customer_name': 'Mr. Chris',
-            'customer_email': '-',
-            'customer_phone': '+447570149032',
-            'origin': 'United Kingdom',
-            'destination': 'Lagos',
-            'package_type': 'Parcel',
-            'package_weight': 24.0,
-            'status': 'Delivered successfully',
-            'current_location': 'Lagos',
-            'last_update': datetime(2026, 6, 23, 9, 16, 0),
-            'partner_courier': None,
-            'partner_tracking': None,
-            'origin_country': 'UK',
-            'partner_courier_original': 'Royal Mail',
-            'partner_tracking_original': None
-        },
-        
-        # 8. Areo Tolulope B
-        {
-            'tracking_code': 'DJL-2026-HXESB',
-            'shipment_direction': 'outgoing',
-            'customer_name': 'Areo Tolulope B',
-            'customer_email': 'toluare123@gmail.com',
-            'customer_phone': '+447833889142',
-            'origin': 'Ibadan',
-            'destination': 'Wolverhampton, United Kingdom',
-            'package_type': 'Parcel',
-            'package_weight': 10.0,
-            'status': 'Delivered successfully',
-            'current_location': 'Wolverhampton, United Kingdom',
-            'last_update': datetime(2026, 6, 23, 9, 19, 0),
-            'partner_courier': 'FedEx',
-            'partner_tracking': None
-        }
-    ]
-    
-    count_added = 0
-    skipped = 0
-    
-    for data in shipments_data:
-        # Check if tracking code already exists
-        existing = Shipment.query.filter_by(tracking_code=data['tracking_code']).first()
-        if existing:
-            skipped += 1
-            continue
-        
-        # Create shipment with all available fields
-        shipment = Shipment(
-            tracking_code=data['tracking_code'],
-            shipment_direction=data.get('shipment_direction', 'outgoing'),
-            customer_name=data['customer_name'],
-            customer_email=data.get('customer_email'),
-            customer_phone=data.get('customer_phone'),
-            origin=data['origin'],
-            destination=data['destination'],
-            package_type=data['package_type'],
-            package_weight=data['package_weight'],
-            status=data['status'],
-            current_location=data['current_location'],
-            last_update=data['last_update'],
-            partner_courier=data.get('partner_courier'),
-            partner_tracking=data.get('partner_tracking'),
-            origin_country=data.get('origin_country'),
-            partner_courier_original=data.get('partner_courier_original'),
-            partner_tracking_original=data.get('partner_tracking_original')
-        )
-        db.session.add(shipment)
-        count_added += 1
-    
-    # Commit all changes
-    db.session.commit()
-    
-    # Generate HTML response
-    html_response = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Restore Shipments</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <style>
-            body {{ 
-                background: linear-gradient(135deg, #0A192F, #0F3B5C); 
-                min-height: 100vh; 
-                display: flex; 
-                align-items: center; 
-                justify-content: center;
-                color: white;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            }}
-            .card {{
-                background: rgba(255, 255, 255, 0.95);
-                border-radius: 20px;
-                padding: 40px;
-                max-width: 600px;
-                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-                color: #333;
-            }}
-            .success-icon {{
-                font-size: 4rem;
-                color: #28a745;
-                margin-bottom: 20px;
-            }}
-            .btn-primary {{ 
-                background-color: #0F3B5C; 
-                border: none; 
-                padding: 12px 30px;
-                border-radius: 10px;
-            }}
-            .btn-primary:hover {{ background-color: #0A192F; }}
-        </style>
-    </head>
-    <body>
-        <div class="card text-center">
-            <div class="success-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <h2 class="mb-3">✅ {count_added} Shipments Restored!</h2>
-            <p class="lead">All shipments have been added to the database successfully.</p>
-            
-            <div class="alert alert-success mb-4">
-                <strong>📦 {count_added} new shipments added</strong><br>
-                <small class="text-muted">Skipped {skipped} existing shipments</small>
-            </div>
-            
-            <div class="d-grid gap-2">
-                <a href="/admin" class="btn btn-primary">
-                    <i class="fas fa-tachometer-alt"></i> Go to Admin Dashboard
-                </a>
-                <a href="/track" class="btn btn-outline-primary">
-                    <i class="fas fa-search"></i> Track a Package
-                </a>
-            </div>
-        </div>
-        
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    </body>
-    </html>
-    """
-    
-    return html_response
-
-# ============================================
-# EXPRESS ADMIN ROUTES
-# ============================================
-
-@app.route('/express-admin', methods=['GET', 'POST'])
+@app.route('/admin/riders/<int:rider_id>/approve', methods=['POST'])
 @login_required
-def express_admin():
-    new_tracking_code = None
-    new_customer_name = None
-    new_destination = None
-    
-    if request.method == 'POST':
-        action = request.form.get('action')
-        
-        if action == 'create_express_shipment':
-            # Generate EXPDJL + 6 random numbers
-            random_numbers = ''.join(random.choices(string.digits, k=6))
-            tracking_code = f"EXPDJL{random_numbers}"
-            
-            # Calculate delivery date (3-5 days from now)
-            from datetime import timedelta
-            delivery_date = datetime.now(timezone.utc) + timedelta(days=5)
-            formatted_delivery = delivery_date.strftime("%B %d, %Y")
-            
-            # Create the shipment
-            new_shipment = Shipment(
-                tracking_code=tracking_code,
-                customer_name=request.form.get('customer_name'),
-                customer_email=request.form.get('customer_email'),
-                customer_phone=request.form.get('customer_phone'),
-                origin=request.form.get('origin'),
-                destination=request.form.get('destination'),
-                package_type=request.form.get('package_type'),
-                package_weight=float(request.form.get('package_weight', 1.0)),
-                status='Express - Package registered',
-                current_location=request.form.get('origin'),
-                notes=request.form.get('notes'),
-                # Express shipments are outgoing by default
-                shipment_direction='outgoing'
-            )
-            
-            db.session.add(new_shipment)
-            db.session.commit()
-            
-            # Store values to display in the template
-            new_tracking_code = tracking_code
-            new_customer_name = request.form.get('customer_name')
-            new_destination = request.form.get('destination')
-            
-            flash(f'✅ Express shipment created! Tracking Code: {tracking_code}', 'success')
-            
-            # Return the template with the new tracking code
-            return render_template('express_admin.html', 
-                                  new_tracking_code=new_tracking_code,
-                                  new_customer_name=new_customer_name,
-                                  new_destination=new_destination)
-    
-    return render_template('express_admin.html')
+def admin_approve_rider(rider_id):
+    rider = Rider.query.get_or_404(rider_id)
+    rider.status = 'approved'
+    rider.is_active = True
+    rider.approved_at = datetime.now(timezone.utc)
+    db.session.commit()
+    flash(f'✅ {rider.full_name} has been approved.', 'success')
+    return redirect(url_for('admin') + '#riders')
+
+
+@app.route('/admin/riders/<int:rider_id>/reject', methods=['POST'])
+@login_required
+def admin_reject_rider(rider_id):
+    rider = Rider.query.get_or_404(rider_id)
+    rider.status = 'rejected'
+    db.session.commit()
+    flash(f'❌ {rider.full_name} has been rejected.', 'danger')
+    return redirect(url_for('admin') + '#riders')
+
+
+@app.route('/admin/riders/<int:rider_id>/toggle_active', methods=['POST'])
+@login_required
+def admin_toggle_rider_active(rider_id):
+    rider = Rider.query.get_or_404(rider_id)
+    rider.is_active = not rider.is_active
+    db.session.commit()
+    state = "activated" if rider.is_active else "deactivated"
+    flash(f'✅ {rider.full_name} has been {state}.', 'success')
+    return redirect(url_for('admin') + '#riders')
+
+
+@app.route('/admin/riders/<int:rider_id>/reset_password', methods=['POST'])
+@login_required
+def admin_reset_rider_password(rider_id):
+    rider = Rider.query.get_or_404(rider_id)
+    new_password = request.form.get('new_password', '').strip()
+
+    if not new_password or len(new_password) < 6:
+        flash('❌ Password must be at least 6 characters.', 'danger')
+        return redirect(url_for('admin') + '#riders')
+
+    rider.password_hash = hashlib.sha256(new_password.encode()).hexdigest()
+    db.session.commit()
+    flash(f'🔑 Password reset for {rider.full_name}.', 'success')
+    return redirect(url_for('admin') + '#riders')
+
+
+@app.route('/admin/riders/<int:rider_id>/delete', methods=['POST'])
+@login_required
+def admin_delete_rider(rider_id):
+    rider = Rider.query.get_or_404(rider_id)
+    name = rider.full_name
+    db.session.delete(rider)
+    db.session.commit()
+    flash(f'🗑️ {name} has been deleted.', 'success')
+    return redirect(url_for('admin') + '#riders')
+
+# ============================================
+# ADMIN — DELIVERY TASK ASSIGNMENT
+# ============================================
+
+@app.route('/admin/riders/assign', methods=['POST'])
+@login_required
+def admin_assign_task():
+    tracking_code = request.form.get('tracking_code', '').strip()
+    rider_id = request.form.get('rider_id', '').strip()
+
+    if not tracking_code or not rider_id:
+        flash('❌ Please provide both tracking code and rider.', 'danger')
+        return redirect(url_for('admin') + '#riders')
+
+    shipment = Shipment.query.filter_by(tracking_code=tracking_code).first()
+    if not shipment:
+        flash(f'❌ Shipment "{tracking_code}" not found.', 'danger')
+        return redirect(url_for('admin') + '#riders')
+
+    rider = Rider.query.get(rider_id)
+    if not rider or rider.status != 'approved':
+        flash('❌ Invalid rider or rider is not approved.', 'danger')
+        return redirect(url_for('admin') + '#riders')
+
+    # Check if shipment already has an active task
+    existing = DeliveryTask.query.filter_by(shipment_id=shipment.id)\
+                                 .filter(DeliveryTask.status != 'delivered').first()
+    if existing:
+        flash(f'⚠️ This shipment is already assigned to {existing.rider.full_name}.', 'warning')
+        return redirect(url_for('admin') + '#riders')
+
+    task = DeliveryTask(
+        rider_id=rider.id,
+        shipment_id=shipment.id,
+        status='assigned'
+    )
+    db.session.add(task)
+
+    # Update the shipment status
+    shipment.status = 'Assigned to rider'
+    shipment.current_location = f'With rider - {rider.full_name}'
+    shipment.last_update = datetime.now(timezone.utc)
+
+    db.session.commit()
+
+    flash(f'✅ {shipment.tracking_code} assigned to {rider.full_name}.', 'success')
+    return redirect(url_for('admin') + '#riders')
+
+
+@app.route('/admin/riders/unassign/<int:task_id>', methods=['POST'])
+@login_required
+def admin_unassign_task(task_id):
+    task = DeliveryTask.query.get_or_404(task_id)
+    shipment_code = task.shipment.tracking_code
+    rider_name = task.rider.full_name
+
+    # Reset shipment status
+    task.shipment.status = 'Awaiting rider assignment'
+    task.shipment.current_location = task.shipment.origin
+    task.shipment.last_update = datetime.now(timezone.utc)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    flash(f'✅ Unassigned {shipment_code} from {rider_name}.', 'success')
+    return redirect(url_for('admin') + '#riders')
+
+
+@app.route('/admin/riders/reassign/<int:task_id>', methods=['POST'])
+@login_required
+def admin_reassign_task(task_id):
+    task = DeliveryTask.query.get_or_404(task_id)
+    new_rider_id = request.form.get('new_rider_id', '').strip()
+
+    if not new_rider_id:
+        flash('❌ Please select a rider.', 'danger')
+        return redirect(url_for('admin') + '#riders')
+
+    new_rider = Rider.query.get(new_rider_id)
+    if not new_rider or new_rider.status != 'approved':
+        flash('❌ Invalid rider or rider is not approved.', 'danger')
+        return redirect(url_for('admin') + '#riders')
+
+    old_rider_name = task.rider.full_name
+    task.rider_id = new_rider.id
+    task.assigned_at = datetime.now(timezone.utc)
+
+    task.shipment.current_location = f'With rider - {new_rider.full_name}'
+    task.shipment.last_update = datetime.now(timezone.utc)
+
+    db.session.commit()
+
+    flash(f'✅ Reassigned from {old_rider_name} to {new_rider.full_name}.', 'success')
+    return redirect(url_for('admin') + '#riders')
+
+# ============================================
+# ADMIN — SHIPMENT EDIT
+# ============================================
 
 @app.route('/admin/shipment/edit/<int:shipment_id>', methods=['GET', 'POST'])
 @login_required
@@ -994,14 +721,639 @@ def admin_edit_shipment(shipment_id):
         flash(f'✅ Shipment {shipment.tracking_code} updated successfully!', 'success')
         return redirect(url_for('admin'))
     
-    return render_template('admin_edit_shipment.html', shipment=shipment)    
+    return render_template('admin_edit_shipment.html', shipment=shipment)
+
+
+# ============================================
+# EXPRESS ADMIN ROUTES
+# ============================================
+
+@app.route('/express-admin', methods=['GET', 'POST'])
+@login_required
+def express_admin():
+    new_tracking_code = None
+    new_customer_name = None
+    new_destination = None
+    
+    if request.method == 'POST':
+        action = request.form.get('action')
+        
+        if action == 'create_express_shipment':
+            random_numbers = ''.join(random.choices(string.digits, k=6))
+            tracking_code = f"EXPDJL{random_numbers}"
+            
+            new_shipment = Shipment(
+                tracking_code=tracking_code,
+                customer_name=request.form.get('customer_name'),
+                customer_email=request.form.get('customer_email'),
+                customer_phone=request.form.get('customer_phone'),
+                origin=request.form.get('origin'),
+                destination=request.form.get('destination'),
+                package_type=request.form.get('package_type'),
+                package_weight=float(request.form.get('package_weight', 1.0)),
+                status='Express - Package registered',
+                current_location=request.form.get('origin'),
+                notes=request.form.get('notes'),
+                shipment_direction='outgoing'
+            )
+            db.session.add(new_shipment)
+            db.session.commit()
+            
+            new_tracking_code = tracking_code
+            new_customer_name = request.form.get('customer_name')
+            new_destination = request.form.get('destination')
+            
+            flash(f'✅ Express shipment created! Tracking Code: {tracking_code}', 'success')
+            
+            return render_template('express_admin.html', 
+                                  new_tracking_code=new_tracking_code,
+                                  new_customer_name=new_customer_name,
+                                  new_destination=new_destination)
+    
+    return render_template('express_admin.html')
+
+
+# ============================================
+# API ROUTES
+# ============================================
+
+@app.route('/api/shipment/<code>')
+def get_shipment(code):
+    shipment = Shipment.query.filter_by(tracking_code=code).first()
+    if shipment:
+        return jsonify({
+            'tracking_code': shipment.tracking_code,
+            'status': shipment.status,
+            'location': shipment.current_location,
+            'last_update': shipment.last_update.strftime('%Y-%m-%d %H:%M'),
+            'partner_courier': shipment.partner_courier,
+            'partner_tracking': shipment.partner_tracking
+        })
+    return jsonify({'error': 'Not found'}), 404
+
+
+@app.route('/api/stats')
+def get_stats():
+    total = Shipment.query.count()
+    delivered = Shipment.query.filter(Shipment.status.like('%Delivered%')).count()
+    return jsonify({
+        'total': total,
+        'delivered': delivered,
+        'in_transit': total - delivered
+    })
+
+
+@app.route('/api/detect-courier', methods=['POST'])
+def detect_courier_ajax():
+    try:
+        data = request.get_json()
+        tracking_number = data.get('tracking_number', '')
+        courier = detect_courier(tracking_number)
+        return jsonify({
+            'success': True,
+            'courier': courier,
+            'detected': courier != 'Unknown',
+            'url': get_tracking_url(courier, tracking_number) if courier != 'Unknown' else '#'
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ============================================
+# DISPATCH RIDER — PUBLIC PAGES
+# ============================================
+
+@app.route('/dispatch_riders')
+def dispatch_rider_landing():
+    return render_template('dispatch_rider_landing.html')
+
+
+@app.route('/dispatch_riders/signup', methods=['GET', 'POST'])
+def dispatch_rider_signup():
+    print("=" * 60)
+    print(f"🔵 SIGNUP ROUTE HIT — Method: {request.method}")
+
+    if request.method == 'POST':
+        print(f"📦 Form data received: {dict(request.form)}")
+
+        full_name = request.form.get('full_name', '').strip()
+        phone = request.form.get('phone', '').strip()
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
+        confirm = request.form.get('confirm_password', '')
+        vehicle = request.form.get('vehicle_type', '')
+
+        print(f"📝 Parsed: name={full_name}, phone={phone}, vehicle={vehicle}")
+
+        errors = []
+        if not full_name:
+            errors.append("Full name is required.")
+        if not phone:
+            errors.append("Phone number is required.")
+        if not password:
+            errors.append("Password is required.")
+        if password != confirm:
+            errors.append("Passwords do not match.")
+        if not vehicle:
+            errors.append("Please select a vehicle type.")
+
+        # Add +234 prefix
+        if phone and not phone.startswith('+'):
+            phone = '+234' + phone.lstrip('0')
+
+        if phone and Rider.query.filter_by(phone=phone).first():
+            errors.append("This phone number is already registered.")
+
+        # Strip +234 for clean display
+        display_phone = phone
+        if display_phone:
+            if display_phone.startswith('+234'):
+                display_phone = display_phone[4:]
+            elif display_phone.startswith('0'):
+                display_phone = display_phone[1:]
+
+        if errors:
+            print(f"❌ Validation errors: {errors}")
+            return render_template(
+                'dispatch_rider_signup.html',
+                errors=errors,
+                full_name=full_name,
+                phone=display_phone,
+                email=email,
+                vehicle=vehicle
+            )
+
+        # Save the rider
+        try:
+            rider = Rider(
+                full_name=full_name,
+                phone=phone,
+                email=email if email else None,
+                password_hash=hashlib.sha256(password.encode()).hexdigest(),
+                vehicle_type=vehicle,
+                status='pending'
+            )
+            print(f"💾 About to save rider: {full_name}, {phone}, {vehicle}")
+            db.session.add(rider)
+            db.session.commit()
+            print(f"✅ Rider saved! ID: {rider.id}")
+            print("=" * 60)
+
+        except Exception as e:
+            db.session.rollback()
+            print(f"❌ SAVE ERROR: {e}")
+            print("=" * 60)
+            errors.append(f"Could not save rider: {str(e)}")
+            return render_template(
+                'dispatch_rider_signup.html',
+                errors=errors,
+                full_name=full_name,
+                phone=display_phone,
+                email=email,
+                vehicle=vehicle
+            )
+
+        flash(
+            "✅ Account submitted! Your account is pending admin approval. "
+            "You'll be able to log in once approved.",
+            'success'
+        )
+        return redirect(url_for('dispatch_rider_login'))
+
+    return render_template('dispatch_rider_signup.html')
+
+
+@app.route('/dispatch_riders/login', methods=['GET', 'POST'])
+def dispatch_rider_login():
+    if 'rider_id' in session:
+        return redirect(url_for('dispatch_rider_coming_soon'))
+
+    if request.method == 'POST':
+        phone = request.form.get('phone', '').strip()
+        password = request.form.get('password', '')
+
+        errors = []
+
+        if not phone:
+            errors.append("Phone number is required.")
+        if not password:
+            errors.append("Password is required.")
+
+        if phone and not phone.startswith('+'):
+            phone = '+234' + phone.lstrip('0')
+
+        if not errors:
+            rider = Rider.query.filter_by(phone=phone).first()
+
+            if not rider:
+                errors.append("No account found with this phone number.")
+            else:
+                password_hash = hashlib.sha256(password.encode()).hexdigest()
+
+                if rider.password_hash != password_hash:
+                    errors.append("Incorrect password.")
+                elif rider.status == 'pending':
+                    errors.append("Your account is pending admin approval. You'll be able to log in once approved.")
+                elif rider.status == 'rejected':
+                    errors.append("Your account was not approved. Please contact the admin for more information.")
+                elif not rider.is_active:
+                    errors.append("Your account has been deactivated.")
+                else:
+                    session['rider_id'] = rider.id
+                    session['rider_name'] = rider.full_name
+                    session['rider_phone'] = rider.phone
+                    return redirect(url_for('dispatch_rider_dashboard'))
+
+        # Strip +234 for clean display
+        display_phone = phone
+        if display_phone:
+            if display_phone.startswith('+234'):
+                display_phone = display_phone[4:]
+            elif display_phone.startswith('0'):
+                display_phone = display_phone[1:]
+
+        return render_template(
+            'dispatch_rider_login.html',
+            errors=errors,
+            phone=display_phone
+        )
+
+    return render_template('dispatch_rider_login.html')
+
+@app.route('/dispatch_riders/dashboard')
+def dispatch_rider_dashboard():
+    if 'rider_id' not in session:
+        return redirect(url_for('dispatch_rider_login'))
+
+    rider = Rider.query.get(session['rider_id'])
+    if not rider:
+        session.clear()
+        return redirect(url_for('dispatch_rider_login'))
+
+    return render_template('rider_dashboard.html', rider=rider)    
+
+@app.route('/dispatch_riders/logout')
+def dispatch_rider_logout():
+    session.pop('rider_id', None)
+    session.pop('rider_name', None)
+    session.pop('rider_phone', None)
+    flash("You have been logged out.", 'success')
+    return redirect(url_for('dispatch_rider_login'))
+
+
+@app.route('/dispatch_riders/coming_soon')
+def dispatch_rider_coming_soon():
+    if 'rider_id' not in session:
+        return redirect(url_for('dispatch_rider_login'))
+
+    rider = Rider.query.get(session['rider_id'])
+    if not rider:
+        session.clear()
+        return redirect(url_for('dispatch_rider_login'))
+
+    return render_template('dispatch_rider_coming_soon.html', rider=rider)
+
+
+@app.route('/dispatch_riders/forgot_password')
+def dispatch_rider_forgot_password():
+    return render_template('dispatch_rider_forgot_password.html')
+
+
+# ============================================
+# RIDER API — TASKS & UPDATES
+# ============================================
+
+@app.route('/api/rider/tasks')
+def api_rider_tasks():
+    if 'rider_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    rider_id = session['rider_id']
+
+    # Active tasks (not delivered and not failed)
+    active_tasks = DeliveryTask.query\
+        .filter_by(rider_id=rider_id)\
+        .filter(DeliveryTask.status.in_(['assigned', 'picked_up', 'in_transit']))\
+        .order_by(DeliveryTask.assigned_at.desc()).all()
+
+    # Recently delivered (last 20)
+    completed_tasks = DeliveryTask.query\
+        .filter_by(rider_id=rider_id)\
+        .filter(DeliveryTask.status == 'delivered')\
+        .order_by(DeliveryTask.delivered_at.desc())\
+        .limit(20).all()
+
+    def serialize(task):
+        s = task.shipment
+        return {
+            'task_id': task.id,
+            'status': task.status,
+            'tracking_code': s.tracking_code,
+            'customer_name': s.customer_name,
+            'customer_phone': s.customer_phone,
+            'destination': s.destination,
+            'delivery_address': s.delivery_address or s.destination,
+            'package_type': s.package_type,
+            'weight': s.package_weight,
+            'notes': s.notes,
+            'assigned_at': task.assigned_at.strftime('%Y-%m-%d %H:%M') if task.assigned_at else None,
+            'picked_up_at': task.picked_up_at.strftime('%Y-%m-%d %H:%M') if task.picked_up_at else None,
+            'delivered_at': task.delivered_at.strftime('%Y-%m-%d %H:%M') if task.delivered_at else None
+        }
+
+    return jsonify({
+        'active': [serialize(t) for t in active_tasks],
+        'completed': [serialize(t) for t in completed_tasks],
+        'counts': {
+            'active': len(active_tasks),
+            'completed_today': DeliveryTask.query\
+                .filter_by(rider_id=rider_id, status='delivered')\
+                .filter(DeliveryTask.delivered_at >= datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0))\
+                .count()
+        }
+    })
+
+@app.route('/api/rider/task/<int:task_id>/update', methods=['POST'])
+def api_rider_update_task(task_id):
+    if 'rider_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    task = DeliveryTask.query.get(task_id)
+    if not task:
+        return jsonify({'error': 'Task not found'}), 404
+
+    if task.rider_id != session['rider_id']:
+        return jsonify({'error': 'Forbidden'}), 403
+
+    data = request.get_json() or {}
+    new_status = data.get('status')
+    notes = data.get('notes', '').strip()
+    photo_data = data.get('photo_data')  # Base64 encoded image
+
+    # Validate status
+    valid_statuses = ['assigned', 'picked_up', 'in_transit', 'delivered', 'failed']
+    if new_status not in valid_statuses:
+        return jsonify({'error': 'Invalid status'}), 400
+
+    # Update task
+    task.status = new_status
+    if notes:
+        task.notes = notes
+
+    # Update timestamps
+    now = datetime.now(timezone.utc)
+    if new_status == 'picked_up' and not task.picked_up_at:
+        task.picked_up_at = now
+    elif new_status == 'delivered':
+        task.delivered_at = now
+
+    # Save photo if provided (base64)
+    if photo_data:
+        try:
+            import base64
+            # Strip header if present
+            if ',' in photo_data:
+                photo_data = photo_data.split(',')[1]
+            img_bytes = base64.b64decode(photo_data)
+
+            # Save to static/uploads/delivery_proofs/
+            upload_dir = os.path.join('static', 'uploads', 'delivery_proofs')
+            os.makedirs(upload_dir, exist_ok=True)
+
+            filename = f"task_{task_id}_{now.strftime('%Y%m%d_%H%M%S')}.jpg"
+            filepath = os.path.join(upload_dir, filename)
+
+            with open(filepath, 'wb') as f:
+                f.write(img_bytes)
+
+            task.photo_proof = f"/static/uploads/delivery_proofs/{filename}"
+        except Exception as e:
+            print(f"⚠️ Photo upload failed: {e}")
+            # Continue anyway — photo is optional
+
+    # Sync the shipment status
+    shipment = task.shipment
+    if new_status == 'picked_up':
+        shipment.status = 'Picked up from customer'
+        shipment.current_location = 'With rider'
+    elif new_status == 'in_transit':
+        shipment.status = 'In transit to destination'
+        shipment.current_location = 'In transit'
+    elif new_status == 'delivered':
+        shipment.status = 'Delivered successfully'
+        shipment.current_location = shipment.destination
+    elif new_status == 'failed':
+        shipment.status = 'Delivery failed - Will retry'
+        shipment.current_location = 'Returning to hub'
+
+    shipment.last_update = now
+
+    db.session.commit()
+
+    return jsonify({
+        'success': True,
+        'task_id': task.id,
+        'status': task.status,
+        'photo_proof': task.photo_proof
+    })
+
+@app.route('/api/rider/location', methods=['POST'])
+def api_rider_location():
+    if 'rider_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    data = request.get_json() or {}
+    lat = data.get('lat')
+    lng = data.get('lng')
+
+    if lat is None or lng is None:
+        return jsonify({'error': 'Missing coordinates'}), 400
+
+    rider = Rider.query.get(session['rider_id'])
+    if not rider:
+        return jsonify({'error': 'Rider not found'}), 404
+
+    # We don't have lat/lng columns yet, so we just acknowledge receipt
+    # (We can add columns later if you want live tracking)
+    return jsonify({'success': True, 'received': {'lat': lat, 'lng': lng}})
+
+# ============================================
+# EXPORT ROUTES
+# ============================================
+
+@app.route('/admin/export/all')
+@login_required
+def export_all():
+    shipments = Shipment.query.order_by(Shipment.id.desc()).all()
+    return export_all_shipments(shipments)
+
+
+@app.route('/admin/export/outgoing')
+@login_required
+def export_outgoing():
+    shipments = Shipment.query.all()
+    return export_outgoing_shipments(shipments)
+
+
+@app.route('/admin/export/incoming')
+@login_required
+def export_incoming():
+    shipments = Shipment.query.all()
+    return export_incoming_shipments(shipments)
+
+
+@app.route('/admin/export/delivered')
+@login_required
+def export_delivered():
+    shipments = Shipment.query.all()
+    return export_delivered_shipments(shipments)
+
+
+@app.route('/admin/export/pending')
+@login_required
+def export_pending():
+    shipments = Shipment.query.all()
+    return export_pending_shipments(shipments)
+
+
+@app.route('/admin/export/customers')
+@login_required
+def export_customers_list():
+    customers = Customer.query.order_by(Customer.last_shipment.desc()).all()
+    return export_customers(customers)
+
+
+# ============================================
+# UTILITY ROUTES
+# ============================================
+
+@app.route('/reset-database')
+def reset_database():
+    db.drop_all()
+    db.create_all()
+    
+    password_hash = hashlib.sha256("admin123".encode()).hexdigest()
+    admin = Admin(username="admin", password_hash=password_hash)
+    db.session.add(admin)
+    
+    sample_reviews = [
+        Review(customer_name="Mr. Adebayo Ogunlesi", location="Ibadan", rating=5, 
+               comment="Excellent service! My package from Ibadan arrived quickly."),
+        Review(customer_name="Mrs. Funmilayo Adeyemi", location="Oyo Town", rating=5, 
+               comment="Best logistics company in Oyo State. Very reliable!"),
+    ]
+    db.session.add_all(sample_reviews)
+    db.session.commit()
+    
+    return "✅ Database reset successful! <br><br>Login: admin / admin123 <br><br><a href='/admin/login'>Go to Admin Login</a>"
+
+
+@app.route('/restore-shipment')
+def restore_shipment():
+    existing = Shipment.query.filter_by(tracking_code="DJL-2026-HXESB").first()
+    if existing:
+        return "✅ Shipment DJL-2026-HXESB already exists in database!"
+    
+    new_shipment = Shipment(
+        tracking_code="DJL-2026-HXESB",
+        customer_name="Areo Tolulope B",
+        customer_email="toluare123@gmail.com",
+        customer_phone="+447833889142",
+        origin="Ibadan",
+        destination="Wolverhampton, United Kingdom",
+        package_type="Parcel",
+        package_weight=10.0,
+        status="Picked up from customer",
+        current_location="Ibadan",
+        last_update=datetime.now(timezone.utc)
+    )
+    db.session.add(new_shipment)
+    db.session.commit()
+    
+    return """
+    <h2>✅ Shipment Restored Successfully!</h2>
+    <p><strong>Tracking Code:</strong> DJL-2026-HXESB</p>
+    <p><strong>Customer:</strong> Areo Tolulope B</p>
+    <p><strong>Destination:</strong> Wolverhampton, United Kingdom</p>
+    <p><strong>Status:</strong> Picked up from customer</p>
+    <br>
+    <a href='/track'>Track this package</a><br>
+    <a href='/admin/login'>Go to Admin Panel</a>
+    """
+
+
+@app.route('/restore-all-shipments')
+def restore_all_shipments():
+    shipments_data = [
+        {'tracking_code': 'DJL-2026-ZOEAY', 'shipment_direction': 'outgoing', 'customer_name': 'Iyabo Odueyingbo', 'customer_email': 'emmanueltee@hotmail.com', 'customer_phone': '+447943004101', 'origin': 'Ibadan', 'destination': 'United Kingdom', 'package_type': 'Parcel', 'package_weight': 14.0, 'status': 'Customs clearance in progress', 'current_location': 'Lagos Hub', 'last_update': datetime(2026, 6, 29, 13, 58, 0)},
+        {'tracking_code': 'DJL-2026-6URUQ', 'shipment_direction': 'outgoing', 'customer_name': 'Oluwadamilare Oloyede', 'customer_email': 'kolapastor62@yahoo.co.uk', 'customer_phone': '+447950711976', 'origin': 'Ibadan', 'destination': 'United Kingdom', 'package_type': 'Parcel', 'package_weight': 14.0, 'status': 'Handed over to partner courier', 'current_location': 'In transit to United kingdom', 'last_update': datetime(2026, 6, 23, 9, 29, 0)},
+        {'tracking_code': 'DJL-2026-BBZTG', 'shipment_direction': 'outgoing', 'customer_name': 'Olumide Adejumo', 'customer_email': 'molumide74@yahoo.com', 'customer_phone': '+447445921438', 'origin': 'Ibadan', 'destination': 'United Kingdom', 'package_type': 'Parcel', 'package_weight': 24.4, 'status': 'Delivered successfully', 'current_location': 'United Kingdom', 'last_update': datetime(2026, 6, 26, 12, 4, 0)},
+        {'tracking_code': 'DJL-2026-3CHNJ', 'shipment_direction': 'outgoing', 'customer_name': 'Favour Ibirogba Taiwo', 'customer_email': 'favouribirogba0@gmail.com', 'customer_phone': '+447809162523', 'origin': '-', 'destination': 'United Kingdom', 'package_type': 'Parcel', 'package_weight': 10.0, 'status': 'Delivered successfully', 'current_location': 'United Kingdom', 'last_update': datetime(2026, 6, 26, 12, 5, 0)},
+        {'tracking_code': 'DJL-2026-Z1J5Q', 'shipment_direction': 'outgoing', 'customer_name': 'Ezekiel Rhoda', 'customer_email': 'ezekielrhoda@gmail.com', 'customer_phone': '+447908030466', 'origin': 'Ibadan', 'destination': 'United Kingdom', 'package_type': 'Parcel', 'package_weight': 20.0, 'status': 'Delivered successfully', 'current_location': 'United Kingdom', 'last_update': datetime(2026, 6, 26, 15, 35, 0)},
+        {'tracking_code': 'INT-CA-2026-457520', 'shipment_direction': 'incoming', 'customer_name': 'Joseph Loseyi', 'customer_email': '-', 'customer_phone': '+1 (204) 558-9160', 'origin': 'Canada', 'destination': 'Lagos', 'package_type': 'Parcel', 'package_weight': 2.0, 'status': 'Shipped from origin country', 'current_location': 'Shipped from origin country', 'last_update': datetime(2026, 6, 11, 10, 33, 0), 'origin_country': 'Canada'},
+        {'tracking_code': 'INT-UK-2026-479432', 'shipment_direction': 'incoming', 'customer_name': 'Mr. Chris', 'customer_email': '-', 'customer_phone': '+447570149032', 'origin': 'United Kingdom', 'destination': 'Lagos', 'package_type': 'Parcel', 'package_weight': 24.0, 'status': 'Delivered successfully', 'current_location': 'Lagos', 'last_update': datetime(2026, 6, 23, 9, 16, 0), 'origin_country': 'UK', 'partner_courier_original': 'Royal Mail'},
+        {'tracking_code': 'DJL-2026-HXESB', 'shipment_direction': 'outgoing', 'customer_name': 'Areo Tolulope B', 'customer_email': 'toluare123@gmail.com', 'customer_phone': '+447833889142', 'origin': 'Ibadan', 'destination': 'Wolverhampton, United Kingdom', 'package_type': 'Parcel', 'package_weight': 10.0, 'status': 'Delivered successfully', 'current_location': 'Wolverhampton, United Kingdom', 'last_update': datetime(2026, 6, 23, 9, 19, 0), 'partner_courier': 'FedEx'}
+    ]
+    
+    count_added = 0
+    skipped = 0
+    
+    for data in shipments_data:
+        existing = Shipment.query.filter_by(tracking_code=data['tracking_code']).first()
+        if existing:
+            skipped += 1
+            continue
+        
+        shipment = Shipment(
+            tracking_code=data['tracking_code'],
+            shipment_direction=data.get('shipment_direction', 'outgoing'),
+            customer_name=data['customer_name'],
+            customer_email=data.get('customer_email'),
+            customer_phone=data.get('customer_phone'),
+            origin=data['origin'],
+            destination=data['destination'],
+            package_type=data['package_type'],
+            package_weight=data['package_weight'],
+            status=data['status'],
+            current_location=data['current_location'],
+            last_update=data['last_update'],
+            partner_courier=data.get('partner_courier'),
+            partner_tracking=data.get('partner_tracking'),
+            origin_country=data.get('origin_country'),
+            partner_courier_original=data.get('partner_courier_original'),
+            partner_tracking_original=data.get('partner_tracking_original')
+        )
+        db.session.add(shipment)
+        count_added += 1
+    
+    db.session.commit()
+    
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Restore Shipments</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            body {{ background: linear-gradient(135deg, #0A192F, #0F3B5C); min-height: 100vh; display: flex; align-items: center; justify-content: center; color: white; font-family: 'Segoe UI', sans-serif; }}
+            .card {{ background: white; border-radius: 20px; padding: 40px; max-width: 600px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); color: #333; text-align: center; }}
+            .btn-primary {{ background-color: #0F3B5C; border: none; padding: 12px 30px; border-radius: 10px; color: white; text-decoration: none; display: inline-block; margin: 5px; }}
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <h2 class="mb-3">✅ {count_added} Shipments Restored!</h2>
+            <p>Skipped {skipped} existing shipments.</p>
+            <a href="/admin" class="btn-primary">Go to Admin Dashboard</a>
+            <a href="/track" class="btn-primary">Track a Package</a>
+        </div>
+    </body>
+    </html>
+    """
+
 
 # For Render deployment
 application = app
-
-@app.route('/health')
-def health():
-    return "OK", 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

@@ -992,6 +992,30 @@ def dispatch_rider_dashboard():
 
     return render_template('rider_dashboard.html', rider=rider)    
 
+@app.route('/dispatch_riders/history')
+def dispatch_rider_history():
+    if 'rider_id' not in session:
+        return redirect(url_for('dispatch_rider_login'))
+
+    rider = Rider.query.get(session['rider_id'])
+    if not rider:
+        session.clear()
+        return redirect(url_for('dispatch_rider_login'))
+
+    return render_template('rider_history.html', rider=rider)
+
+@app.route('/dispatch_riders/profile')
+def dispatch_rider_profile():
+    if 'rider_id' not in session:
+        return redirect(url_for('dispatch_rider_login'))
+
+    rider = Rider.query.get(session['rider_id'])
+    if not rider:
+        session.clear()
+        return redirect(url_for('dispatch_rider_login'))
+
+    return render_template('rider_profile.html', rider=rider)    
+
 @app.route('/dispatch_riders/logout')
 def dispatch_rider_logout():
     session.pop('rider_id', None)
@@ -1072,6 +1096,75 @@ def api_rider_tasks():
                 .count()
         }
     })
+
+@app.route('/api/rider/history')
+def api_rider_history():
+    if 'rider_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    rider_id = session['rider_id']
+
+    # Get all delivered and failed tasks (last 50)
+    tasks = DeliveryTask.query\
+        .filter_by(rider_id=rider_id)\
+        .filter(DeliveryTask.status.in_(['delivered', 'failed']))\
+        .order_by(DeliveryTask.delivered_at.desc().nullslast(), DeliveryTask.assigned_at.desc())\
+        .limit(50).all()
+
+    def serialize(task):
+        s = task.shipment
+        return {
+            'task_id': task.id,
+            'status': task.status,
+            'tracking_code': s.tracking_code,
+            'customer_name': s.customer_name,
+            'customer_phone': s.customer_phone,
+            'destination': s.destination,
+            'delivery_address': s.delivery_address or s.destination,
+            'package_type': s.package_type,
+            'weight': s.package_weight,
+            'notes': task.notes,
+            'photo_proof': task.photo_proof,
+            'assigned_at': task.assigned_at.strftime('%Y-%m-%d %H:%M') if task.assigned_at else None,
+            'delivered_at': task.delivered_at.strftime('%Y-%m-%d %H:%M') if task.delivered_at else None
+        }
+
+    return jsonify({
+        'tasks': [serialize(t) for t in tasks]
+    })
+
+@app.route('/api/rider/stats')
+def api_rider_stats():
+    if 'rider_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    rider_id = session['rider_id']
+
+    # Calculate start-of-day, start-of-week, start-of-month
+    now = datetime.now(timezone.utc)
+    start_of_today = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    start_of_week = start_of_today - timedelta(days=now.weekday())
+    start_of_month = start_of_today.replace(day=1)
+
+    def count_since(since):
+        return DeliveryTask.query\
+            .filter_by(rider_id=rider_id, status='delivered')\
+            .filter(DeliveryTask.delivered_at >= since)\
+            .count()
+
+    total_delivered = DeliveryTask.query\
+        .filter_by(rider_id=rider_id, status='delivered').count()
+
+    total_failed = DeliveryTask.query\
+        .filter_by(rider_id=rider_id, status='failed').count()
+
+    return jsonify({
+        'today': count_since(start_of_today),
+        'this_week': count_since(start_of_week),
+        'this_month': count_since(start_of_month),
+        'total_delivered': total_delivered,
+        'total_failed': total_failed
+    })    
 
 @app.route('/api/rider/task/<int:task_id>/update', methods=['POST'])
 def api_rider_update_task(task_id):

@@ -5,6 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0F3B5C">
     <title>My Deliveries - DeeJohnson Rider</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/static/manifest.json">
+
+    <!-- App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/images/icon-192.png">
+    <link rel="apple-touch-icon" href="/static/images/apple-touch-icon.png">
+
+    <!-- Apple PWA meta (for iPhone) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DJ Rider">
+
+    <!-- Microsoft tile -->
+    <meta name="msapplication-TileColor" content="#0F3B5C">
+    <meta name="msapplication-TileImage" content="/static/images/icon-192.png">
+
+    <!-- Fonts and Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -629,6 +648,29 @@
 </head>
 <body>
 
+    <body>
+
+    <!-- ===== SPLASH SCREEN ===== -->
+    <div id="splashScreen" style="
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(135deg, #0A192F, #0F3B5C);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 24px;
+        z-index: 99999;
+        transition: opacity 0.4s ease;
+    ">
+        <img src="/static/images/icon-192.png" alt="DeeJohnson Rider"
+             style="width: 100px; height: 100px; border-radius: 24px; box-shadow: 0 12px 40px rgba(0,0,0,0.4);">
+        <div style="color: white; font-family: 'Inter', sans-serif; text-align: center;">
+            <div style="font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px;">DeeJohnson Rider</div>
+            <div style="font-size: 0.85rem; opacity: 0.7; margin-top: 4px; letter-spacing: 2px; text-transform: uppercase;">Loading…</div>
+        </div>
+    </div>
+
     <!-- ===== TOP BAR ===== -->
     <div class="top-bar">
         <div class="row">
@@ -687,11 +729,11 @@
             <i class="fas fa-home"></i>
             Deliveries
         </a>
-        <a href="#" onclick="showComingSoon('History'); return false;">
+            <a href="/dispatch_riders/history">
             <i class="fas fa-history"></i>
             History
         </a>
-        <a href="#" onclick="showComingSoon('Profile'); return false;">
+            <a href="/dispatch_riders/profile">
             <i class="fas fa-user"></i>
             Profile
         </a>
@@ -773,6 +815,36 @@
             </form>
         </div>
     </div>
+
+        <script>
+        // ============================================
+        // PWA — Register Service Worker
+        // ============================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/js/service-worker.js')
+                    .then(reg => {
+                        console.log('[PWA] Service worker registered:', reg.scope);
+                    })
+                    .catch(err => {
+                        console.warn('[PWA] Service worker registration failed:', err);
+                    });
+            });
+        }
+
+        // ============================================
+        // Hide splash screen after page loads
+        // ============================================
+        window.addEventListener('load', () => {
+            const splash = document.getElementById('splashScreen');
+            if (splash) {
+                setTimeout(() => {
+                    splash.style.opacity = '0';
+                    setTimeout(() => splash.remove(), 400);
+                }, 600);
+            }
+        });
+    </script>
 
     <script>
         // ============================================

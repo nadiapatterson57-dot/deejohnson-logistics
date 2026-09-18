@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0F3B5C">
+    <title>History - DeeJohnson Rider</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f4f6f9;
+            color: #0A192F;
+            padding-bottom: 80px;
+            min-height: 100vh;
+        }
+
+        /* ===== TOP BAR ===== */
+        .top-bar {
+            background: linear-gradient(135deg, #0A192F, #0F3B5C);
+            color: white;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(10, 25, 47, 0.15);
+        }
+
+        .top-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .back-btn:hover { background: rgba(255,255,255,0.2); }
+
+        .page-title h1 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .page-title p {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin: 0;
+        }
+
+        /* ===== STATS STRIP ===== */
+        .stats-strip {
+            display: flex;
+            background: white;
+            margin: -12px 16px 0;
+            border-radius: 16px;
+            padding: 18px 12px;
+            box-shadow: 0 8px 24px rgba(10, 25, 47, 0.08);
+            position: relative;
+            z-index: 5;
+            gap: 8px;
+        }
+
+        .stat-item {
+            flex: 1;
+            text-align: center;
+            border-right: 1px solid #f0f2f5;
+        }
+
+        .stat-item:last-child { border-right: none; }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #0F3B5C;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+
+        /* ===== GROUPS ===== */
+        .group {
+            padding: 22px 16px 0;
+        }
+
+        .group-title {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .group-title .count-badge {
+            background: #e5e7eb;
+            color: #4b5563;
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        /* ===== HISTORY CARD ===== */
+        .history-card {
+            background: white;
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            border: 1px solid #eef0f4;
+            border-left: 4px solid #10b981;
+        }
+
+        .history-card.failed {
+            border-left-color: #dc3545;
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+
+        .tracking-code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: #0F3B5C;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pill {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .status-delivered { background: #d1fae5; color: #065f46; }
+        .status-failed { background: #fee2e2; color: #991b1b; }
+
+        .customer-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #0A192F;
+            margin-bottom: 4px;
+        }
+
+        .meta-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 6px;
+        }
+
+        .meta-row i {
+            color: #C9A03D;
+            width: 14px;
+            font-size: 0.75rem;
+        }
+
+        .photo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #eff6ff;
+            color: #1e40af;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-top: 10px;
+            cursor: pointer;
+            border: 1px solid #dbeafe;
+        }
+
+        .photo-badge:hover { background: #dbeafe; }
+
+        .failed-note {
+            background: #fef2f2;
+            color: #991b1b;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            border-left: 3px solid #dc3545;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+            margin: 24px 16px;
+        }
+
+        .empty-state i {
+            font-size: 3.5rem;
+            color: #d1d5db;
+            margin-bottom: 14px;
+        }
+
+        .empty-state h3 {
+            color: #0A192F;
+            font-weight: 800;
+            font-size: 1.15rem;
+            margin-bottom: 6px;
+        }
+
+        .empty-state p {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* ===== LOADER ===== */
+        .loader {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loader .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e5e7eb;
+            border-top-color: #0F3B5C;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            border-top: 1px solid #e5e7eb;
+            box-shadow: 0 -4px 20px rgba(10, 25, 47, 0.08);
+            z-index: 100;
+        }
+
+        .bottom-nav a {
+            flex: 1;
+            padding: 12px 6px;
+            text-align: center;
+            color: #9ca3af;
+            text-decoration: none;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            transition: color 0.15s;
+        }
+
+        .bottom-nav a i {
+            display: block;
+            font-size: 1.25rem;
+            margin-bottom: 4px;
+        }
+
+        .bottom-nav a.active,
+        .bottom-nav a:hover {
+            color: #0F3B5C;
+        }
+
+        /* ===== PHOTO VIEWER MODAL ===== */
+        .photo-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 25, 47, 0.92);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 9999;
+        }
+
+        .photo-modal.show { display: flex; }
+
+        .photo-modal img {
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .photo-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .photo-modal-close:hover { background: rgba(255,255,255,0.25); }
+    </style>
+</head>
+<body>
+
+    <!-- ===== TOP BAR ===== -->
+    <div class="top-bar">
+        <div class="top-bar-row">
+            <a href="/dispatch_riders/dashboard" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div class="page-title">
+                <h1>History</h1>
+                <p>Your completed deliveries</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== STATS STRIP ===== -->
+    <div class="stats-strip">
+        <div class="stat-item">
+            <div class="stat-number" id="statToday">—</div>
+            <div class="stat-label">Today</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" id="statWeek">—</div>
+            <div class="stat-label">Week</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" id="statMonth">—</div>
+            <div class="stat-label">Month</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" id="statTotal">—</div>
+            <div class="stat-label">All Time</div>
+        </div>
+    </div>
+
+    <!-- ===== HISTORY CONTENT ===== -->
+    <div id="historyContent">
+        <div class="loader">
+            <div class="spinner"></div>
+            <div style="color: #6b7280; font-size: 0.85rem;">Loading your history…</div>
+        </div>
+    </div>
+
+    <!-- ===== BOTTOM NAV ===== -->
+    <div class="bottom-nav">
+        <a href="/dispatch_riders/dashboard">
+            <i class="fas fa-home"></i>
+            Deliveries
+        </a>
+        <a href="/dispatch_riders/history" class="active">
+            <i class="fas fa-history"></i>
+            History
+        </a>
+            <a href="/dispatch_riders/profile">
+            <i class="fas fa-user"></i>
+            Profile
+        </a>
+        <a href="/dispatch_riders/logout">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </a>
+    </div>
+
+    <!-- ===== PHOTO VIEWER MODAL ===== -->
+    <div class="photo-modal" id="photoModal" onclick="closePhoto()">
+        <button class="photo-modal-close" onclick="closePhoto()">
+            <i class="fas fa-times"></i>
+        </button>
+        <img id="photoModalImg" src="" alt="Delivery proof" onclick="event.stopPropagation()">
+    </div>
+
+    <!-- ===== COMING SOON MODAL ===== -->
+    <div class="photo-modal" id="comingSoonModal" onclick="closeComingSoon()">
+        <div class="modal-box" onclick="event.stopPropagation()" style="background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 360px;">
+            <i class="fas fa-tools" style="font-size: 2.5rem; color: #C9A03D; margin-bottom: 15px;"></i>
+            <h3 id="comingSoonTitle" style="color: #0A192F; font-weight: 800; margin-bottom: 10px;">Coming Soon</h3>
+            <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 20px;">This feature is being built and will be available soon.</p>
+            <button onclick="closeComingSoon()" style="background: #0F3B5C; color: white; padding: 12px 30px; border-radius: 12px; border: none; font-family: inherit; font-weight: 700; cursor: pointer;">Got It</button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // LOAD STATS
+        // ============================================
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/rider/stats');
+                if (!res.ok) throw new Error('Failed to load stats');
+                const data = await res.json();
+
+                document.getElementById('statToday').textContent = data.today || 0;
+                document.getElementById('statWeek').textContent = data.this_week || 0;
+                document.getElementById('statMonth').textContent = data.this_month || 0;
+                document.getElementById('statTotal').textContent = data.total_delivered || 0;
+            } catch (err) {
+                console.error('Stats load error:', err);
+            }
+        }
+
+        // ============================================
+        // LOAD HISTORY
+        // ============================================
+        async function loadHistory() {
+            try {
+                const res = await fetch('/api/rider/history');
+                if (!res.ok) throw new Error('Failed to load history');
+                const data = await res.json();
+
+                renderHistory(data.tasks || []);
+            } catch (err) {
+                console.error('History load error:', err);
+                document.getElementById('historyContent').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i>
+                        <h3>Could not load history</h3>
+                        <p>Please check your connection and try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // ============================================
+        // RENDER HISTORY (Grouped by Date)
+        // ============================================
+        function renderHistory(tasks) {
+            const container = document.getElementById('historyContent');
+
+            if (!tasks.length) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No deliveries yet</h3>
+                        <p>Your completed deliveries will appear here.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group tasks by date label
+            const groups = {};
+            const groupOrder = [];
+
+            tasks.forEach(task => {
+                const label = getDateLabel(task.delivered_at || task.assigned_at);
+                if (!groups[label]) {
+                    groups[label] = [];
+                    groupOrder.push(label);
+                }
+                groups[label].push(task);
+            });
+
+            let html = '';
+            groupOrder.forEach(label => {
+                const groupTasks = groups[label];
+                html += `
+                    <div class="group">
+                        <div class="group-title">
+                            <i class="fas fa-calendar-day"></i>
+                            ${label}
+                            <span class="count-badge">${groupTasks.length}</span>
+                        </div>
+                        ${groupTasks.map(renderCard).join('')}
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // ============================================
+        // RENDER SINGLE CARD
+        // ============================================
+        function renderCard(task) {
+            const isFailed = task.status === 'failed';
+            const cardClass = isFailed ? 'history-card failed' : 'history-card';
+            const statusClass = isFailed ? 'status-failed' : 'status-delivered';
+            const statusText = isFailed ? 'FAILED' : 'DELIVERED';
+
+            const deliveredTime = task.delivered_at
+                ? formatTime(task.delivered_at)
+                : 'Not delivered';
+
+            return `
+                <div class="${cardClass}">
+                    <div class="card-top">
+                        <div class="tracking-code">${task.tracking_code}</div>
+                        <span class="status-pill ${statusClass}">${statusText}</span>
+                    </div>
+
+                    <div class="customer-name">${escapeHtml(task.customer_name || 'N/A')}</div>
+
+                    <div class="meta-row">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>${escapeHtml(task.delivery_address || task.destination || 'N/A')}</span>
+                    </div>
+
+                    <div class="meta-row">
+                        <i class="fas fa-clock"></i>
+                        <span>${deliveredTime}</span>
+                    </div>
+
+                    ${task.photo_proof ? `
+                        <div class="photo-badge" onclick="openPhoto('${task.photo_proof}')">
+                            <i class="fas fa-camera"></i>
+                            View Photo Proof
+                        </div>
+                    ` : ''}
+
+                    ${isFailed && task.notes ? `
+                        <div class="failed-note">
+                            <strong>Note:</strong> ${escapeHtml(task.notes)}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // ============================================
+        // HELPERS
+        // ============================================
+        function getDateLabel(datetimeStr) {
+            if (!datetimeStr) return 'Older';
+
+            const date = new Date(datetimeStr.replace(' ', 'T'));
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            const weekAgo = new Date(today);
+            weekAgo.setDate(weekAgo.getDate() - 7);
+
+            const taskDate = new Date(date);
+            taskDate.setHours(0, 0, 0, 0);
+
+            if (taskDate.getTime() === today.getTime()) return 'Today';
+            if (taskDate.getTime() === yesterday.getTime()) return 'Yesterday';
+            if (taskDate >= weekAgo) return 'This Week';
+            return 'Older';
+        }
+
+        function formatTime(datetimeStr) {
+            if (!datetimeStr) return '—';
+            const date = new Date(datetimeStr.replace(' ', 'T'));
+            const day = date.getDate();
+            const month = date.toLocaleString('en', { month: 'short' });
+            const time = date.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit', hour12: false });
+            return `${day} ${month}, ${time}`;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // ============================================
+        // PHOTO VIEWER
+        // ============================================
+        function openPhoto(url) {
+            document.getElementById('photoModalImg').src = url;
+            document.getElementById('photoModal').classList.add('show');
+        }
+
+        function closePhoto() {
+            document.getElementById('photoModal').classList.remove('show');
+        }
+
+        // ============================================
+        // COMING SOON
+        // ============================================
+        function showComingSoon(title) {
+            document.getElementById('comingSoonTitle').textContent = title + ' — Coming Soon';
+            document.getElementById('comingSoonModal').classList.add('show');
+        }
+
+        function closeComingSoon() {
+            document.getElementById('comingSoonModal').classList.remove('show');
+        }
+
+        // ============================================
+        // INIT
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+            loadHistory();
+        });
+    </script>
+
+</body>
+</html>

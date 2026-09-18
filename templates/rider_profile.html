@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0F3B5C">
+    <title>Profile - DeeJohnson Rider</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f4f6f9;
+            color: #0A192F;
+            padding-bottom: 80px;
+            min-height: 100vh;
+        }
+
+        /* ===== TOP BAR ===== */
+        .top-bar {
+            background: linear-gradient(135deg, #0A192F, #0F3B5C);
+            color: white;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(10, 25, 47, 0.15);
+        }
+
+        .top-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .back-btn:hover { background: rgba(255,255,255,0.2); }
+
+        .page-title h1 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .page-title p {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin: 0;
+        }
+
+        /* ===== PROFILE HEADER ===== */
+        .profile-header {
+            background: white;
+            margin: -12px 16px 0;
+            border-radius: 20px;
+            padding: 30px 20px;
+            box-shadow: 0 8px 24px rgba(10, 25, 47, 0.08);
+            position: relative;
+            z-index: 5;
+            text-align: center;
+        }
+
+        .avatar {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #0A192F, #0F3B5C);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.4rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 24px rgba(15, 59, 92, 0.35);
+            border: 4px solid #ffffff;
+        }
+
+        .profile-name {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #0A192F;
+            margin: 0 0 4px;
+            letter-spacing: -0.3px;
+        }
+
+        .profile-role {
+            font-size: 0.85rem;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #d1fae5;
+            color: #065f46;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .verified-badge.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .verified-badge.inactive {
+            background: #e5e7eb;
+            color: #4b5563;
+        }
+
+        /* ===== SECTIONS ===== */
+        .section {
+            padding: 24px 16px 0;
+        }
+
+        .section-title {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ===== DETAILS CARD ===== */
+        .details-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+            border: 1px solid #eef0f4;
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 16px 18px;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .detail-row:last-child { border-bottom: none; }
+
+        .detail-row .detail-icon {
+            width: 40px;
+            height: 40px;
+            background: #f8fafc;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0F3B5C;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .detail-row .detail-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .detail-row .detail-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 3px;
+        }
+
+        .detail-row .detail-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #0A192F;
+            word-break: break-word;
+        }
+
+        /* ===== STATS GRID ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 18px 12px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+            border: 1px solid #eef0f4;
+        }
+
+        .stat-card .stat-number {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #0F3B5C;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== HELP BOX ===== */
+        .help-box {
+            background: linear-gradient(135deg, #f8fafc, #ffffff);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #eef0f4;
+            border-left: 4px solid #C9A03D;
+        }
+
+        .help-box h4 {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #0A192F;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .help-box h4 i {
+            color: #C9A03D;
+        }
+
+        .help-box p {
+            font-size: 0.85rem;
+            color: #6b7280;
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+
+        .help-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .help-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 0.82rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.15s;
+        }
+
+        .help-btn-whatsapp {
+            background: #25D366;
+            color: white;
+        }
+
+        .help-btn-whatsapp:active { background: #1ea952; }
+
+        .help-btn-call {
+            background: #0F3B5C;
+            color: white;
+        }
+
+        .help-btn-call:active { background: #0A192F; }
+
+        /* ===== LOGOUT ===== */
+        .logout-section {
+            padding: 24px 16px 30px;
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 16px;
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            border-radius: 14px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.15s;
+        }
+
+        .btn-logout:hover {
+            background: #fecaca;
+        }
+
+        .btn-logout:active {
+            transform: scale(0.98);
+        }
+
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            border-top: 1px solid #e5e7eb;
+            box-shadow: 0 -4px 20px rgba(10, 25, 47, 0.08);
+            z-index: 100;
+        }
+
+        .bottom-nav a {
+            flex: 1;
+            padding: 12px 6px;
+            text-align: center;
+            color: #9ca3af;
+            text-decoration: none;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            transition: color 0.15s;
+        }
+
+        .bottom-nav a i {
+            display: block;
+            font-size: 1.25rem;
+            margin-bottom: 4px;
+        }
+
+        .bottom-nav a.active,
+        .bottom-nav a:hover {
+            color: #0F3B5C;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== TOP BAR ===== -->
+    <div class="top-bar">
+        <div class="top-bar-row">
+            <a href="/dispatch_riders/dashboard" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div class="page-title">
+                <h1>Profile</h1>
+                <p>Your rider account</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== PROFILE HEADER ===== -->
+    <div class="profile-header">
+        <div class="avatar">{{ rider.full_name[0]|upper }}</div>
+        <div class="profile-name">{{ rider.full_name }}</div>
+        <div class="profile-role">{{ rider.vehicle_type }} Rider</div>
+
+        {% if rider.status == 'approved' and rider.is_active %}
+            <span class="verified-badge">
+                <i class="fas fa-check-circle"></i> Verified Rider
+            </span>
+        {% elif rider.status == 'pending' %}
+            <span class="verified-badge pending">
+                <i class="fas fa-clock"></i> Pending Approval
+            </span>
+        {% elif not rider.is_active %}
+            <span class="verified-badge inactive">
+                <i class="fas fa-pause-circle"></i> Inactive
+            </span>
+        {% else %}
+            <span class="verified-badge inactive">
+                <i class="fas fa-times-circle"></i> {{ rider.status|capitalize }}
+            </span>
+        {% endif %}
+    </div>
+
+    <!-- ===== ACCOUNT DETAILS ===== -->
+    <div class="section">
+        <div class="section-title">
+            <i class="fas fa-id-card"></i>
+            Account Details
+        </div>
+        <div class="details-card">
+            <div class="detail-row">
+                <div class="detail-icon"><i class="fas fa-user"></i></div>
+                <div class="detail-content">
+                    <div class="detail-label">Full Name</div>
+                    <div class="detail-value">{{ rider.full_name }}</div>
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-icon"><i class="fas fa-phone"></i></div>
+                <div class="detail-content">
+                    <div class="detail-label">Phone Number</div>
+                    <div class="detail-value">{{ rider.phone }}</div>
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-icon"><i class="fas fa-envelope"></i></div>
+                <div class="detail-content">
+                    <div class="detail-label">Email</div>
+                    <div class="detail-value">{{ rider.email if rider.email else 'Not provided' }}</div>
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-icon"><i class="fas fa-motorcycle"></i></div>
+                <div class="detail-content">
+                    <div class="detail-label">Vehicle Type</div>
+                    <div class="detail-value">{{ rider.vehicle_type }}</div>
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-icon"><i class="fas fa-calendar-alt"></i></div>
+                <div class="detail-content">
+                    <div class="detail-label">Member Since</div>
+                    <div class="detail-value">{{ rider.created_at.strftime('%d %B %Y') if rider.created_at else '—' }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== QUICK STATS ===== -->
+    <div class="section">
+        <div class="section-title">
+            <i class="fas fa-chart-line"></i>
+            Quick Stats
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="statTotal">—</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="statToday">—</div>
+                <div class="stat-label">Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="statRate">—</div>
+                <div class="stat-label">Success</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== NEED HELP ===== -->
+    <div class="section">
+        <div class="section-title">
+            <i class="fas fa-headset"></i>
+            Need to Change Something?
+        </div>
+        <div class="help-box">
+            <h4>
+                <i class="fas fa-info-circle"></i>
+                Update info or reset password
+            </h4>
+            <p>
+                To update your details or reset your password, please contact the DeeJohnson admin team.
+            </p>
+            <div class="help-buttons">
+                <a href="tel:+2347062550379" class="help-btn help-btn-call">
+                    <i class="fas fa-phone"></i> Call Admin
+                </a>
+                <a href="https://wa.me/2347062550379?text=Hello%20DeeJohnson%20Admin%2C%20I%20need%20help%20with%20my%20rider%20account"
+                   target="_blank"
+                   class="help-btn help-btn-whatsapp">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LOGOUT ===== -->
+    <div class="logout-section">
+        <a href="/dispatch_riders/logout" class="btn-logout">
+            <i class="fas fa-sign-out-alt"></i>
+            Log Out of Account
+        </a>
+    </div>
+
+    <!-- ===== BOTTOM NAV ===== -->
+    <div class="bottom-nav">
+        <a href="/dispatch_riders/dashboard">
+            <i class="fas fa-home"></i>
+            Deliveries
+        </a>
+        <a href="/dispatch_riders/history">
+            <i class="fas fa-history"></i>
+            History
+        </a>
+        <a href="/dispatch_riders/profile" class="active">
+            <i class="fas fa-user"></i>
+            Profile
+        </a>
+        <a href="/dispatch_riders/logout">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </a>
+    </div>
+
+    <script>
+        // ============================================
+        // LOAD STATS
+        // ============================================
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/rider/stats');
+                if (!res.ok) throw new Error('Failed');
+                const data = await res.json();
+
+                document.getElementById('statTotal').textContent = data.total_delivered || 0;
+                document.getElementById('statToday').textContent = data.today || 0;
+
+                // Calculate success rate
+                const delivered = data.total_delivered || 0;
+                const failed = data.total_failed || 0;
+                const total = delivered + failed;
+
+                if (total === 0) {
+                    document.getElementById('statRate').textContent = '—';
+                } else {
+                    const rate = Math.round((delivered / total) * 100);
+                    document.getElementById('statRate').textContent = rate + '%';
+                }
+            } catch (err) {
+                console.error('Stats error:', err);
+                document.getElementById('statTotal').textContent = '0';
+                document.getElementById('statToday').textContent = '0';
+                document.getElementById('statRate').textContent = '—';
+            }
+        }
+
+        // ============================================
+        // INIT
+        // ============================================
+        document.addEventListener('DOMContentLoaded', loadStats);
+    </script>
+
+</body>
+</html>

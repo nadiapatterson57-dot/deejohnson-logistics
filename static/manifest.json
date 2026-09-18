@@ -1,0 +1,39 @@
+{
+    "name": "DeeJohnson Rider",
+    "short_name": "DJ Rider",
+    "description": "Delivery management app for DeeJohnson dispatch riders",
+    "start_url": "/dispatch_riders/dashboard",
+    "scope": "/dispatch_riders/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#0A192F",
+    "theme_color": "#0F3B5C",
+    "categories": ["business", "productivity"],
+    "lang": "en",
+    "icons": [
+        {
+            "src": "/static/images/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/static/images/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/static/images/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/static/images/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}

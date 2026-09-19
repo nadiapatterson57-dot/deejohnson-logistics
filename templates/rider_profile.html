@@ -412,6 +412,47 @@
         {% endif %}
     </div>
 
+        <!-- ===== INSTALL APP CARD ===== -->
+    <div class="section" id="installSection" style="display: none;">
+        <div class="section-title">
+            <i class="fas fa-mobile-alt"></i>
+            Install the App
+        </div>
+        <div class="help-box" style="
+            background: linear-gradient(135deg, #0A192F, #0F3B5C);
+            border-left-color: #C9A03D;
+            border: 1px solid #0F3B5C;
+            color: white;
+        ">
+            <h4 style="color: white;">
+                <i class="fas fa-download" style="color: #C9A03D;"></i>
+                Get DJ Rider on your phone
+            </h4>
+            <p style="color: rgba(255,255,255,0.85);">
+                Install the app on your home screen for one-tap access, faster loading, and offline support.
+            </p>
+            <button id="installBtn" style="
+                width: 100%;
+                padding: 14px;
+                background: #C9A03D;
+                color: #0A192F;
+                border: none;
+                border-radius: 12px;
+                font-family: inherit;
+                font-weight: 800;
+                font-size: 0.95rem;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            ">
+                <i class="fas fa-download"></i>
+                Install App
+            </button>
+        </div>
+    </div>
+
     <!-- ===== ACCOUNT DETAILS ===== -->
     <div class="section">
         <div class="section-title">
@@ -574,6 +615,114 @@
         // INIT
         // ============================================
         document.addEventListener('DOMContentLoaded', loadStats);
+
+                // ============================================
+        // PWA — Install App logic
+        // ============================================
+        let deferredInstallPrompt = null;
+        const installSection = document.getElementById('installSection');
+        const installBtn = document.getElementById('installBtn');
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                          || window.navigator.standalone === true;
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isAndroid = /Android/.test(navigator.userAgent);
+
+        // If already installed → never show the button
+        if (isStandalone) {
+            installSection.style.display = 'none';
+        } else if (isIOS) {
+            // iPhone: show button → shows manual instructions modal
+            installSection.style.display = 'block';
+            installBtn.innerHTML = '<i class="fas fa-download"></i> Install App';
+            installBtn.addEventListener('click', showIOSInstructions);
+        } else if (isAndroid) {
+            // Android: wait for beforeinstallprompt event
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredInstallPrompt = e;
+                installSection.style.display = 'block';
+            });
+
+            installBtn.addEventListener('click', async () => {
+                if (!deferredInstallPrompt) {
+                    alert('To install: tap the browser menu (⋮) and choose "Install app" or "Add to Home Screen".');
+                    return;
+                }
+                deferredInstallPrompt.prompt();
+                const { outcome } = await deferredInstallPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installSection.style.display = 'none';
+                }
+                deferredInstallPrompt = null;
+            });
+
+            // If the event never fires, still show button after a delay
+            setTimeout(() => {
+                if (installSection.style.display === 'none' && !isStandalone) {
+                    installSection.style.display = 'block';
+                }
+            }, 1500);
+        } else {
+            // Desktop and other browsers — show generic button
+            installSection.style.display = 'block';
+            installBtn.addEventListener('click', () => {
+                alert('To install: use your browser menu and look for "Install app" or "Add to Home Screen".');
+            });
+        }
+
+        // ============================================
+        // iPhone Instructions Modal
+        // ============================================
+        function showIOSInstructions() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; inset: 0;
+                background: rgba(10, 25, 47, 0.85);
+                display: flex; align-items: center; justify-content: center;
+                padding: 20px; z-index: 99999;
+                backdrop-filter: blur(4px);
+            `;
+            modal.innerHTML = `
+                <div style="
+                    background: white; border-radius: 20px; padding: 26px;
+                    max-width: 380px; width: 100%; text-align: center;
+                    font-family: 'Inter', sans-serif;
+                ">
+                    <div style="font-size: 2.2rem; color: #0F3B5C; margin-bottom: 12px;">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3 style="color: #0A192F; font-weight: 800; font-size: 1.15rem; margin-bottom: 6px;">
+                        Install on iPhone
+                    </h3>
+                    <p style="color: #6b7280; font-size: 0.88rem; margin-bottom: 20px; line-height: 1.5;">
+                        Follow these 3 steps:
+                    </p>
+                    <div style="text-align: left; font-size: 0.9rem; color: #0A192F; line-height: 1.7;">
+                        <div style="margin-bottom: 12px;">
+                            <span style="display:inline-flex; width: 26px; height: 26px; background: #0F3B5C; color: white; border-radius: 50%; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; margin-right: 10px;">1</span>
+                            Tap the <strong>Share</strong> button <i class="fas fa-arrow-up-from-bracket" style="color: #0F3B5C;"></i> at the bottom of Safari.
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <span style="display:inline-flex; width: 26px; height: 26px; background: #0F3B5C; color: white; border-radius: 50%; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; margin-right: 10px;">2</span>
+                            Scroll down and tap <strong>"Add to Home Screen"</strong>.
+                        </div>
+                        <div>
+                            <span style="display:inline-flex; width: 26px; height: 26px; background: #0F3B5C; color: white; border-radius: 50%; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; margin-right: 10px;">3</span>
+                            Tap <strong>"Add"</strong> in the top-right corner.
+                        </div>
+                    </div>
+                    <button id="iosCloseBtn" style="
+                        width: 100%; margin-top: 22px; padding: 14px;
+                        background: #0F3B5C; color: white; border: none;
+                        border-radius: 12px; font-family: inherit;
+                        font-weight: 700; font-size: 0.95rem; cursor: pointer;
+                    ">Got It</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('iosCloseBtn').addEventListener('click', () => modal.remove());
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+        }
     </script>
 
 </body>

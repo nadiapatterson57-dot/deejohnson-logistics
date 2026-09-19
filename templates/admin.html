@@ -6,6 +6,9 @@
     <title>Admin Dashboard - DeeJohnson Logistics</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet (for the Live Map) -->
+    <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -505,6 +508,52 @@
                             </div>
                             <div class="card-body">
 
+                                
+                                <!-- ============================================ -->
+                                <!-- LIVE MAP SECTION -->
+                                <!-- ============================================ -->
+                                <div class="card mb-4" style="border-radius: 16px; border: 1px solid #eef0f4; box-shadow: 0 4px 16px rgba(0,0,0,0.04);">
+                                    <div class="card-header" style="background: white; border-bottom: 1px solid #eef0f4; border-radius: 16px 16px 0 0; padding: 16px 20px;">
+                                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                            <h5 class="mb-0" style="color: #0A192F; font-weight: 700;">
+                                                <i class="fas fa-map-marked-alt" style="color: #C9A03D;"></i>
+                                                Live Rider Map
+                                                <span class="badge bg-primary ms-2" id="mapRiderCount">0</span>
+                                            </h5>
+                                            <div class="d-flex gap-2">
+                                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="refreshMap()">
+                                                    <i class="fas fa-sync-alt"></i> Refresh
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-primary" id="toggleMapBtn" onclick="toggleLiveMap()">
+                                                    <i class="fas fa-eye"></i> <span id="toggleMapText">Show Live Map</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="mapSection" style="display: none;">
+                                        <div class="card-body" style="padding: 0;">
+                                            <!-- Legend -->
+                                            <div style="padding: 12px 20px; background: #f8fafc; display: flex; flex-wrap: wrap; gap: 18px; font-size: 0.82rem;">
+                                                <span><span style="display:inline-block;width:10px;height:10px;background:#10b981;border-radius:50%;margin-right:6px;"></span>Active (under 5 min)</span>
+                                                <span><span style="display:inline-block;width:10px;height:10px;background:#f59e0b;border-radius:50%;margin-right:6px;"></span>Recent (under 30 min)</span>
+                                                <span><span style="display:inline-block;width:10px;height:10px;background:#ef4444;border-radius:50%;margin-right:6px;"></span>Stale (over 30 min)</span>
+                                                <span><span style="display:inline-block;width:10px;height:10px;background:#9ca3af;border-radius:50%;margin-right:6px;"></span>No location yet</span>
+                                            </div>
+
+                                            <div style="display: grid; grid-template-columns: 1fr 300px; min-height: 460px;">
+                                                <div id="riderMap" style="min-height: 460px;"></div>
+                                                <div id="mapSidebar" style="border-left: 1px solid #eef0f4; padding: 16px; max-height: 460px; overflow-y: auto; background: #fafbfc;">
+                                                    <div class="empty-msg" style="text-align:center; padding: 40px 15px; color: #9ca3af;">
+                                                        <i class="fas fa-spinner fa-spin" style="font-size: 1.8rem;"></i>
+                                                        <div style="margin-top: 8px; font-size: 0.85rem;">Loading riders…</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Filter tabs -->
                                 <div class="d-flex flex-wrap gap-2 mb-4">
                                     <a href="{{ url_for('admin') }}#riders" class="btn btn-sm {% if not request.args.get('status') %}btn-primary{% else %}btn-outline-primary{% endif %}">
@@ -788,10 +837,9 @@
                                     {% endif %}
                                 </div>
                             </div>
-
-                            </div>
                         </div>
                     </div>
+                </div>
 
                     <!-- Settings Tab -->
                     <div class="tab-pane fade" id="settings">
@@ -955,6 +1003,240 @@
                 }
             }
         });
+
+                // ============================================
+        // LIVE MAP — Leaflet + rider location tracking
+        // ============================================
+        let riderMap = null;
+        let riderMarkers = {};
+        let mapRefreshInterval = null;
+        let mapLoaded = false;
+
+        function getMarkerColor(freshness) {
+            switch (freshness) {
+                case 'active': return '#10b981';
+                case 'recent': return '#f59e0b';
+                case 'stale':  return '#ef4444';
+                default:       return '#9ca3af';
+            }
+        }
+
+        function makeRiderIcon(color) {
+            return L.divIcon({
+                className: 'custom-rider-marker',
+                html: `
+                    <div style="
+                        background: ${color};
+                        width: 30px; height: 30px;
+                        border-radius: 50% 50% 50% 0;
+                        transform: rotate(-45deg);
+                        border: 3px solid white;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                        display: flex; align-items: center; justify-content: center;
+                    ">
+                        <i class="fas fa-motorcycle" style="transform: rotate(45deg); color: white; font-size: 0.8rem;"></i>
+                    </div>
+                `,
+                iconSize: [30, 30],
+                iconAnchor: [15, 30],
+                popupAnchor: [0, -30]
+            });
+        }
+
+        function initRiderMap() {
+            if (riderMap) return;
+
+            riderMap = L.map('riderMap').setView([7.3775, 3.9470], 8);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(riderMap);
+        }
+
+        function loadMapRiders() {
+            fetch('/api/admin/rider-locations')
+                .then(r => r.json())
+                .then(data => {
+                    const riders = data.riders || [];
+                    document.getElementById('mapRiderCount').textContent = riders.length;
+                    renderMapMarkers(riders);
+                    renderMapSidebar(riders);
+                })
+                .catch(err => {
+                    console.error('[Live Map] Load error:', err);
+                    document.getElementById('mapSidebar').innerHTML = `
+                        <div class="empty-msg" style="text-align:center; padding: 40px 15px; color: #9ca3af;">
+                            <i class="fas fa-exclamation-triangle" style="color: #dc3545; font-size: 1.8rem;"></i>
+                            <div style="margin-top: 8px; font-size: 0.85rem;">Could not load riders</div>
+                        </div>
+                    `;
+                });
+        }
+
+        function renderMapMarkers(riders) {
+            if (!riderMap) return;
+            const currentIds = new Set();
+
+            riders.forEach(rider => {
+                if (rider.lat === null || rider.lng === null) return;
+                currentIds.add(rider.id);
+
+                const color = getMarkerColor(rider.freshness);
+                const icon = makeRiderIcon(color);
+
+                const popupHtml = `
+                    <h6 style="font-weight: 800; color: #0A192F; margin-bottom: 6px;">${escapeHtml(rider.full_name)}</h6>
+                    <div style="font-size: 0.8rem; color: #4b5563; margin-bottom: 3px;">
+                        <i class="fas fa-phone" style="color: #C9A03D; width: 14px;"></i> ${escapeHtml(rider.phone)}
+                    </div>
+                    <div style="font-size: 0.8rem; color: #4b5563; margin-bottom: 3px;">
+                        <i class="fas fa-motorcycle" style="color: #C9A03D; width: 14px;"></i> ${escapeHtml(rider.vehicle_type)}
+                    </div>
+                    <div style="font-size: 0.8rem; color: #4b5563; margin-bottom: 3px;">
+                        <i class="fas fa-clock" style="color: #C9A03D; width: 14px;"></i>
+                        ${rider.last_update || 'Never'}
+                        ${rider.minutes_ago !== null ? `(${rider.minutes_ago} min ago)` : ''}
+                    </div>
+                    ${rider.current_delivery ? `
+                        <div style="margin-top: 8px; padding: 8px 10px; background: #f0f4f8; border-radius: 8px; font-size: 0.75rem;">
+                            <strong>Delivering:</strong> ${escapeHtml(rider.current_delivery.tracking_code)}<br>
+                            To: ${escapeHtml(rider.current_delivery.customer_name)}<br>
+                            Status: ${escapeHtml(rider.current_delivery.status.replace('_', ' '))}
+                        </div>
+                    ` : ''}
+                `;
+
+                if (riderMarkers[rider.id]) {
+                    riderMarkers[rider.id].setLatLng([rider.lat, rider.lng]);
+                    riderMarkers[rider.id].setIcon(icon);
+                    riderMarkers[rider.id].setPopupContent(popupHtml);
+                } else {
+                    riderMarkers[rider.id] = L.marker([rider.lat, rider.lng], { icon })
+                        .addTo(riderMap)
+                        .bindPopup(popupHtml);
+                }
+            });
+
+            // Remove markers for riders no longer in list
+            Object.keys(riderMarkers).forEach(id => {
+                if (!currentIds.has(parseInt(id))) {
+                    riderMap.removeLayer(riderMarkers[id]);
+                    delete riderMarkers[id];
+                }
+            });
+        }
+
+        function renderMapSidebar(riders) {
+            const sidebar = document.getElementById('mapSidebar');
+
+            if (!riders.length) {
+                sidebar.innerHTML = `
+                    <div class="empty-msg" style="text-align:center; padding: 40px 15px; color: #9ca3af;">
+                        <i class="fas fa-motorcycle" style="font-size: 2rem;"></i>
+                        <div style="margin-top: 8px; font-size: 0.85rem;">No approved riders yet</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const order = { active: 0, recent: 1, stale: 2, never: 3 };
+            const sorted = [...riders].sort((a, b) => {
+                const diff = order[a.freshness] - order[b.freshness];
+                if (diff !== 0) return diff;
+                return a.full_name.localeCompare(b.full_name);
+            });
+
+            sidebar.innerHTML = sorted.map(rider => {
+                const color = getMarkerColor(rider.freshness);
+                const hasLocation = rider.lat !== null && rider.lng !== null;
+
+                return `
+                    <div onclick="${hasLocation ? `focusMapRider(${rider.id})` : ''}"
+                         style="padding: 12px 14px; border-radius: 12px; border: 1px solid #eef0f4; margin-bottom: 10px; background: white; cursor: ${hasLocation ? 'pointer' : 'default'}; transition: all 0.15s;"
+                         onmouseover="this.style.borderColor='#0F3B5C'; this.style.transform='translateX(3px)';"
+                         onmouseout="this.style.borderColor='#eef0f4'; this.style.transform='translateX(0)';">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                            <strong style="color: #0A192F; font-size: 0.88rem;">${escapeHtml(rider.full_name)}</strong>
+                            <span style="width: 10px; height: 10px; background: ${color}; border-radius: 50%;"></span>
+                        </div>
+                        <div style="font-size: 0.76rem; color: #6b7280; line-height: 1.4;">
+                            <div><i class="fas fa-phone" style="color: #C9A03D; width: 14px;"></i> ${escapeHtml(rider.phone)}</div>
+                            <div><i class="fas fa-clock" style="color: #C9A03D; width: 14px;"></i>
+                                ${rider.minutes_ago !== null ? `${rider.minutes_ago} min ago` : 'No location yet'}
+                            </div>
+                            ${rider.current_delivery ? `
+                                <div><i class="fas fa-box" style="color: #C9A03D; width: 14px;"></i> ${escapeHtml(rider.current_delivery.tracking_code)}</div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function focusMapRider(riderId) {
+            const marker = riderMarkers[riderId];
+            if (marker && riderMap) {
+                riderMap.setView(marker.getLatLng(), 15);
+                marker.openPopup();
+            }
+        }
+
+        function refreshMap() {
+            if (mapLoaded) {
+                loadMapRiders();
+            }
+        }
+
+        function toggleLiveMap() {
+            const section = document.getElementById('mapSection');
+            const btnText = document.getElementById('toggleMapText');
+            const btn = document.getElementById('toggleMapBtn');
+
+            if (section.style.display === 'none' || !section.style.display) {
+                section.style.display = 'block';
+                btnText.textContent = 'Hide Live Map';
+                btn.innerHTML = '<i class="fas fa-eye-slash"></i> <span id="toggleMapText">Hide Live Map</span>';
+
+                // Small delay so the div has size before Leaflet initializes
+                setTimeout(() => {
+                    initRiderMap();
+                    if (riderMap) {
+                        riderMap.invalidateSize();
+                    }
+                    loadMapRiders();
+                    mapLoaded = true;
+
+                    // Auto-refresh every 30s
+                    if (!mapRefreshInterval) {
+                        mapRefreshInterval = setInterval(loadMapRiders, 30000);
+                    }
+                }, 200);
+
+            } else {
+                section.style.display = 'none';
+                btnText.textContent = 'Show Live Map';
+                btn.innerHTML = '<i class="fas fa-eye"></i> <span id="toggleMapText">Show Live Map</span>';
+
+                if (mapRefreshInterval) {
+                    clearInterval(mapRefreshInterval);
+                    mapRefreshInterval = null;
+                }
+            }
+        }
+
+        // Helper — escape HTML (may already exist elsewhere, but ensuring it's available)
+        if (typeof escapeHtml === 'undefined') {
+            window.escapeHtml = function(str) {
+                if (!str) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            };
+        }
     </script>
 
     <!-- Reset Password Modal -->

@@ -127,6 +127,9 @@ class Rider(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     approved_at = db.Column(db.DateTime)
+    current_lat = db.Column(db.Float)
+    current_lng = db.Column(db.Float)
+    last_location_update = db.Column(db.DateTime)
 
 class DeliveryTask(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -679,6 +682,72 @@ def admin_reassign_task(task_id):
 
     flash(f'✅ Reassigned from {old_rider_name} to {new_rider.full_name}.', 'success')
     return redirect(url_for('admin') + '#riders')
+
+@app.route('/api/admin/rider-locations')
+@login_required
+def api_admin_rider_locations():
+    """Return all approved riders with their latest known location"""
+    riders = Rider.query.filter_by(status='approved').all()
+
+    now = datetime.now(timezone.utc)
+    result = []
+
+    for rider in riders:
+        # Determine freshness
+        freshness = 'never'
+        minutes_ago = None
+
+        if rider.last_location_update:
+            delta = now - rider.last_location_update.replace(tzinfo=timezone.utc) \
+                if rider.last_location_update.tzinfo is None \
+                else now - rider.last_location_update
+            minutes_ago = int(delta.total_seconds() / 60)
+
+            if minutes_ago < 5:
+                freshness = 'active'      # green
+            elif minutes_ago < 30:
+                freshness = 'recent'      # yellow
+            else:
+                freshness = 'stale'       # red
+
+        # Find rider's current active task (if any)
+        active_task = DeliveryTask.query\
+            .filter_by(rider_id=rider.id)\
+            .filter(DeliveryTask.status.in_(['assigned', 'picked_up', 'in_transit']))\
+            .first()
+
+        current_delivery = None
+        if active_task:
+            current_delivery = {
+                'tracking_code': active_task.shipment.tracking_code,
+                'customer_name': active_task.shipment.customer_name,
+                'destination': active_task.shipment.destination,
+                'status': active_task.status
+            }
+
+        result.append({
+            'id': rider.id,
+            'full_name': rider.full_name,
+            'phone': rider.phone,
+            'vehicle_type': rider.vehicle_type,
+            'lat': rider.current_lat,
+            'lng': rider.current_lng,
+            'last_update': rider.last_location_update.strftime('%Y-%m-%d %H:%M') if rider.last_location_update else None,
+            'minutes_ago': minutes_ago,
+            'freshness': freshness,
+            'current_delivery': current_delivery
+        })
+
+    return jsonify({
+        'riders': result,
+        'count': len(result),
+        'timestamp': now.strftime('%Y-%m-%d %H:%M:%S')
+    })    
+
+@app.route('/admin/live-map')
+@login_required
+def admin_live_map():
+    return render_template('admin_live_map.html')    
 
 # ============================================
 # ADMIN — SHIPMENT EDIT
@@ -1266,9 +1335,15 @@ def api_rider_location():
     if not rider:
         return jsonify({'error': 'Rider not found'}), 404
 
-    # We don't have lat/lng columns yet, so we just acknowledge receipt
-    # (We can add columns later if you want live tracking)
-    return jsonify({'success': True, 'received': {'lat': lat, 'lng': lng}})
+    rider.current_lat = float(lat)
+    rider.current_lng = float(lng)
+    rider.last_location_update = datetime.now(timezone.utc)
+    db.session.commit()
+
+    return jsonify({
+        'success': True,
+        'received': {'lat': lat, 'lng': lng}
+    })
 
 # ============================================
 # EXPORT ROUTES

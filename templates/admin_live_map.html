@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Rider Map - DeeJohnson Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy-deep: #0A192F;
+            --navy-dark: #0B2B4D;
+            --navy-medium: #0F3B5C;
+            --gold-accent: #C9A03D;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f4f6f9;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--navy-deep), var(--navy-medium));
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            color: white !important;
+        }
+
+        .page-wrap {
+            padding: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--navy-deep), var(--navy-medium));
+            color: white;
+            border-radius: 20px;
+            padding: 26px 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px rgba(10, 25, 47, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .page-header h1 {
+            font-weight: 800;
+            font-size: 1.6rem;
+            margin: 0 0 4px;
+        }
+
+        .page-header p {
+            margin: 0;
+            opacity: 0.85;
+            font-size: 0.9rem;
+        }
+
+        .refresh-info {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            background: rgba(255,255,255,0.12);
+            padding: 8px 16px;
+            border-radius: 30px;
+        }
+
+        .map-container {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 20px;
+            height: 640px;
+        }
+
+        @media (max-width: 992px) {
+            .map-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+        }
+
+        #map {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            height: 100%;
+            min-height: 480px;
+            overflow: hidden;
+        }
+
+        .sidebar-panel {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 640px;
+        }
+
+        .sidebar-panel h5 {
+            font-weight: 800;
+            color: var(--navy-deep);
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .legend {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 12px 14px;
+            background: #f8fafc;
+            border-radius: 12px;
+            font-size: 0.82rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .dot-active { background: #10b981; }
+        .dot-recent { background: #f59e0b; }
+        .dot-stale { background: #ef4444; }
+        .dot-never { background: #9ca3af; }
+
+        .rider-list-item {
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid #eef0f4;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: white;
+        }
+
+        .rider-list-item:hover {
+            border-color: var(--navy-medium);
+            background: #f8fafc;
+            transform: translateX(3px);
+        }
+
+        .rider-list-item .rider-name {
+            font-weight: 700;
+            color: var(--navy-deep);
+            font-size: 0.92rem;
+            margin-bottom: 3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rider-list-item .rider-info {
+            font-size: 0.78rem;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        .rider-list-item .rider-info i {
+            color: var(--gold-accent);
+            width: 14px;
+        }
+
+        .empty-msg {
+            text-align: center;
+            padding: 30px 15px;
+            color: #9ca3af;
+        }
+
+        .empty-msg i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #d1d5db;
+        }
+
+        /* Leaflet popup styling */
+        .leaflet-popup-content {
+            font-family: 'Inter', sans-serif;
+            margin: 14px 16px;
+            min-width: 220px;
+        }
+
+        .leaflet-popup-content h6 {
+            font-weight: 800;
+            color: var(--navy-deep);
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+        }
+
+        .leaflet-popup-content .popup-row {
+            font-size: 0.8rem;
+            color: #4b5563;
+            margin-bottom: 3px;
+        }
+
+        .leaflet-popup-content .popup-row i {
+            color: var(--gold-accent);
+            width: 14px;
+        }
+
+        .leaflet-popup-content .popup-delivery {
+            margin-top: 8px;
+            padding: 8px 10px;
+            background: #f0f4f8;
+            border-radius: 8px;
+            font-size: 0.75rem;
+        }
+
+        .leaflet-popup-content .popup-delivery strong {
+            color: var(--navy-medium);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/admin">
+                <i class="fas fa-shipping-fast me-2"></i>DeeJohnson Admin
+            </a>
+            <div class="ms-auto">
+                <a href="/admin" class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-wrap">
+
+        <div class="page-header">
+            <div>
+                <h1><i class="fas fa-map-marked-alt me-2"></i> Live Rider Map</h1>
+                <p>Real-time GPS positions of all active riders</p>
+            </div>
+            <div class="refresh-info">
+                <i class="fas fa-sync-alt fa-spin"></i>
+                Auto-refresh every 30 seconds
+            </div>
+        </div>
+
+        <div class="map-container">
+
+            <div id="map"></div>
+
+            <div class="sidebar-panel">
+                <h5>
+                    <span>Riders <span id="riderCount" class="badge bg-primary">0</span></span>
+                    <button onclick="loadRiders()" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </h5>
+
+                <div class="legend">
+                    <div class="legend-item"><span class="dot dot-active"></span> Active (under 5 min)</div>
+                    <div class="legend-item"><span class="dot dot-recent"></span> Recent (under 30 min)</div>
+                    <div class="legend-item"><span class="dot dot-stale"></span> Stale (over 30 min)</div>
+                    <div class="legend-item"><span class="dot dot-never"></span> No location yet</div>
+                </div>
+
+                <div id="riderList"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // ============================================
+        // INIT MAP
+        // ============================================
+        const map = L.map('map').setView([7.3775, 3.9470], 8);  // centered on Ibadan
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+
+        // Store markers so we can update them
+        let markers = {};
+        let riderData = [];
+
+        // ============================================
+        // COLOR PICKER
+        // ============================================
+        function getColor(freshness) {
+            switch (freshness) {
+                case 'active': return '#10b981';  // green
+                case 'recent': return '#f59e0b';  // yellow
+                case 'stale':  return '#ef4444';  // red
+                default:       return '#9ca3af';  // gray
+            }
+        }
+
+        // ============================================
+        // MARKER ICON
+        // ============================================
+        function makeIcon(color) {
+            return L.divIcon({
+                className: 'custom-rider-marker',
+                html: `
+                    <div style="
+                        background: ${color};
+                        width: 32px;
+                        height: 32px;
+                        border-radius: 50% 50% 50% 0;
+                        transform: rotate(-45deg);
+                        border: 3px solid white;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    ">
+                        <i class="fas fa-motorcycle" style="
+                            transform: rotate(45deg);
+                            color: white;
+                            font-size: 0.85rem;
+                        "></i>
+                    </div>
+                `,
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
+            });
+        }
+
+        // ============================================
+        // LOAD RIDERS
+        // ============================================
+        async function loadRiders() {
+            try {
+                const res = await fetch('/api/admin/rider-locations');
+                if (!res.ok) throw new Error('Failed to load');
+                const data = await res.json();
+
+                riderData = data.riders || [];
+                renderMarkers(riderData);
+                renderSidebar(riderData);
+
+                document.getElementById('riderCount').textContent = riderData.length;
+            } catch (err) {
+                console.error('Load error:', err);
+            }
+        }
+
+        // ============================================
+        // RENDER MAP MARKERS
+        // ============================================
+        function renderMarkers(riders) {
+            const currentIds = new Set();
+
+            riders.forEach(rider => {
+                // Skip riders with no location yet
+                if (rider.lat === null || rider.lng === null) return;
+
+                currentIds.add(rider.id);
+
+                const color = getColor(rider.freshness);
+                const icon = makeIcon(color);
+
+                const popupHtml = `
+                    <h6>${escapeHtml(rider.full_name)}</h6>
+                    <div class="popup-row">
+                        <i class="fas fa-phone"></i> ${escapeHtml(rider.phone)}
+                    </div>
+                    <div class="popup-row">
+                        <i class="fas fa-motorcycle"></i> ${escapeHtml(rider.vehicle_type)}
+                    </div>
+                    <div class="popup-row">
+                        <i class="fas fa-clock"></i> ${rider.last_update || 'Never'} ${rider.minutes_ago !== null ? `(${rider.minutes_ago} min ago)` : ''}
+                    </div>
+                    ${rider.current_delivery ? `
+                        <div class="popup-delivery">
+                            <strong>Delivering:</strong> ${escapeHtml(rider.current_delivery.tracking_code)}<br>
+                            To: ${escapeHtml(rider.current_delivery.customer_name)}<br>
+                            Status: ${escapeHtml(rider.current_delivery.status.replace('_', ' '))}
+                        </div>
+                    ` : ''}
+                `;
+
+                if (markers[rider.id]) {
+                    // Update existing marker
+                    markers[rider.id].setLatLng([rider.lat, rider.lng]);
+                    markers[rider.id].setIcon(icon);
+                    markers[rider.id].setPopupContent(popupHtml);
+                } else {
+                    // New marker
+                    markers[rider.id] = L.marker([rider.lat, rider.lng], { icon })
+                        .addTo(map)
+                        .bindPopup(popupHtml);
+                }
+            });
+
+            // Remove markers for riders no longer in list
+            Object.keys(markers).forEach(id => {
+                if (!currentIds.has(parseInt(id))) {
+                    map.removeLayer(markers[id]);
+                    delete markers[id];
+                }
+            });
+        }
+
+        // ============================================
+        // RENDER SIDEBAR
+        // ============================================
+        function renderSidebar(riders) {
+            const list = document.getElementById('riderList');
+
+            if (!riders.length) {
+                list.innerHTML = `
+                    <div class="empty-msg">
+                        <i class="fas fa-motorcycle"></i>
+                        <div>No approved riders yet</div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort: active first, then recent, then stale, then never
+            const order = { active: 0, recent: 1, stale: 2, never: 3 };
+            const sorted = [...riders].sort((a, b) => {
+                const diff = order[a.freshness] - order[b.freshness];
+                if (diff !== 0) return diff;
+                return a.full_name.localeCompare(b.full_name);
+            });
+
+            list.innerHTML = sorted.map(rider => {
+                const color = getColor(rider.freshness);
+                const hasLocation = rider.lat !== null && rider.lng !== null;
+
+                return `
+                    <div class="rider-list-item" onclick="${hasLocation ? `focusRider(${rider.id})` : ''}">
+                        <div class="rider-name">
+                            <span>${escapeHtml(rider.full_name)}</span>
+                            <span style="
+                                display: inline-block;
+                                width: 10px;
+                                height: 10px;
+                                background: ${color};
+                                border-radius: 50%;
+                            "></span>
+                        </div>
+                        <div class="rider-info">
+                            <div><i class="fas fa-phone"></i> ${escapeHtml(rider.phone)}</div>
+                            <div>
+                                <i class="fas fa-clock"></i>
+                                ${rider.minutes_ago !== null ? `${rider.minutes_ago} min ago` : 'No location yet'}
+                            </div>
+                            ${rider.current_delivery ? `
+                                <div>
+                                    <i class="fas fa-box"></i>
+                                    ${escapeHtml(rider.current_delivery.tracking_code)}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================
+        // FOCUS ON A RIDER
+        // ============================================
+        function focusRider(riderId) {
+            const marker = markers[riderId];
+            if (marker) {
+                map.setView(marker.getLatLng(), 15);
+                marker.openPopup();
+            }
+        }
+
+        // ============================================
+        // HELPERS
+        // ============================================
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // ============================================
+        // INIT
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRiders();
+            setInterval(loadRiders, 30000);  // refresh every 30s
+        });
+    </script>
+
+</body>
+</html>

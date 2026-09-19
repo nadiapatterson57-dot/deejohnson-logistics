@@ -1134,6 +1134,108 @@
             loadTasks();
             setInterval(loadTasks, 30000);
         });
+
+                // ============================================
+        // GPS LOCATION TRACKING (sends every 60s)
+        // ============================================
+        let locationWatchId = null;
+        let locationInterval = null;
+        let lastLocationSent = null;
+
+        function sendLocation(lat, lng) {
+            fetch('/api/rider/location', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lat: lat, lng: lng })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    lastLocationSent = new Date();
+                    console.log('[GPS] Location sent:', lat.toFixed(4), lng.toFixed(4));
+                }
+            })
+            .catch(err => {
+                console.warn('[GPS] Failed to send location:', err);
+            });
+        }
+
+        function startLocationTracking() {
+            if (!navigator.geolocation) {
+                console.warn('[GPS] Geolocation not supported by this browser');
+                return;
+            }
+
+            // Get initial position right away
+            navigator.geolocation.getCurrentPosition(
+                pos => sendLocation(pos.coords.latitude, pos.coords.longitude),
+                err => console.warn('[GPS] Permission denied or unavailable:', err.message),
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+
+            // Then update every 60 seconds
+            locationInterval = setInterval(() => {
+                navigator.geolocation.getCurrentPosition(
+                    pos => sendLocation(pos.coords.latitude, pos.coords.longitude),
+                    err => console.warn('[GPS] Update failed:', err.message),
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            }, 60000);
+        }
+
+        function stopLocationTracking() {
+            if (locationInterval) {
+                clearInterval(locationInterval);
+                locationInterval = null;
+            }
+        }
+
+        // Start tracking when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Ask permission + start tracking
+            startLocationTracking();
+        });
+
+        // Stop when the page is hidden (battery saving)
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopLocationTracking();
+            } else {
+                startLocationTracking();
+            }
+        });
+
+        // Show location status badge (optional small indicator)
+        function showLocationStatus() {
+            // We'll add a visual indicator in the top bar
+            const greeting = document.querySelector('.greeting');
+            if (!greeting || document.getElementById('locationBadge')) return;
+
+            const badge = document.createElement('div');
+            badge.id = 'locationBadge';
+            badge.style.cssText = `
+                font-size: 0.7rem;
+                color: rgba(255,255,255,0.7);
+                margin-top: 6px;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            `;
+            badge.innerHTML = '<i class="fas fa-map-marker-alt"></i> Sharing location';
+            greeting.appendChild(badge);
+
+            // Hide after 5 seconds
+            setTimeout(() => {
+                badge.style.opacity = '0';
+                badge.style.transition = 'opacity 0.5s';
+                setTimeout(() => badge.remove(), 500);
+            }, 5000);
+        }
+
+        // Show the "Sharing location" indicator briefly when tracking starts
+        window.addEventListener('load', () => {
+            setTimeout(showLocationStatus, 2000);
+        });
     </script>
 
 </body>

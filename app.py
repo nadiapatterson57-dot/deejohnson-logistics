@@ -22,16 +22,17 @@ app.secret_key = 'deejohnson_super_secret_key_2024'
 # DATABASE CONFIGURATION
 # ============================================
 if os.environ.get('DATABASE_URL'):
-    # Production on Render - Use PostgreSQL
     database_url = os.environ.get('DATABASE_URL')
+    # Convert old postgres:// to postgresql+psycopg2://
     if database_url.startswith('postgres://'):
-        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+        database_url = database_url.replace('postgres://', 'postgresql+psycopg2://', 1)
+    elif database_url.startswith('postgresql://') and '+psycopg2' not in database_url:
+        database_url = database_url.replace('postgresql://', 'postgresql+psycopg2://', 1)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
     print("=" * 50)
-    print("✅ USING POSTGRESQL DATABASE (Data will persist!)")
+    print("✅ USING POSTGRESQL DATABASE (via psycopg2)")
     print("=" * 50)
 else:
-    # Local development - Use SQLite
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///logistics.db'
     print("=" * 50)
     print("✅ USING SQLITE DATABASE (Local development)")

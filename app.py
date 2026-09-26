@@ -791,6 +791,24 @@ def admin_reassign_task(task_id):
     flash(f'✅ Reassigned from {old_rider_name} to {new_rider.full_name}.', 'success')
     return redirect(url_for('admin') + '#riders')
 
+@app.route('/admin/riders/unassign/<int:task_id>', methods=['POST'])
+@login_required
+def admin_unassign_task(task_id):
+    task = DeliveryTask.query.get_or_404(task_id)
+    shipment_code = task.shipment.tracking_code
+    rider_name = task.rider.full_name
+
+    # Reset shipment status
+    task.shipment.status = 'Awaiting rider assignment'
+    task.shipment.current_location = task.shipment.origin
+    task.shipment.last_update = datetime.now(timezone.utc)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    flash(f'✅ Unassigned {shipment_code} from {rider_name}.', 'success')
+    return redirect(url_for('admin') + '#riders')    
+
 @app.route('/api/admin/rider-locations')
 @login_required
 def api_admin_rider_locations():

@@ -6,3 +6,4 @@ openpyxl==3.1.2
 pywebpush
 py-vapid
 python-dotenv
+psycopg[binary]

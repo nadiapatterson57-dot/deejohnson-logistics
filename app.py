@@ -6,6 +6,11 @@ import string
 import hashlib
 import os
 from functools import wraps
+from pywebpush import webpush, WebPushException
+from dotenv import load_dotenv
+
+# Load environment variables from .env file (local dev only)
+load_dotenv()
 from export_reports import (
     export_all_shipments, 
     export_outgoing_shipments, 
@@ -131,6 +136,19 @@ class Rider(db.Model):
     current_lat = db.Column(db.Float)
     current_lng = db.Column(db.Float)
     last_location_update = db.Column(db.DateTime)
+
+class PushSubscription(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    rider_id = db.Column(db.Integer, db.ForeignKey('rider.id'), nullable=False)
+    endpoint = db.Column(db.Text, nullable=False, unique=True)
+    p256dh = db.Column(db.String(300), nullable=False)
+    auth = db.Column(db.String(100), nullable=False)
+    user_agent = db.Column(db.String(300))
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    last_used_at = db.Column(db.DateTime)
+
+    # Relationship
+    rider = db.relationship('Rider', backref='push_subscriptions')    
 
 class DeliveryTask(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -271,6 +289,91 @@ def generate_tracking_code():
     random_chars = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
     return f"DJL-{year}-{random_chars}"
 
+# ============================================
+# PUSH NOTIFICATION HELPERS
+# ============================================
+
+def get_vapid_keys():
+    """Load VAPID keys from environment"""
+    public_key = os.environ.get('VAPID_PUBLIC_KEY')
+    private_key = os.environ.get('VAPID_PRIVATE_KEY')
+    subject = os.environ.get('VAPID_SUBJECT', 'mailto:deejohnsonnigerialimited@gmail.com')
+    return public_key, private_key, subject
+
+
+def send_push_notification(rider_id, title, body, url='/dispatch_riders/dashboard'):
+    """
+    Send a push notification to all subscriptions for a given rider.
+    Returns (success_count, failure_count).
+    """
+    public_key, private_key, subject = get_vapid_keys()
+
+    if not public_key or not private_key:
+        print("⚠️ VAPID keys missing — skipping push")
+        return 0, 0
+
+    subscriptions = PushSubscription.query.filter_by(rider_id=rider_id).all()
+
+    if not subscriptions:
+        print(f"⚠️ No push subscriptions for rider {rider_id}")
+        return 0, 0
+
+    payload = {
+        "title": title,
+        "body": body,
+        "url": url,
+        "icon": "/static/images/icon-192.png",
+        "badge": "/static/images/icon-192.png"
+    }
+
+    import json
+    payload_json = json.dumps(payload)
+
+    success = 0
+    failed = 0
+
+    for sub in subscriptions:
+        subscription_info = {
+            "endpoint": sub.endpoint,
+            "keys": {
+                "p256dh": sub.p256dh,
+                "auth": sub.auth
+            }
+        }
+
+        try:
+            webpush(
+                subscription_info=subscription_info,
+                data=payload_json,
+                vapid_private_key=private_key,
+                vapid_claims={"sub": subject}
+            )
+            sub.last_used_at = datetime.now(timezone.utc)
+            success += 1
+            print(f"✅ Push sent to rider {rider_id} (sub {sub.id})")
+
+        except WebPushException as e:
+            failed += 1
+            error_text = str(e)
+
+            # If subscription is dead (404, 410), remove it
+            if '410' in error_text or '404' in error_text:
+                print(f"🗑️ Removing dead subscription {sub.id}")
+                db.session.delete(sub)
+            else:
+                print(f"❌ Push failed for rider {rider_id}: {error_text}")
+
+        except Exception as e:
+            failed += 1
+            print(f"❌ Push error for rider {rider_id}: {e}")
+
+    try:
+        db.session.commit()
+    except Exception as e:
+        print(f"⚠️ Could not commit push updates: {e}")
+        db.session.rollback()
+
+    return success, failed
 
 # ============================================
 # PUBLIC ROUTES
@@ -620,7 +723,7 @@ def admin_assign_task():
         flash(f'⚠️ This shipment is already assigned to {existing.rider.full_name}.', 'warning')
         return redirect(url_for('admin') + '#riders')
 
-    task = DeliveryTask(
+        task = DeliveryTask(
         rider_id=rider.id,
         shipment_id=shipment.id,
         status='assigned'
@@ -633,6 +736,17 @@ def admin_assign_task():
     shipment.last_update = datetime.now(timezone.utc)
 
     db.session.commit()
+
+    # Send push notification to the rider
+    try:
+        send_push_notification(
+            rider_id=rider.id,
+            title="🚚 New Delivery Assigned",
+            body=f"{shipment.tracking_code} → {shipment.customer_name or 'Customer'}",
+            url="/dispatch_riders/dashboard"
+        )
+    except Exception as e:
+        print(f"⚠️ Push notification failed: {e}")
 
     flash(f'✅ {shipment.tracking_code} assigned to {rider.full_name}.', 'success')
     return redirect(url_for('admin') + '#riders')
@@ -680,6 +794,17 @@ def admin_reassign_task(task_id):
     task.shipment.last_update = datetime.now(timezone.utc)
 
     db.session.commit()
+
+    # Send push notification to the new rider
+    try:
+        send_push_notification(
+            rider_id=new_rider.id,
+            title="🚚 Delivery Reassigned to You",
+            body=f"{task.shipment.tracking_code} → {task.shipment.customer_name or 'Customer'}",
+            url="/dispatch_riders/dashboard"
+        )
+    except Exception as e:
+        print(f"⚠️ Push notification failed: {e}")
 
     flash(f'✅ Reassigned from {old_rider_name} to {new_rider.full_name}.', 'success')
     return redirect(url_for('admin') + '#riders')
@@ -1166,6 +1291,84 @@ def api_rider_tasks():
                 .count()
         }
     })
+
+# ============================================
+# PUSH NOTIFICATION ENDPOINTS
+# ============================================
+
+@app.route('/api/rider/vapid-public-key')
+def api_vapid_public_key():
+    """Return the VAPID public key for the frontend to use when subscribing."""
+    public_key, _, _ = get_vapid_keys()
+    if not public_key:
+        return jsonify({'error': 'VAPID public key not configured'}), 500
+    return jsonify({'publicKey': public_key})
+
+
+@app.route('/api/rider/push-subscribe', methods=['POST'])
+def api_push_subscribe():
+    """Save a push subscription for the current rider."""
+    if 'rider_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    data = request.get_json() or {}
+    endpoint = data.get('endpoint')
+    p256dh = data.get('keys', {}).get('p256dh')
+    auth = data.get('keys', {}).get('auth')
+
+    if not endpoint or not p256dh or not auth:
+        return jsonify({'error': 'Missing subscription data'}), 400
+
+    rider_id = session['rider_id']
+
+    # Check if this endpoint already exists (for any rider)
+    existing = PushSubscription.query.filter_by(endpoint=endpoint).first()
+    if existing:
+        # Update rider_id in case it's a different rider now (re-login on same device)
+        existing.rider_id = rider_id
+        existing.p256dh = p256dh
+        existing.auth = auth
+        existing.user_agent = request.headers.get('User-Agent', '')[:300]
+        existing.last_used_at = datetime.now(timezone.utc)
+    else:
+        sub = PushSubscription(
+            rider_id=rider_id,
+            endpoint=endpoint,
+            p256dh=p256dh,
+            auth=auth,
+            user_agent=request.headers.get('User-Agent', '')[:300]
+        )
+        db.session.add(sub)
+
+    db.session.commit()
+    print(f"✅ Push subscription saved for rider {rider_id}")
+
+    return jsonify({'success': True})
+
+
+@app.route('/api/rider/push-unsubscribe', methods=['POST'])
+def api_push_unsubscribe():
+    """Remove a push subscription."""
+    if 'rider_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    data = request.get_json() or {}
+    endpoint = data.get('endpoint')
+
+    if not endpoint:
+        return jsonify({'error': 'Missing endpoint'}), 400
+
+    sub = PushSubscription.query.filter_by(
+        endpoint=endpoint,
+        rider_id=session['rider_id']
+    ).first()
+
+    if sub:
+        db.session.delete(sub)
+        db.session.commit()
+        print(f"🗑️ Push subscription removed for rider {session['rider_id']}")
+
+    return jsonify({'success': True})
 
 @app.route('/api/rider/history')
 def api_rider_history():

@@ -817,6 +817,53 @@
         </div>
     </div>
 
+        <!-- ===== NOTIFICATION PERMISSION BANNER ===== -->
+    <div id="notifBanner" style="
+        display: none;
+        position: fixed;
+        bottom: 90px;
+        left: 16px;
+        right: 16px;
+        background: linear-gradient(135deg, #0A192F, #0F3B5C);
+        color: white;
+        padding: 16px 18px;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(10, 25, 47, 0.35);
+        z-index: 9000;
+        align-items: center;
+        gap: 14px;
+    ">
+        <div style="flex-shrink: 0; font-size: 1.6rem; color: #C9A03D;">
+            <i class="fas fa-bell"></i>
+        </div>
+        <div style="flex: 1;">
+            <div style="font-weight: 800; font-size: 0.95rem; margin-bottom: 2px;">Enable Notifications</div>
+            <div style="font-size: 0.78rem; opacity: 0.85; line-height: 1.4;">
+                Get notified when a new delivery is assigned to you.
+            </div>
+        </div>
+        <button onclick="enableNotifications()" style="
+            background: #C9A03D;
+            color: #0A192F;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.82rem;
+            cursor: pointer;
+            white-space: nowrap;
+        ">Enable</button>
+        <button onclick="hideNotifBanner()" style="
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 4px;
+        "><i class="fas fa-times"></i></button>
+    </div>
+
         <script>
         // ============================================
         // PWA — Register Service Worker
@@ -1135,7 +1182,7 @@
             setInterval(loadTasks, 30000);
         });
 
-                // ============================================
+        // ============================================
         // GPS LOCATION TRACKING (sends every 60s)
         // ============================================
         let locationWatchId = null;
@@ -1236,6 +1283,132 @@
         window.addEventListener('load', () => {
             setTimeout(showLocationStatus, 2000);
         });
+
+        // ============================================
+        // PUSH NOTIFICATIONS — Subscribe the rider
+        // ============================================
+        const NOTIF_PROMPT_KEY = 'dj_rider_notif_dismissed';
+
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding)
+                .replace(/\-/g, '+')
+                .replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
+
+        function hideNotifBanner() {
+            const banner = document.getElementById('notifBanner');
+            if (banner) banner.style.display = 'none';
+            // Remember they dismissed it for this session (not forever)
+            // (we don't store forever so they get a chance again next visit)
+        }
+
+        async function enableNotifications() {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                alert('Your browser does not support notifications. On iPhone, install the app to your home screen first.');
+                return;
+            }
+
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission !== 'granted') {
+                    hideNotifBanner();
+                    alert('Notifications were not enabled. To enable later, check your browser settings for this site.');
+                    return;
+                }
+
+                // Get the VAPID public key from the server
+                const keyRes = await fetch('/api/rider/vapid-public-key');
+                if (!keyRes.ok) throw new Error('Could not fetch VAPID key');
+                const keyData = await keyRes.json();
+                const applicationServerKey = urlBase64ToUint8Array(keyData.publicKey);
+
+                // Get the service worker registration
+                const reg = await navigator.serviceWorker.ready;
+
+                // Subscribe (or get existing subscription)
+                let subscription = await reg.pushManager.getSubscription();
+                if (!subscription) {
+                    subscription = await reg.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: applicationServerKey
+                    });
+                }
+
+                // Send to server
+                const subJson = subscription.toJSON();
+                const saveRes = await fetch('/api/rider/push-subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(subJson)
+                });
+
+                if (saveRes.ok) {
+                    hideNotifBanner();
+                    console.log('[PUSH] Subscribed successfully');
+                } else {
+                    throw new Error('Server rejected subscription');
+                }
+
+            } catch (err) {
+                console.error('[PUSH] Error:', err);
+                alert('Could not enable notifications: ' + err.message);
+            }
+        }
+
+        // Check on page load whether we should show the banner
+        async function checkNotificationStatus() {
+            // Not supported?
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                // Don't show banner — can't help them
+                return;
+            }
+
+            // Permission blocked?
+            if (Notification.permission === 'denied') {
+                // Don't show the banner — they said no
+                return;
+            }
+
+            // Already granted? Then check if we're subscribed
+            if (Notification.permission === 'granted') {
+                try {
+                    const reg = await navigator.serviceWorker.ready;
+                    const sub = await reg.pushManager.getSubscription();
+                    if (sub) {
+                        // We're already subscribed — send it to the server (in case it's a new server DB)
+                        const subJson = sub.toJSON();
+                        await fetch('/api/rider/push-subscribe', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(subJson)
+                        });
+                        console.log('[PUSH] Already subscribed, synced with server');
+                        return;  // No banner needed
+                    }
+                } catch (e) {
+                    console.warn('[PUSH] Check failed:', e);
+                }
+            }
+
+            // Default: show the banner after a short delay
+            setTimeout(() => {
+                const banner = document.getElementById('notifBanner');
+                if (banner && Notification.permission !== 'denied') {
+                    banner.style.display = 'flex';
+                }
+            }, 3000);
+        }
+
+        // Run on page load
+        document.addEventListener('DOMContentLoaded', checkNotificationStatus);
+
     </script>
 
 </body>

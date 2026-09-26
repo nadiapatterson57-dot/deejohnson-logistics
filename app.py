@@ -723,7 +723,8 @@ def admin_assign_task():
         flash(f'⚠️ This shipment is already assigned to {existing.rider.full_name}.', 'warning')
         return redirect(url_for('admin') + '#riders')
 
-        task = DeliveryTask(
+    # Create the task
+    task = DeliveryTask(
         rider_id=rider.id,
         shipment_id=shipment.id,
         status='assigned'
@@ -737,7 +738,7 @@ def admin_assign_task():
 
     db.session.commit()
 
-    # Send push notification to the rider
+    # Send push notification to the rider (non-blocking)
     try:
         send_push_notification(
             rider_id=rider.id,
@@ -749,25 +750,6 @@ def admin_assign_task():
         print(f"⚠️ Push notification failed: {e}")
 
     flash(f'✅ {shipment.tracking_code} assigned to {rider.full_name}.', 'success')
-    return redirect(url_for('admin') + '#riders')
-
-
-@app.route('/admin/riders/unassign/<int:task_id>', methods=['POST'])
-@login_required
-def admin_unassign_task(task_id):
-    task = DeliveryTask.query.get_or_404(task_id)
-    shipment_code = task.shipment.tracking_code
-    rider_name = task.rider.full_name
-
-    # Reset shipment status
-    task.shipment.status = 'Awaiting rider assignment'
-    task.shipment.current_location = task.shipment.origin
-    task.shipment.last_update = datetime.now(timezone.utc)
-
-    db.session.delete(task)
-    db.session.commit()
-
-    flash(f'✅ Unassigned {shipment_code} from {rider_name}.', 'success')
     return redirect(url_for('admin') + '#riders')
 
 

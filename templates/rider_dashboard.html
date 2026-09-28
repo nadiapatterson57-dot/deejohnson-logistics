@@ -1309,7 +1309,7 @@
             // (we don't store forever so they get a chance again next visit)
         }
 
-                async function enableNotifications() {
+        async function enableNotifications() {
             console.log('[PUSH] enableNotifications called');
             console.log('[PUSH] Notification permission:', Notification.permission);
 
@@ -1381,48 +1381,64 @@
             }
         }
 
+        // ============================================
         // Check on page load whether we should show the banner
+        // ============================================
         async function checkNotificationStatus() {
+            console.log('[PUSH] checkNotificationStatus called');
+            console.log('[PUSH] Notification.permission =', Notification.permission);
+            console.log('[PUSH] serviceWorker in navigator =', 'serviceWorker' in navigator);
+            console.log('[PUSH] PushManager in window =', 'PushManager' in window);
+            console.log('[PUSH] navigator.standalone =', window.navigator.standalone);
+
             // Not supported?
             if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-                // Don't show banner — can't help them
+                console.log('[PUSH] Not supported — banner will not show');
                 return;
             }
 
             // Permission blocked?
             if (Notification.permission === 'denied') {
-                // Don't show the banner — they said no
+                console.log('[PUSH] Permission denied — banner will not show');
                 return;
             }
 
-            // Already granted? Then check if we're subscribed
+            // Already granted? Check if we're subscribed
             if (Notification.permission === 'granted') {
+                console.log('[PUSH] Permission already granted, checking subscription...');
                 try {
                     const reg = await navigator.serviceWorker.ready;
+                    console.log('[PUSH] Service worker ready');
                     const sub = await reg.pushManager.getSubscription();
+                    console.log('[PUSH] Existing subscription:', sub);
+
                     if (sub) {
-                        // We're already subscribed — send it to the server (in case it's a new server DB)
+                        console.log('[PUSH] Syncing existing subscription with server...');
                         const subJson = sub.toJSON();
-                        await fetch('/api/rider/push-subscribe', {
+                        const syncRes = await fetch('/api/rider/push-subscribe', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(subJson)
                         });
-                        console.log('[PUSH] Already subscribed, synced with server');
-                        return;  // No banner needed
+                        const syncData = await syncRes.json();
+                        console.log('[PUSH] Sync response:', syncRes.status, syncData);
+                        return;
                     }
                 } catch (e) {
                     console.warn('[PUSH] Check failed:', e);
                 }
             }
 
-            // Default: show the banner after a short delay
+            // Default: show banner
+            console.log('[PUSH] Showing notification banner in 2 seconds...');
             setTimeout(() => {
                 const banner = document.getElementById('notifBanner');
+                console.log('[PUSH] Banner element:', banner);
                 if (banner && Notification.permission !== 'denied') {
                     banner.style.display = 'flex';
+                    console.log('[PUSH] ✅ Banner is now visible');
                 }
-            }, 3000);
+            }, 2000);
         }
 
         // Run on page load

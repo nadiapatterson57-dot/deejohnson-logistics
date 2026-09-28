@@ -687,8 +687,17 @@ def admin_reset_rider_password(rider_id):
 def admin_delete_rider(rider_id):
     rider = Rider.query.get_or_404(rider_id)
     name = rider.full_name
+
+    # Delete related push subscriptions
+    PushSubscription.query.filter_by(rider_id=rider.id).delete()
+
+    # Delete related delivery tasks
+    DeliveryTask.query.filter_by(rider_id=rider.id).delete()
+
+    # Delete the rider
     db.session.delete(rider)
     db.session.commit()
+
     flash(f'🗑️ {name} has been deleted.', 'success')
     return redirect(url_for('admin') + '#riders')
 

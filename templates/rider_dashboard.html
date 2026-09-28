@@ -1309,14 +1309,20 @@
             // (we don't store forever so they get a chance again next visit)
         }
 
-        async function enableNotifications() {
+                async function enableNotifications() {
+            console.log('[PUSH] enableNotifications called');
+            console.log('[PUSH] Notification permission:', Notification.permission);
+
             if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                console.log('[PUSH] Service worker or PushManager not supported');
                 alert('Your browser does not support notifications. On iPhone, install the app to your home screen first.');
                 return;
             }
 
             try {
                 const permission = await Notification.requestPermission();
+                console.log('[PUSH] Permission result:', permission);
+
                 if (permission !== 'granted') {
                     hideNotifBanner();
                     alert('Notifications were not enabled. To enable later, check your browser settings for this site.');
@@ -1324,36 +1330,49 @@
                 }
 
                 // Get the VAPID public key from the server
+                console.log('[PUSH] Fetching VAPID key...');
                 const keyRes = await fetch('/api/rider/vapid-public-key');
                 if (!keyRes.ok) throw new Error('Could not fetch VAPID key');
                 const keyData = await keyRes.json();
+                console.log('[PUSH] VAPID key received');
                 const applicationServerKey = urlBase64ToUint8Array(keyData.publicKey);
 
                 // Get the service worker registration
                 const reg = await navigator.serviceWorker.ready;
+                console.log('[PUSH] Service worker ready');
 
                 // Subscribe (or get existing subscription)
                 let subscription = await reg.pushManager.getSubscription();
+                console.log('[PUSH] Existing subscription:', subscription);
+
                 if (!subscription) {
+                    console.log('[PUSH] Creating new subscription...');
                     subscription = await reg.pushManager.subscribe({
                         userVisibleOnly: true,
                         applicationServerKey: applicationServerKey
                     });
+                    console.log('[PUSH] New subscription created');
                 }
 
                 // Send to server
                 const subJson = subscription.toJSON();
+                console.log('[PUSH] Subscription object:', subJson);
+                console.log('[PUSH] Sending to server...');
+
                 const saveRes = await fetch('/api/rider/push-subscribe', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(subJson)
                 });
 
-                if (saveRes.ok) {
+                const saveData = await saveRes.json();
+                console.log('[PUSH] Server response:', saveRes.status, saveData);
+
+                if (saveRes.ok && saveData.success) {
                     hideNotifBanner();
-                    console.log('[PUSH] Subscribed successfully');
+                    console.log('[PUSH] ✅ Subscribed successfully');
                 } else {
-                    throw new Error('Server rejected subscription');
+                    throw new Error(saveData.error || 'Server rejected subscription');
                 }
 
             } catch (err) {

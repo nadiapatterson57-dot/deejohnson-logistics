@@ -4,27 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0F3B5C">
-    <title>My Deliveries - DeeJohnson Rider</title>
-
-    <!-- PWA Manifest -->
+    <title>Dashboard - DeeJohnson Rider</title>
     <link rel="manifest" href="/static/manifest.json">
-
-    <!-- App Icons -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/icon-192.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/static/images/icon-192.png">
     <link rel="apple-touch-icon" href="/static/images/apple-touch-icon.png">
-
-    <!-- Apple PWA meta (for iPhone) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="DJ Rider">
-
-    <!-- Microsoft tile -->
-    <meta name="msapplication-TileColor" content="#0F3B5C">
-    <meta name="msapplication-TileImage" content="/static/images/icon-192.png">
-
-    <!-- Fonts and Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -47,7 +34,7 @@
         .top-bar {
             background: linear-gradient(135deg, #0A192F, #0F3B5C);
             color: white;
-            padding: 20px 20px 24px;
+            padding: 20px 20px 26px;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -63,7 +50,7 @@
         .greeting h1 {
             font-size: 1.4rem;
             font-weight: 800;
-            margin: 0 0 2px;
+            margin: 0 0 4px;
             letter-spacing: -0.3px;
         }
 
@@ -71,6 +58,26 @@
             font-size: 0.85rem;
             opacity: 0.8;
             margin: 0;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge i {
+            font-size: 0.6rem;
+            color: #C9A03D;
         }
 
         .logout-btn {
@@ -88,49 +95,31 @@
             flex-shrink: 0;
         }
 
-        .logout-btn:hover {
-            background: rgba(255,255,255,0.2);
-        }
-
-        .offline-badge {
-            display: none;
-            background: #dc3545;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            margin-top: 8px;
-            width: fit-content;
-        }
-
-        .offline-badge.show { display: inline-block; }
+        .logout-btn:hover { background: rgba(255,255,255,0.2); }
 
         /* ===== STATS STRIP ===== */
         .stats-strip {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             background: white;
-            margin: -12px 16px 0;
+            margin: -14px 16px 0;
             border-radius: 16px;
-            padding: 18px;
+            padding: 18px 12px;
             box-shadow: 0 8px 24px rgba(10, 25, 47, 0.08);
             position: relative;
             z-index: 5;
-            gap: 12px;
+            gap: 8px;
         }
 
         .stat-item {
-            flex: 1;
             text-align: center;
             border-right: 1px solid #f0f2f5;
         }
 
-        .stat-item:last-child {
-            border-right: none;
-        }
+        .stat-item:last-child { border-right: none; }
 
         .stat-number {
-            font-size: 1.7rem;
+            font-size: 1.6rem;
             font-weight: 800;
             color: #0F3B5C;
             line-height: 1;
@@ -138,11 +127,11 @@
         }
 
         .stat-label {
-            font-size: 0.7rem;
+            font-size: 0.62rem;
             color: #6b7280;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         /* ===== SECTIONS ===== */
@@ -151,112 +140,95 @@
         }
 
         .section-title {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #6b7280;
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #9ca3af;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
             margin-bottom: 12px;
             display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* ===== DELIVERY CARD ===== */
-        .delivery-card {
-            background: white;
-            border-radius: 18px;
-            padding: 20px;
-            margin-bottom: 14px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
-            border: 1px solid #eef0f4;
-            border-left: 4px solid #C9A03D;
-            transition: all 0.2s;
-        }
-
-        .delivery-card.in_transit { border-left-color: #0F3B5C; }
-        .delivery-card.picked_up { border-left-color: #0d6efd; }
-        .delivery-card.assigned { border-left-color: #C9A03D; }
-
-        .card-header-row {
-            display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 14px;
-            gap: 10px;
+            align-items: center;
         }
 
-        .tracking-code {
-            font-family: 'Courier New', monospace;
-            font-size: 0.95rem;
-            font-weight: 800;
+        .section-title a {
             color: #0F3B5C;
-            letter-spacing: 0.5px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.72rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
-        .status-pill {
-            padding: 5px 12px;
-            border-radius: 20px;
+        /* ===== NEXT DELIVERY CARD ===== */
+        .next-card {
+            background: linear-gradient(135deg, #0A192F, #0F3B5C);
+            color: white;
+            border-radius: 18px;
+            padding: 22px;
+            box-shadow: 0 10px 30px rgba(10, 25, 47, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .next-card::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -10%;
+            width: 200px;
+            height: 200px;
+            background: rgba(201, 160, 61, 0.12);
+            border-radius: 50%;
+        }
+
+        .next-card > * { position: relative; z-index: 1; }
+
+        .next-label {
             font-size: 0.68rem;
             font-weight: 800;
-            letter-spacing: 0.5px;
+            color: #C9A03D;
+            letter-spacing: 1.2px;
             text-transform: uppercase;
-            white-space: nowrap;
+            margin-bottom: 10px;
         }
 
-        .status-assigned { background: #fef3c7; color: #92400e; }
-        .status-picked_up { background: #dbeafe; color: #1e40af; }
-        .status-in_transit { background: #cffafe; color: #155e75; }
-        .status-delivered { background: #d1fae5; color: #065f46; }
-        .status-failed { background: #fee2e2; color: #991b1b; }
-
-        .info-block {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 14px 16px;
-            margin-bottom: 14px;
+        .next-tracking {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
         }
 
-        .info-row {
+        .next-customer {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: white;
+        }
+
+        .next-address {
+            font-size: 0.82rem;
+            opacity: 0.8;
+            margin-bottom: 16px;
             display: flex;
             align-items: flex-start;
-            gap: 10px;
-            padding: 5px 0;
-            font-size: 0.9rem;
-            line-height: 1.4;
+            gap: 6px;
         }
 
-        .info-row i {
-            width: 18px;
+        .next-address i {
             color: #C9A03D;
-            font-size: 0.9rem;
-            padding-top: 2px;
-            flex-shrink: 0;
+            margin-top: 2px;
         }
 
-        .info-row .label {
-            color: #6b7280;
-            font-size: 0.72rem;
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 0.3px;
-            display: block;
-            margin-bottom: 1px;
-        }
-
-        .info-row .value {
-            color: #0A192F;
-            font-weight: 600;
-        }
-
-        /* ===== ACTION BUTTONS ===== */
-        .card-actions {
+        .next-actions {
             display: flex;
             gap: 8px;
-            margin-top: 4px;
         }
 
-        .action-btn {
+        .next-action-btn {
             flex: 1;
             padding: 12px 8px;
             border-radius: 12px;
@@ -274,77 +246,196 @@
             gap: 6px;
         }
 
-        .action-btn:active {
+        .next-action-btn:active {
             transform: scale(0.97);
         }
 
-        .btn-call {
-            background: #25D366;
-            color: white;
-        }
-
-        .btn-call:active { background: #1ea952; }
-
-        .btn-map {
-            background: #0F3B5C;
-            color: white;
-        }
-
-        .btn-map:active { background: #0A192F; }
-
-        .btn-update {
+        .btn-start {
             background: #C9A03D;
             color: #0A192F;
         }
 
-        .btn-update:active { background: #b8912f; }
+        .btn-call-sm {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            flex: 0 0 auto;
+            padding: 12px 16px;
+        }
 
-        /* ===== EMPTY STATE ===== */
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
+        /* ===== EMPTY STATE (no next delivery) ===== */
+        .no-next-card {
             background: white;
-            border-radius: 20px;
+            border-radius: 18px;
+            padding: 30px 20px;
+            text-align: center;
             box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+            border: 1px solid #eef0f4;
         }
 
-        .empty-state i {
-            font-size: 3.5rem;
+        .no-next-card i {
+            font-size: 2.5rem;
             color: #d1d5db;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
 
-        .empty-state h3 {
+        .no-next-card h3 {
             color: #0A192F;
             font-weight: 800;
-            font-size: 1.15rem;
-            margin-bottom: 6px;
+            font-size: 1.05rem;
+            margin-bottom: 4px;
         }
 
-        .empty-state p {
+        .no-next-card p {
             color: #6b7280;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             margin: 0;
         }
 
-        /* ===== LOADER ===== */
-        .loader {
-            text-align: center;
-            padding: 40px 20px;
+        /* ===== ACTIVE LIST (mini) ===== */
+        .mini-delivery {
+            background: white;
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            border: 1px solid #eef0f4;
+            border-left: 4px solid #C9A03D;
         }
 
-        .loader .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #e5e7eb;
-            border-top-color: #0F3B5C;
+        .mini-delivery i.mini-icon {
+            width: 36px;
+            height: 36px;
+            background: #f0f4f8;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0F3B5C;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .mini-delivery .mini-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .mini-delivery .mini-code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: #0F3B5C;
+            margin-bottom: 2px;
+        }
+
+        .mini-delivery .mini-customer {
+            font-size: 0.78rem;
+            color: #6b7280;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ===== QUICK ACTIONS ===== */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .quick-action {
+            background: white;
+            border-radius: 14px;
+            padding: 16px 14px;
+            text-decoration: none;
+            color: #0A192F;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            border: 1px solid #eef0f4;
+            transition: all 0.15s;
+        }
+
+        .quick-action:active {
+            transform: scale(0.97);
+        }
+
+        .quick-action .qa-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+            color: white;
+        }
+
+        .qa-blue { background: #0F3B5C; }
+        .qa-green { background: #25D366; }
+        .qa-gold { background: #C9A03D; }
+        .qa-red { background: #dc3545; }
+
+        .quick-action .qa-text {
+            font-weight: 700;
+            font-size: 0.82rem;
+            line-height: 1.2;
+        }
+
+        .quick-action .qa-sub {
+            font-size: 0.68rem;
+            color: #6b7280;
+            margin-top: 2px;
+            font-weight: 500;
+        }
+
+        /* ===== RECENT ACTIVITY ===== */
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .activity-item:last-child { border-bottom: none; }
+
+        .activity-icon {
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #d1fae5;
+            color: #065f46;
+            font-size: 0.8rem;
+            flex-shrink: 0;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .activity-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .activity-info .activity-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #0A192F;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .activity-info .activity-meta {
+            font-size: 0.72rem;
+            color: #6b7280;
         }
 
         /* ===== BOTTOM NAV ===== */
@@ -362,11 +453,11 @@
 
         .bottom-nav a {
             flex: 1;
-            padding: 12px 6px;
+            padding: 10px 4px;
             text-align: center;
             color: #9ca3af;
             text-decoration: none;
-            font-size: 0.68rem;
+            font-size: 0.62rem;
             font-weight: 700;
             letter-spacing: 0.3px;
             text-transform: uppercase;
@@ -375,8 +466,8 @@
 
         .bottom-nav a i {
             display: block;
-            font-size: 1.25rem;
-            margin-bottom: 4px;
+            font-size: 1.2rem;
+            margin-bottom: 3px;
         }
 
         .bottom-nav a.active,
@@ -384,302 +475,35 @@
             color: #0F3B5C;
         }
 
-        /* ===== MODAL (PLACEHOLDER FOR PART C) ===== */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(10, 25, 47, 0.7);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            z-index: 9999;
-            backdrop-filter: blur(4px);
-        }
-
-        .modal-overlay.show { display: flex; }
-
-        .modal-box {
-            background: white;
-            border-radius: 20px;
-            padding: 28px;
-            max-width: 420px;
-            width: 100%;
+        /* ===== LOADER ===== */
+        .loader {
             text-align: center;
+            padding: 30px 20px;
         }
 
-        .modal-box h3 {
-            color: #0A192F;
-            font-weight: 800;
-            margin-bottom: 10px;
-            font-size: 1.2rem;
-        }
-
-        .modal-box p {
-            color: #6b7280;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-
-        .modal-box button {
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            border: none;
-            font-family: inherit;
-            font-weight: 700;
-            font-size: 0.95rem;
-            cursor: pointer;
-            background: #0F3B5C;
-            color: white;
-        }
-
-        /* ===== REFRESH INDICATOR ===== */
-        .refresh-bar {
-            text-align: center;
-            font-size: 0.75rem;
-            color: #9ca3af;
-            padding: 12px 16px 24px;
-        }
-
-                /* ===== UPDATE MODAL STYLES ===== */
-        .update-box {
-            text-align: left;
-            max-height: 92vh;
-            overflow-y: auto;
-            padding: 24px;
-        }
-
-        .modal-header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 18px;
-        }
-
-        .modal-header-row h3 {
-            margin: 0;
-            color: #0A192F;
-            font-weight: 800;
-            font-size: 1.15rem;
-        }
-
-        .close-x {
-            background: #f0f2f5;
-            border: none;
+        .loader .spinner {
             width: 34px;
             height: 34px;
-            border-radius: 10px;
-            color: #6b7280;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border: 4px solid #e5e7eb;
+            border-top-color: #0F3B5C;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 10px;
         }
 
-        .shipment-info {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 12px 14px;
-            margin-bottom: 18px;
-            font-size: 0.85rem;
-            color: #0A192F;
-        }
-
-        .shipment-info .code {
-            font-family: 'Courier New', monospace;
-            font-weight: 800;
-            color: #0F3B5C;
-            letter-spacing: 0.5px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.78rem;
-            font-weight: 700;
-            color: #0A192F;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-            margin-top: 14px;
-        }
-
-        .form-textarea {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1.5px solid #e5e7eb;
-            border-radius: 12px;
-            font-family: inherit;
-            font-size: 0.9rem;
-            resize: vertical;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .form-textarea:focus {
-            border-color: #0F3B5C;
-            box-shadow: 0 0 0 3px rgba(15, 59, 92, 0.08);
-        }
-
-        .status-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        .status-option {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            padding: 14px 8px;
-            border: 1.5px solid #e5e7eb;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.15s;
-            background: white;
-        }
-
-        .status-option input { display: none; }
-
-        .status-option i {
-            font-size: 1.3rem;
-            color: #9ca3af;
-        }
-
-        .status-option span {
-            font-size: 0.78rem;
-            font-weight: 700;
-            color: #6b7280;
-        }
-
-        .status-option.selected {
-            border-color: #0F3B5C;
-            background: rgba(15, 59, 92, 0.05);
-        }
-
-        .status-option.selected i,
-        .status-option.selected span {
-            color: #0F3B5C;
-        }
-
-        .photo-upload-area {
-            border: 2px dashed #d1d5db;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: #fafbfc;
-        }
-
-        .photo-upload-area:hover {
-            border-color: #0F3B5C;
-            background: #f0f4f8;
-        }
-
-        #photoPlaceholder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            color: #6b7280;
-        }
-
-        #photoPlaceholder i {
-            font-size: 1.8rem;
-            color: #0F3B5C;
-        }
-
-        #photoPlaceholder span {
-            font-size: 0.82rem;
-            font-weight: 600;
-        }
-
-        #photoPreview {
-            width: 100%;
-            border-radius: 12px;
-            max-height: 220px;
-            object-fit: cover;
-        }
-
-        .modal-btns {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .btn-cancel, .btn-save {
-            flex: 1;
-            padding: 14px;
-            border-radius: 12px;
-            border: none;
-            font-family: inherit;
-            font-weight: 700;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-
-        .btn-cancel {
-            background: #f0f2f5;
-            color: #0A192F;
-        }
-
-        .btn-save {
-            background: #0F3B5C;
-            color: white;
-        }
-
-        .btn-save:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-        }
-
-        .update-error {
-            margin-top: 12px;
-            padding: 12px 14px;
-            background: #fee2e2;
-            color: #991b1b;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-
-    <body>
-
-    <!-- ===== SPLASH SCREEN ===== -->
-    <div id="splashScreen" style="
-        position: fixed;
-        inset: 0;
-        background: linear-gradient(135deg, #0A192F, #0F3B5C);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        gap: 24px;
-        z-index: 99999;
-        transition: opacity 0.4s ease;
-    ">
-        <img src="/static/images/icon-192.png" alt="DeeJohnson Rider"
-             style="width: 100px; height: 100px; border-radius: 24px; box-shadow: 0 12px 40px rgba(0,0,0,0.4);">
-        <div style="color: white; font-family: 'Inter', sans-serif; text-align: center;">
-            <div style="font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px;">DeeJohnson Rider</div>
-            <div style="font-size: 0.85rem; opacity: 0.7; margin-top: 4px; letter-spacing: 2px; text-transform: uppercase;">Loading…</div>
-        </div>
-    </div>
 
     <!-- ===== TOP BAR ===== -->
     <div class="top-bar">
         <div class="row">
             <div class="greeting">
                 <h1>Hi, {{ rider.full_name.split()[0] }} 👋</h1>
-                <p>Here are your deliveries for today</p>
-                <span class="offline-badge" id="offlineBadge">
-                    <i class="fas fa-wifi"></i> Offline
+                <p id="todayDate">Welcome back</p>
+                <span class="status-badge" id="statusBadge">
+                    <i class="fas fa-circle"></i> <span id="statusText">Available</span>
                 </span>
             </div>
             <a href="/dispatch_riders/logout" class="logout-btn" title="Log Out">
@@ -691,50 +515,102 @@
     <!-- ===== STATS STRIP ===== -->
     <div class="stats-strip">
         <div class="stat-item">
-            <div class="stat-number" id="activeCount">—</div>
+            <div class="stat-number" id="statActive">—</div>
             <div class="stat-label">Active</div>
         </div>
         <div class="stat-item">
-            <div class="stat-number" id="deliveredCount">—</div>
-            <div class="stat-label">Delivered</div>
+            <div class="stat-number" id="statToday">—</div>
+            <div class="stat-label">Today</div>
         </div>
         <div class="stat-item">
-            <div class="stat-number" id="totalCount">—</div>
-            <div class="stat-label">Total</div>
+            <div class="stat-number" id="statRate">—</div>
+            <div class="stat-label">Success</div>
         </div>
     </div>
 
-    <!-- ===== ACTIVE DELIVERIES ===== -->
+    <!-- ===== NEXT DELIVERY ===== -->
     <div class="section">
         <div class="section-title">
-            <i class="fas fa-box" style="color: #C9A03D;"></i>
-            Active Deliveries
+            <span><i class="fas fa-bolt" style="color: #C9A03D;"></i> Next Delivery</span>
         </div>
-
-        <div id="activeDeliveries">
+        <div id="nextDeliveryContainer">
             <div class="loader">
                 <div class="spinner"></div>
-                <div style="color: #6b7280; font-size: 0.85rem;">Loading your deliveries…</div>
             </div>
         </div>
     </div>
 
-    <!-- ===== REFRESH BAR ===== -->
-    <div class="refresh-bar">
-        <span id="lastUpdated">Auto-refreshing every 30 seconds</span>
+    <!-- ===== ACTIVE DELIVERIES PREVIEW ===== -->
+    <div class="section" id="activeSection" style="display: none;">
+        <div class="section-title">
+            <span><i class="fas fa-box" style="color: #C9A03D;"></i> Active Deliveries</span>
+            <a href="/dispatch_riders/deliveries">View All <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div id="activePreview"></div>
+    </div>
+
+    <!-- ===== QUICK ACTIONS ===== -->
+    <div class="section">
+        <div class="section-title">
+            <span><i class="fas fa-bolt" style="color: #C9A03D;"></i> Quick Actions</span>
+        </div>
+        <div class="quick-actions">
+            <a href="tel:+2347062550379" class="quick-action">
+                <div class="qa-icon qa-blue"><i class="fas fa-phone"></i></div>
+                <div>
+                    <div class="qa-text">Call Admin</div>
+                    <div class="qa-sub">Support</div>
+                </div>
+            </a>
+            <a href="https://wa.me/2347062550379" target="_blank" class="quick-action">
+                <div class="qa-icon qa-green"><i class="fab fa-whatsapp"></i></div>
+                <div>
+                    <div class="qa-text">WhatsApp</div>
+                    <div class="qa-sub">Chat now</div>
+                </div>
+            </a>
+            <a href="/dispatch_riders/history" class="quick-action">
+                <div class="qa-icon qa-gold"><i class="fas fa-history"></i></div>
+                <div>
+                    <div class="qa-text">History</div>
+                    <div class="qa-sub">Past deliveries</div>
+                </div>
+            </a>
+            <a href="/dispatch_riders/profile" class="quick-action">
+                <div class="qa-icon qa-red"><i class="fas fa-user"></i></div>
+                <div>
+                    <div class="qa-text">Profile</div>
+                    <div class="qa-sub">Your account</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- ===== RECENT ACTIVITY ===== -->
+    <div class="section" id="recentSection" style="display: none;">
+        <div class="section-title">
+            <span><i class="fas fa-check-circle" style="color: #C9A03D;"></i> Recent Activity</span>
+        </div>
+        <div style="background: white; border-radius: 16px; padding: 6px 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.04); border: 1px solid #eef0f4;">
+            <div id="recentList"></div>
+        </div>
     </div>
 
     <!-- ===== BOTTOM NAV ===== -->
     <div class="bottom-nav">
         <a href="/dispatch_riders/dashboard" class="active">
             <i class="fas fa-home"></i>
+            Dashboard
+        </a>
+        <a href="/dispatch_riders/deliveries">
+            <i class="fas fa-box"></i>
             Deliveries
         </a>
-            <a href="/dispatch_riders/history">
+        <a href="/dispatch_riders/history">
             <i class="fas fa-history"></i>
             History
         </a>
-            <a href="/dispatch_riders/profile">
+        <a href="/dispatch_riders/profile">
             <i class="fas fa-user"></i>
             Profile
         </a>
@@ -744,296 +620,191 @@
         </a>
     </div>
 
-    <!-- ===== COMING SOON MODAL ===== -->
-    <div class="modal-overlay" id="comingSoonModal">
-        <div class="modal-box">
-            <i class="fas fa-tools" style="font-size: 2.5rem; color: #C9A03D; margin-bottom: 15px;"></i>
-            <h3 id="comingSoonTitle">Coming Soon</h3>
-            <p>This feature is being built and will be available soon. Check back later!</p>
-            <button onclick="closeComingSoon()">Got It</button>
-        </div>
-    </div>
-
-        <!-- ===== UPDATE MODAL ===== -->
-    <div class="modal-overlay" id="updateModal">
-        <div class="modal-box update-box">
-            <div class="modal-header-row">
-                <h3>Update Delivery</h3>
-                <button class="close-x" onclick="closeUpdateModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <div id="updateShipmentInfo" class="shipment-info"></div>
-
-            <form id="updateForm" onsubmit="submitUpdate(event)">
-
-                <label class="form-label">What's the status?</label>
-                <div class="status-options">
-                    <label class="status-option" data-status="picked_up">
-                        <input type="radio" name="status" value="picked_up" required>
-                        <i class="fas fa-box"></i>
-                        <span>Picked Up</span>
-                    </label>
-                    <label class="status-option" data-status="in_transit">
-                        <input type="radio" name="status" value="in_transit">
-                        <i class="fas fa-truck"></i>
-                        <span>In Transit</span>
-                    </label>
-                    <label class="status-option" data-status="delivered">
-                        <input type="radio" name="status" value="delivered">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Delivered</span>
-                    </label>
-                    <label class="status-option" data-status="failed">
-                        <input type="radio" name="status" value="failed">
-                        <i class="fas fa-times-circle"></i>
-                        <span>Failed</span>
-                    </label>
-                </div>
-
-                <label class="form-label">Notes (optional)</label>
-                <textarea id="updateNotes" class="form-textarea" rows="3" placeholder="e.g., Left with security guard"></textarea>
-
-                <label class="form-label">Photo Proof (optional)</label>
-                <div class="photo-upload-area" onclick="document.getElementById('photoInput').click()">
-                    <input type="file" id="photoInput" accept="image/*" capture="environment" style="display: none;" onchange="handlePhoto(event)">
-                    <div id="photoPlaceholder">
-                        <i class="fas fa-camera"></i>
-                        <span>Tap to take or upload a photo</span>
-                    </div>
-                    <img id="photoPreview" style="display: none;">
-                </div>
-
-                <div class="modal-btns">
-                    <button type="button" class="btn-cancel" onclick="closeUpdateModal()">Cancel</button>
-                    <button type="submit" class="btn-save" id="submitBtn">
-                        <span id="submitText">Save Update</span>
-                    </button>
-                </div>
-
-                <div id="updateError" class="update-error" style="display: none;"></div>
-            </form>
-        </div>
-    </div>
-
-        <!-- ===== NOTIFICATION PERMISSION BANNER ===== -->
-    <div id="notifBanner" style="
-        display: none;
-        position: fixed;
-        bottom: 90px;
-        left: 16px;
-        right: 16px;
-        background: linear-gradient(135deg, #0A192F, #0F3B5C);
-        color: white;
-        padding: 16px 18px;
-        border-radius: 16px;
-        box-shadow: 0 10px 30px rgba(10, 25, 47, 0.35);
-        z-index: 9000;
-        align-items: center;
-        gap: 14px;
-    ">
-        <div style="flex-shrink: 0; font-size: 1.6rem; color: #C9A03D;">
-            <i class="fas fa-bell"></i>
-        </div>
-        <div style="flex: 1;">
-            <div style="font-weight: 800; font-size: 0.95rem; margin-bottom: 2px;">Enable Notifications</div>
-            <div style="font-size: 0.78rem; opacity: 0.85; line-height: 1.4;">
-                Get notified when a new delivery is assigned to you.
-            </div>
-        </div>
-        <button onclick="enableNotifications()" style="
-            background: #C9A03D;
-            color: #0A192F;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 10px;
-            font-family: inherit;
-            font-weight: 800;
-            font-size: 0.82rem;
-            cursor: pointer;
-            white-space: nowrap;
-        ">Enable</button>
-        <button onclick="hideNotifBanner()" style="
-            background: transparent;
-            color: rgba(255,255,255,0.6);
-            border: none;
-            font-size: 1rem;
-            cursor: pointer;
-            padding: 4px;
-        "><i class="fas fa-times"></i></button>
-    </div>
-
-        <script>
-        // ============================================
-        // PWA — Register Service Worker
-        // ============================================
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/static/js/service-worker.js')
-                    .then(reg => {
-                        console.log('[PWA] Service worker registered:', reg.scope);
-                    })
-                    .catch(err => {
-                        console.warn('[PWA] Service worker registration failed:', err);
-                    });
-            });
-        }
-
-        // ============================================
-        // Hide splash screen after page loads
-        // ============================================
-        window.addEventListener('load', () => {
-            const splash = document.getElementById('splashScreen');
-            if (splash) {
-                setTimeout(() => {
-                    splash.style.opacity = '0';
-                    setTimeout(() => splash.remove(), 400);
-                }, 600);
-            }
-        });
-    </script>
-
     <script>
         // ============================================
-        // STATE
+        // SET DATE
         // ============================================
-        let currentTaskId = null;
+        document.getElementById('todayDate').textContent =
+            new Date().toLocaleDateString('en-GB', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long'
+            });
 
         // ============================================
-        // LOAD TASKS
+        // LOAD DASHBOARD DATA
         // ============================================
-        async function loadTasks() {
+        async function loadDashboard() {
             try {
                 const res = await fetch('/api/rider/tasks');
                 if (!res.ok) throw new Error('Failed to load');
                 const data = await res.json();
 
-                renderStats(data);
-                renderActiveDeliveries(data.active || []);
-
-                const now = new Date();
-                document.getElementById('lastUpdated').textContent =
-                    'Last updated: ' + now.toLocaleTimeString();
+                updateStats(data);
+                renderNextDelivery(data.active || []);
+                renderActivePreview(data.active || []);
+                renderRecentActivity(data.completed || []);
+                updateStatusBadge(data.active || []);
 
             } catch (err) {
-                console.error('Load error:', err);
-                document.getElementById('activeDeliveries').innerHTML = `
-                    <div class="empty-state">
+                console.error('Dashboard load error:', err);
+                document.getElementById('nextDeliveryContainer').innerHTML = `
+                    <div class="no-next-card">
                         <i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i>
-                        <h3>Could not load deliveries</h3>
-                        <p>Please check your connection and try again.</p>
+                        <h3>Could not load data</h3>
+                        <p>Check your connection and try again</p>
                     </div>
                 `;
             }
         }
 
         // ============================================
-        // RENDER STATS
+        // STATS
         // ============================================
-        function renderStats(data) {
-            const active = data.active ? data.active.length : 0;
-            const completed = data.counts ? data.counts.completed_today : 0;
-            const total = active + completed;
+        function updateStats(data) {
+            const active = (data.active || []).length;
+            const today = data.counts ? data.counts.completed_today : 0;
 
-            document.getElementById('activeCount').textContent = active;
-            document.getElementById('deliveredCount').textContent = completed;
-            document.getElementById('totalCount').textContent = total;
+            document.getElementById('statActive').textContent = active;
+            document.getElementById('statToday').textContent = today;
+
+            // Success rate (rough estimate)
+            const delivered = today;
+            const total = active + today;
+            if (total === 0) {
+                document.getElementById('statRate').textContent = '—';
+            } else {
+                const rate = Math.round((delivered / total) * 100);
+                document.getElementById('statRate').textContent = rate + '%';
+            }
         }
 
         // ============================================
-        // RENDER ACTIVE DELIVERIES
+        // NEXT DELIVERY
         // ============================================
-        function renderActiveDeliveries(tasks) {
-            const container = document.getElementById('activeDeliveries');
+        function renderNextDelivery(active) {
+            const container = document.getElementById('nextDeliveryContainer');
 
-            if (!tasks.length) {
+            if (active.length === 0) {
                 container.innerHTML = `
-                    <div class="empty-state">
+                    <div class="no-next-card">
                         <i class="fas fa-check-circle" style="color: #10b981;"></i>
                         <h3>All caught up! 🎉</h3>
-                        <p>You have no active deliveries right now.</p>
+                        <p>No deliveries assigned right now</p>
                     </div>
                 `;
                 return;
             }
 
-            container.innerHTML = tasks.map(task => `
-                <div class="delivery-card ${task.status}">
-                    <div class="card-header-row">
-                        <div class="tracking-code">${task.tracking_code}</div>
-                        <span class="status-pill status-${task.status}">${formatStatus(task.status)}</span>
-                    </div>
+            // Show the top task (first one)
+            const task = active[0];
+            const phone = task.customer_phone || '';
 
-                    <div class="info-block">
-                        <div class="info-row">
-                            <i class="fas fa-user"></i>
-                            <div>
-                                <span class="label">Customer</span>
-                                <span class="value">${escapeHtml(task.customer_name || 'N/A')}</span>
-                            </div>
-                        </div>
-                        <div class="info-row">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <div>
-                                <span class="label">Deliver to</span>
-                                <span class="value">${escapeHtml(task.delivery_address || 'N/A')}</span>
-                            </div>
-                        </div>
-                        ${task.customer_phone ? `
-                        <div class="info-row">
-                            <i class="fas fa-phone"></i>
-                            <div>
-                                <span class="label">Phone</span>
-                                <span class="value">${escapeHtml(task.customer_phone)}</span>
-                            </div>
-                        </div>
+            container.innerHTML = `
+                <div class="next-card">
+                    <div class="next-label">
+                        <i class="fas fa-flag"></i> Start here
+                    </div>
+                    <div class="next-tracking">${task.tracking_code}</div>
+                    <div class="next-customer">${escapeHtml(task.customer_name || 'Customer')}</div>
+                    <div class="next-address">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>${escapeHtml(task.delivery_address || task.destination || 'Address not set')}</span>
+                    </div>
+                    <div class="next-actions">
+                        <a href="/dispatch_riders/deliveries" class="next-action-btn btn-start">
+                            <i class="fas fa-play"></i> Open Deliveries
+                        </a>
+                        ${phone ? `
+                            <a href="tel:${phone}" class="next-action-btn btn-call-sm">
+                                <i class="fas fa-phone"></i>
+                            </a>
                         ` : ''}
-                        <div class="info-row">
-                            <i class="fas fa-box"></i>
-                            <div>
-                                <span class="label">Package</span>
-                                <span class="value">${escapeHtml(task.package_type || 'Parcel')} • ${task.weight || 0} kg</span>
-                            </div>
-                        </div>
                     </div>
+                </div>
+            `;
+        }
 
-                    <div class="card-actions">
-                        ${task.customer_phone ? `
-                        <a href="tel:${task.customer_phone}" class="action-btn btn-call">
-                            <i class="fas fa-phone"></i> Call
-                        </a>
-                        ` : `
-                        <button class="action-btn" style="background: #e5e7eb; color: #9ca3af; cursor: not-allowed;" disabled>
-                            <i class="fas fa-phone"></i> No Phone
-                        </button>
-                        `}
-                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(task.delivery_address || task.destination || '')}"
-                           target="_blank" class="action-btn btn-map">
-                            <i class="fas fa-map"></i> Map
-                        </a>
-                        <button class="action-btn btn-update" onclick="openUpdateModal(${task.task_id})">
-                            <i class="fas fa-edit"></i> Update
-                        </button>
+        // ============================================
+        // ACTIVE PREVIEW (top 3)
+        // ============================================
+        function renderActivePreview(active) {
+            const section = document.getElementById('activeSection');
+            const container = document.getElementById('activePreview');
+
+            if (active.length <= 1) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            const preview = active.slice(1, 4); // skip the first (already in Next)
+
+            container.innerHTML = preview.map(task => `
+                <div class="mini-delivery">
+                    <i class="fas fa-box mini-icon"></i>
+                    <div class="mini-info">
+                        <div class="mini-code">${task.tracking_code}</div>
+                        <div class="mini-customer">${escapeHtml(task.customer_name || 'Customer')}</div>
                     </div>
+                    <i class="fas fa-chevron-right" style="color: #9ca3af; font-size: 0.8rem;"></i>
                 </div>
             `).join('');
         }
 
         // ============================================
-        // HELPERS
+        // RECENT ACTIVITY
         // ============================================
-        function formatStatus(status) {
-            const map = {
-                'assigned': 'Assigned',
-                'picked_up': 'Picked Up',
-                'in_transit': 'In Transit',
-                'delivered': 'Delivered',
-                'failed': 'Failed'
-            };
-            return map[status] || status;
+        function renderRecentActivity(completed) {
+            const section = document.getElementById('recentSection');
+            const container = document.getElementById('recentList');
+
+            if (!completed || completed.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            const recent = completed.slice(0, 3);
+
+            container.innerHTML = recent.map(task => {
+                const timeLabel = task.delivered_at
+                    ? new Date(task.delivered_at.replace(' ', 'T')).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+                    : '—';
+
+                return `
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="activity-info">
+                            <div class="activity-title">${task.tracking_code}</div>
+                            <div class="activity-meta">${escapeHtml(task.customer_name || '')} • ${timeLabel}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
+        // ============================================
+        // STATUS BADGE
+        // ============================================
+        function updateStatusBadge(active) {
+            const badge = document.getElementById('statusBadge');
+            const statusText = document.getElementById('statusText');
+
+            if (active.length > 0) {
+                statusText.textContent = 'On Delivery';
+                badge.style.background = 'rgba(201, 160, 61, 0.2)';
+            } else {
+                statusText.textContent = 'Available';
+                badge.style.background = 'rgba(16, 185, 129, 0.15)';
+            }
+        }
+
+        // ============================================
+        // HELPERS
+        // ============================================
         function escapeHtml(str) {
             if (!str) return '';
             return String(str)
@@ -1044,406 +815,13 @@
                 .replace(/'/g, '&#39;');
         }
 
-                // ============================================
-        // UPDATE MODAL
         // ============================================
-        let selectedPhoto = null;
-        let currentTask = null;
-
-        function openUpdateModal(taskId) {
-            currentTaskId = taskId;
-
-            // Find the task data
-            fetch('/api/rider/tasks')
-                .then(r => r.json())
-                .then(data => {
-                    currentTask = (data.active || []).find(t => t.task_id === taskId);
-                    if (currentTask) {
-                        document.getElementById('updateShipmentInfo').innerHTML =
-                            '<span class="code">' + currentTask.tracking_code + '</span>' +
-                            ' — ' + (currentTask.customer_name || 'N/A') +
-                            '<br><small style="color: #6b7280;">' + (currentTask.delivery_address || '') + '</small>';
-                    }
-                });
-
-            // Reset form
-            document.getElementById('updateForm').reset();
-            document.getElementById('updateNotes').value = '';
-            document.getElementById('photoPreview').style.display = 'none';
-            document.getElementById('photoPlaceholder').style.display = 'flex';
-            document.getElementById('updateError').style.display = 'none';
-            document.querySelectorAll('.status-option').forEach(o => o.classList.remove('selected'));
-            selectedPhoto = null;
-
-            document.getElementById('updateModal').classList.add('show');
-        }
-
-        function closeUpdateModal() {
-            document.getElementById('updateModal').classList.remove('show');
-        }
-
-        // Status option click handler
-        document.addEventListener('click', function(e) {
-            const option = e.target.closest('.status-option');
-            if (option) {
-                document.querySelectorAll('.status-option').forEach(o => o.classList.remove('selected'));
-                option.classList.add('selected');
-                option.querySelector('input').checked = true;
-            }
-        });
-
-        // Photo handler
-        function handlePhoto(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                selectedPhoto = e.target.result; // base64
-                document.getElementById('photoPreview').src = e.target.result;
-                document.getElementById('photoPreview').style.display = 'block';
-                document.getElementById('photoPlaceholder').style.display = 'none';
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // Submit update
-        async function submitUpdate(event) {
-            event.preventDefault();
-
-            const submitBtn = document.getElementById('submitBtn');
-            const submitText = document.getElementById('submitText');
-            const errorEl = document.getElementById('updateError');
-
-            errorEl.style.display = 'none';
-
-            const selectedStatus = document.querySelector('input[name="status"]:checked');
-            if (!selectedStatus) {
-                errorEl.textContent = 'Please select a status.';
-                errorEl.style.display = 'block';
-                return;
-            }
-
-            const payload = {
-                status: selectedStatus.value,
-                notes: document.getElementById('updateNotes').value.trim(),
-                photo_data: selectedPhoto
-            };
-
-            submitBtn.disabled = true;
-            submitText.textContent = 'Saving…';
-
-            try {
-                const res = await fetch('/api/rider/task/' + currentTaskId + '/update', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const data = await res.json();
-
-                if (!res.ok || !data.success) {
-                    throw new Error(data.error || 'Failed to update');
-                }
-
-                // Success
-                closeUpdateModal();
-                submitText.textContent = 'Saved!';
-                setTimeout(() => {
-                    loadTasks();
-                    submitBtn.disabled = false;
-                    submitText.textContent = 'Save Update';
-                }, 500);
-
-            } catch (err) {
-                errorEl.textContent = err.message || 'Something went wrong. Please try again.';
-                errorEl.style.display = 'block';
-                submitBtn.disabled = false;
-                submitText.textContent = 'Save Update';
-            }
-        }
-
-        // ============================================
-        // ONLINE / OFFLINE
-        // ============================================
-        window.addEventListener('online', () => {
-            document.getElementById('offlineBadge').classList.remove('show');
-            loadTasks();
-        });
-        window.addEventListener('offline', () => {
-            document.getElementById('offlineBadge').classList.add('show');
-        });
-
-        // ============================================
-        // AUTO REFRESH
+        // INIT
         // ============================================
         document.addEventListener('DOMContentLoaded', () => {
-            loadTasks();
-            setInterval(loadTasks, 30000);
+            loadDashboard();
+            setInterval(loadDashboard, 30000);
         });
-
-        // ============================================
-        // GPS LOCATION TRACKING (sends every 60s)
-        // ============================================
-        let locationWatchId = null;
-        let locationInterval = null;
-        let lastLocationSent = null;
-
-        function sendLocation(lat, lng) {
-            fetch('/api/rider/location', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ lat: lat, lng: lng })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    lastLocationSent = new Date();
-                    console.log('[GPS] Location sent:', lat.toFixed(4), lng.toFixed(4));
-                }
-            })
-            .catch(err => {
-                console.warn('[GPS] Failed to send location:', err);
-            });
-        }
-
-        function startLocationTracking() {
-            if (!navigator.geolocation) {
-                console.warn('[GPS] Geolocation not supported by this browser');
-                return;
-            }
-
-            // Get initial position right away
-            navigator.geolocation.getCurrentPosition(
-                pos => sendLocation(pos.coords.latitude, pos.coords.longitude),
-                err => console.warn('[GPS] Permission denied or unavailable:', err.message),
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-            );
-
-            // Then update every 60 seconds
-            locationInterval = setInterval(() => {
-                navigator.geolocation.getCurrentPosition(
-                    pos => sendLocation(pos.coords.latitude, pos.coords.longitude),
-                    err => console.warn('[GPS] Update failed:', err.message),
-                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-                );
-            }, 60000);
-        }
-
-        function stopLocationTracking() {
-            if (locationInterval) {
-                clearInterval(locationInterval);
-                locationInterval = null;
-            }
-        }
-
-        // Start tracking when the page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            // Ask permission + start tracking
-            startLocationTracking();
-        });
-
-        // Stop when the page is hidden (battery saving)
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                stopLocationTracking();
-            } else {
-                startLocationTracking();
-            }
-        });
-
-        // Show location status badge (optional small indicator)
-        function showLocationStatus() {
-            // We'll add a visual indicator in the top bar
-            const greeting = document.querySelector('.greeting');
-            if (!greeting || document.getElementById('locationBadge')) return;
-
-            const badge = document.createElement('div');
-            badge.id = 'locationBadge';
-            badge.style.cssText = `
-                font-size: 0.7rem;
-                color: rgba(255,255,255,0.7);
-                margin-top: 6px;
-                display: flex;
-                align-items: center;
-                gap: 6px;
-            `;
-            badge.innerHTML = '<i class="fas fa-map-marker-alt"></i> Sharing location';
-            greeting.appendChild(badge);
-
-            // Hide after 5 seconds
-            setTimeout(() => {
-                badge.style.opacity = '0';
-                badge.style.transition = 'opacity 0.5s';
-                setTimeout(() => badge.remove(), 500);
-            }, 5000);
-        }
-
-        // Show the "Sharing location" indicator briefly when tracking starts
-        window.addEventListener('load', () => {
-            setTimeout(showLocationStatus, 2000);
-        });
-
-        // ============================================
-        // PUSH NOTIFICATIONS — Subscribe the rider
-        // ============================================
-        const NOTIF_PROMPT_KEY = 'dj_rider_notif_dismissed';
-
-        function urlBase64ToUint8Array(base64String) {
-            const padding = '='.repeat((4 - base64String.length % 4) % 4);
-            const base64 = (base64String + padding)
-                .replace(/\-/g, '+')
-                .replace(/_/g, '/');
-            const rawData = window.atob(base64);
-            const outputArray = new Uint8Array(rawData.length);
-            for (let i = 0; i < rawData.length; ++i) {
-                outputArray[i] = rawData.charCodeAt(i);
-            }
-            return outputArray;
-        }
-
-        function hideNotifBanner() {
-            const banner = document.getElementById('notifBanner');
-            if (banner) banner.style.display = 'none';
-            // Remember they dismissed it for this session (not forever)
-            // (we don't store forever so they get a chance again next visit)
-        }
-
-        async function enableNotifications() {
-            console.log('[PUSH] enableNotifications called');
-            console.log('[PUSH] Notification permission:', Notification.permission);
-
-            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-                console.log('[PUSH] Service worker or PushManager not supported');
-                alert('Your browser does not support notifications. On iPhone, install the app to your home screen first.');
-                return;
-            }
-
-            try {
-                const permission = await Notification.requestPermission();
-                console.log('[PUSH] Permission result:', permission);
-
-                if (permission !== 'granted') {
-                    hideNotifBanner();
-                    alert('Notifications were not enabled. To enable later, check your browser settings for this site.');
-                    return;
-                }
-
-                // Get the VAPID public key from the server
-                console.log('[PUSH] Fetching VAPID key...');
-                const keyRes = await fetch('/api/rider/vapid-public-key');
-                if (!keyRes.ok) throw new Error('Could not fetch VAPID key');
-                const keyData = await keyRes.json();
-                console.log('[PUSH] VAPID key received');
-                const applicationServerKey = urlBase64ToUint8Array(keyData.publicKey);
-
-                // Get the service worker registration
-                const reg = await navigator.serviceWorker.ready;
-                console.log('[PUSH] Service worker ready');
-
-                // Subscribe (or get existing subscription)
-                let subscription = await reg.pushManager.getSubscription();
-                console.log('[PUSH] Existing subscription:', subscription);
-
-                if (!subscription) {
-                    console.log('[PUSH] Creating new subscription...');
-                    subscription = await reg.pushManager.subscribe({
-                        userVisibleOnly: true,
-                        applicationServerKey: applicationServerKey
-                    });
-                    console.log('[PUSH] New subscription created');
-                }
-
-                // Send to server
-                const subJson = subscription.toJSON();
-                console.log('[PUSH] Subscription object:', subJson);
-                console.log('[PUSH] Sending to server...');
-
-                const saveRes = await fetch('/api/rider/push-subscribe', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(subJson)
-                });
-
-                const saveData = await saveRes.json();
-                console.log('[PUSH] Server response:', saveRes.status, saveData);
-
-                if (saveRes.ok && saveData.success) {
-                    hideNotifBanner();
-                    console.log('[PUSH] ✅ Subscribed successfully');
-                } else {
-                    throw new Error(saveData.error || 'Server rejected subscription');
-                }
-
-            } catch (err) {
-                console.error('[PUSH] Error:', err);
-                alert('Could not enable notifications: ' + err.message);
-            }
-        }
-
-        // ============================================
-        // Check on page load whether we should show the banner
-        // ============================================
-        async function checkNotificationStatus() {
-            console.log('[PUSH] checkNotificationStatus called');
-            console.log('[PUSH] Notification.permission =', Notification.permission);
-            console.log('[PUSH] serviceWorker in navigator =', 'serviceWorker' in navigator);
-            console.log('[PUSH] PushManager in window =', 'PushManager' in window);
-            console.log('[PUSH] navigator.standalone =', window.navigator.standalone);
-
-            // Not supported?
-            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-                console.log('[PUSH] Not supported — banner will not show');
-                return;
-            }
-
-            // Permission blocked?
-            if (Notification.permission === 'denied') {
-                console.log('[PUSH] Permission denied — banner will not show');
-                return;
-            }
-
-            // Already granted? Check if we're subscribed
-            if (Notification.permission === 'granted') {
-                console.log('[PUSH] Permission already granted, checking subscription...');
-                try {
-                    const reg = await navigator.serviceWorker.ready;
-                    console.log('[PUSH] Service worker ready');
-                    const sub = await reg.pushManager.getSubscription();
-                    console.log('[PUSH] Existing subscription:', sub);
-
-                    if (sub) {
-                        console.log('[PUSH] Syncing existing subscription with server...');
-                        const subJson = sub.toJSON();
-                        const syncRes = await fetch('/api/rider/push-subscribe', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(subJson)
-                        });
-                        const syncData = await syncRes.json();
-                        console.log('[PUSH] Sync response:', syncRes.status, syncData);
-                        return;
-                    }
-                } catch (e) {
-                    console.warn('[PUSH] Check failed:', e);
-                }
-            }
-
-            // Default: show banner
-            console.log('[PUSH] Showing notification banner in 2 seconds...');
-            setTimeout(() => {
-                const banner = document.getElementById('notifBanner');
-                console.log('[PUSH] Banner element:', banner);
-                if (banner && Notification.permission !== 'denied') {
-                    banner.style.display = 'flex';
-                    console.log('[PUSH] ✅ Banner is now visible');
-                }
-            }, 2000);
-        }
-
-        // Run on page load
-        document.addEventListener('DOMContentLoaded', checkNotificationStatus);
-
     </script>
 
 </body>

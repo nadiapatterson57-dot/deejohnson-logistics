@@ -747,19 +747,63 @@ def admin_assign_task():
 
     db.session.commit()
 
-    # Send push notification to the rider (non-blocking)
-    try:
-        send_push_notification(
-            rider_id=rider.id,
-            title="🚚 New Delivery Assigned",
-            body=f"{shipment.tracking_code} → {shipment.customer_name or 'Customer'}",
-            url="/dispatch_riders/dashboard"
-        )
-    except Exception as e:
-        print(f"⚠️ Push notification failed: {e}")
+@app.route('/api/rider/push-subscribe', methods=['POST'])
+def api_push_subscribe():
+    """Save a push subscription for the current rider."""
+    print("=" * 60)
+    print("🔵 PUSH SUBSCRIBE HIT")
 
-    flash(f'✅ {shipment.tracking_code} assigned to {rider.full_name}.', 'success')
-    return redirect(url_for('admin') + '#riders')
+    if 'rider_id' not in session:
+        print("❌ No rider_id in session")
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    data = request.get_json() or {}
+    endpoint = data.get('endpoint')
+    keys = data.get('keys', {})
+    p256dh = keys.get('p256dh')
+    auth = keys.get('auth')
+
+    print(f"🔍 endpoint: {endpoint[:50] if endpoint else 'NONE'}...")
+    print(f"🔍 p256dh: {p256dh[:20] if p256dh else 'NONE'}...")
+    print(f"🔍 auth: {auth[:10] if auth else 'NONE'}...")
+
+    if not endpoint or not p256dh or not auth:
+        print("❌ Missing subscription data")
+        return jsonify({'error': 'Missing subscription data'}), 400
+
+    rider_id = session['rider_id']
+    print(f"🔍 rider_id: {rider_id}")
+
+    try:
+        existing = PushSubscription.query.filter_by(endpoint=endpoint).first()
+        if existing:
+            print(f"🔍 Existing subscription found (id={existing.id}), updating...")
+            existing.rider_id = rider_id
+            existing.p256dh = p256dh
+            existing.auth = auth
+            existing.user_agent = request.headers.get('User-Agent', '')[:300]
+            existing.last_used_at = datetime.now(timezone.utc)
+        else:
+            print("🔍 Creating new subscription...")
+            sub = PushSubscription(
+                rider_id=rider_id,
+                endpoint=endpoint,
+                p256dh=p256dh,
+                auth=auth,
+                user_agent=request.headers.get('User-Agent', '')[:300]
+            )
+            db.session.add(sub)
+
+        db.session.commit()
+        print(f"✅ Subscription saved for rider {rider_id}")
+        print("=" * 60)
+        return jsonify({'success': True})
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ SAVE ERROR: {e}")
+        print("=" * 60)
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/admin/riders/reassign/<int:task_id>', methods=['POST'])
@@ -1186,6 +1230,7 @@ def dispatch_rider_login():
 
 @app.route('/dispatch_riders/dashboard')
 def dispatch_rider_dashboard():
+    """New Home — the overview/summary screen."""
     if 'rider_id' not in session:
         return redirect(url_for('dispatch_rider_login'))
 
@@ -1194,7 +1239,21 @@ def dispatch_rider_dashboard():
         session.clear()
         return redirect(url_for('dispatch_rider_login'))
 
-    return render_template('rider_dashboard.html', rider=rider)    
+    return render_template('rider_dashboard.html', rider=rider)
+
+
+@app.route('/dispatch_riders/deliveries')
+def dispatch_rider_deliveries():
+    """The list of active deliveries."""
+    if 'rider_id' not in session:
+        return redirect(url_for('dispatch_rider_login'))
+
+    rider = Rider.query.get(session['rider_id'])
+    if not rider:
+        session.clear()
+        return redirect(url_for('dispatch_rider_login'))
+
+    return render_template('rider_deliveries.html', rider=rider)    
 
 @app.route('/dispatch_riders/history')
 def dispatch_rider_history():

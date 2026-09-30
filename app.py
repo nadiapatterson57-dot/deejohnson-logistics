@@ -1372,48 +1372,6 @@ def api_vapid_public_key():
         return jsonify({'error': 'VAPID public key not configured'}), 500
     return jsonify({'publicKey': public_key})
 
-
-@app.route('/api/rider/push-subscribe', methods=['POST'])
-def api_push_subscribe():
-    """Save a push subscription for the current rider."""
-    if 'rider_id' not in session:
-        return jsonify({'error': 'Unauthorized'}), 401
-
-    data = request.get_json() or {}
-    endpoint = data.get('endpoint')
-    p256dh = data.get('keys', {}).get('p256dh')
-    auth = data.get('keys', {}).get('auth')
-
-    if not endpoint or not p256dh or not auth:
-        return jsonify({'error': 'Missing subscription data'}), 400
-
-    rider_id = session['rider_id']
-
-    # Check if this endpoint already exists (for any rider)
-    existing = PushSubscription.query.filter_by(endpoint=endpoint).first()
-    if existing:
-        # Update rider_id in case it's a different rider now (re-login on same device)
-        existing.rider_id = rider_id
-        existing.p256dh = p256dh
-        existing.auth = auth
-        existing.user_agent = request.headers.get('User-Agent', '')[:300]
-        existing.last_used_at = datetime.now(timezone.utc)
-    else:
-        sub = PushSubscription(
-            rider_id=rider_id,
-            endpoint=endpoint,
-            p256dh=p256dh,
-            auth=auth,
-            user_agent=request.headers.get('User-Agent', '')[:300]
-        )
-        db.session.add(sub)
-
-    db.session.commit()
-    print(f"✅ Push subscription saved for rider {rider_id}")
-
-    return jsonify({'success': True})
-
-
 @app.route('/api/rider/push-unsubscribe', methods=['POST'])
 def api_push_unsubscribe():
     """Remove a push subscription."""

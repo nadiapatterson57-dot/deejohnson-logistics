@@ -14,9 +14,24 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Clip AOS fade-left/right slide-ins so they can't widen the page on mobile */
+        section, footer {
+            overflow-x: clip;
+        }
+
+        /* Keep anchor targets from hiding under the fixed navbar */
+        section[id] {
+            scroll-margin-top: 70px;
         }
 
         /* Deep Navy Blue Color Variables */
@@ -55,10 +70,53 @@
             box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         }
         .navbar-brand {
-            font-size: 1.8rem;
+            font-size: 1.7rem;
             font-weight: 700;
             animation: slideInLeft 0.8s ease;
             color: white !important;
+        }
+
+        /* Mobile / tablet navbar: keep brand and burger on one row without overlap */
+        @media (max-width: 991.98px) {
+            .navbar > .container {
+                flex-wrap: wrap;
+            }
+            .navbar-brand {
+                font-size: 1.15rem;
+                display: flex;
+                align-items: center;
+                min-width: 0;
+                max-width: calc(100% - 64px);
+                margin-right: 0;
+                white-space: nowrap;
+            }
+            .navbar-brand .company-name-mobile {
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .navbar-toggler {
+                flex-shrink: 0;
+                padding: 4px 8px;
+            }
+            .navbar-collapse {
+                max-height: calc(100vh - 70px);
+                overflow-y: auto;
+            }
+            .navbar-nav {
+                padding: 10px 0;
+            }
+            .navbar-nav .nav-link {
+                padding: 10px 4px;
+                border-bottom: 1px solid rgba(255,255,255,0.08);
+            }
+            .nav-link::after {
+                display: none;
+            }
+        }
+        @media (max-width: 380px) {
+            .navbar-brand {
+                font-size: 1rem;
+            }
         }
         .nav-link {
             position: relative;
@@ -225,7 +283,16 @@
                 font-size: 1rem;
             }
             .hero-stats-row {
-                gap: 25px;
+                gap: 12px;
+                flex-wrap: nowrap;
+            }
+            .hero-stats-row .stat-item {
+                flex: 1;
+                padding: 10px 0;
+            }
+            .hero-buttons .btn {
+                padding-left: 1.5rem !important;
+                padding-right: 1.5rem !important;
             }
             .hero-stats-row .stat-item h3 {
                 font-size: 1.4rem;
@@ -632,7 +699,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="navbar" style="padding-top: 8px; padding-bottom: 8px;">
     <div class="container">
         <!-- Brand / Logo -->
-        <a class="navbar-brand" href="#" id="brandLogo" style="font-size: 1.7rem; font-weight: 700;">
+        <a class="navbar-brand" href="#home" id="brandLogo">
             <i class="fas fa-shipping-fast me-2"></i>
             <span class="company-name-mobile">DeeJohnson Company Nig. Ltd.</span>
         </a>
@@ -2771,10 +2838,10 @@
     /* Mobile responsive */
     @media (max-width: 768px) {
         .whatsapp-widget {
-            width: calc(100% - 40px);
-            bottom: 20px;
-            right: 20px;
-            left: 20px;
+            width: auto;
+            max-width: calc(100% - 32px);
+            bottom: 16px;
+            right: 16px;
         }
         
         .whatsapp-header {
@@ -2951,9 +3018,11 @@
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
+                const href = this.getAttribute('href');
+                if (href.length < 2) return;
+                const target = document.querySelector(href);
                 if (target) {
+                    e.preventDefault();
                     target.scrollIntoView({
                         behavior: 'smooth',
                         block: 'start'
@@ -2966,12 +3035,20 @@
         // ADD THE NEW JAVASCRIPT HERE (BEFORE THE CLOSING)
         // ==========================================
         
-        // Toggle company name on mobile when logo is clicked
-        document.getElementById('brandLogo').addEventListener('click', function(e) {
-            e.preventDefault();
-            const nameSpan = document.querySelector('.company-name-mobile');
-            if (nameSpan) {
-                nameSpan.classList.toggle('show');
+        // Close the mobile burger menu after a link (or the logo) is tapped,
+        // or when tapping anywhere outside the open menu
+        const navCollapse = document.getElementById('navbarNav');
+        const closeMobileMenu = () => {
+            if (navCollapse.classList.contains('show')) {
+                bootstrap.Collapse.getOrCreateInstance(navCollapse, { toggle: false }).hide();
+            }
+        };
+        document.querySelectorAll('#navbarNav .nav-link, #brandLogo').forEach(link => {
+            link.addEventListener('click', closeMobileMenu);
+        });
+        document.addEventListener('click', function(e) {
+            if (!document.getElementById('navbar').contains(e.target)) {
+                closeMobileMenu();
             }
         });
         

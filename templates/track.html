@@ -376,9 +376,11 @@
                     </div>
                     <h2 class="tracking-code-display">{{ shipment.tracking_code }}</h2>
                 </div>
-                <div>
+                 <div>
                     {% if 'Delivered' in shipment.status %}
                         <div class="current-status-chip chip-delivered"><i class="fas fa-check-circle"></i> {{ shipment.status }}</div>
+                    {% elif 'Out for delivery' in shipment.status %}
+                        <div class="current-status-chip chip-transit"><i class="fas fa-truck-fast"></i> Out for Delivery / Pickup</div>
                     {% elif 'transit' in shipment.status.lower() or 'flight' in shipment.status.lower() %}
                         <div class="current-status-chip chip-transit"><i class="fas fa-plane"></i> {{ shipment.status }}</div>
                     {% else %}
@@ -524,9 +526,9 @@
                         {% if active_stage > 10 %}<i class="fas fa-check"></i>{% else %}<i class="fas fa-truck-fast"></i>{% endif %}
                     </div>
                     <div class="step-content">
-                        <div class="step-title">Out for Delivery</div>
+                        <div class="step-title">Out for Delivery / Pickup</div>
                         <div class="step-date">{% if active_stage > 10 %}{{ shipment.last_update.strftime('%b %d') }}{% elif active_stage == 10 %}In progress...{% else %}Pending{% endif %}</div>
-                        <div class="step-desc">With the courier for final delivery.</div>
+                        <div class="step-desc">With the courier for final delivery or ready for pickup.</div>
                     </div>
                 </div>
 

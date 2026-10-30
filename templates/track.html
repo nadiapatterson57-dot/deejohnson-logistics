@@ -376,11 +376,13 @@
                     </div>
                     <h2 class="tracking-code-display">{{ shipment.tracking_code }}</h2>
                 </div>
-                 <div>
+                <div>
                     {% if 'Delivered' in shipment.status %}
                         <div class="current-status-chip chip-delivered"><i class="fas fa-check-circle"></i> {{ shipment.status }}</div>
                     {% elif 'Out for delivery' in shipment.status %}
                         <div class="current-status-chip chip-transit"><i class="fas fa-truck-fast"></i> Out for Delivery / Pickup</div>
+                    {% elif 'Arrived at destination' in shipment.status %}
+                        <div class="current-status-chip chip-transit"><i class="fas fa-flag-checkered"></i> Arrived at Destination / Clearance</div>
                     {% elif 'transit' in shipment.status.lower() or 'flight' in shipment.status.lower() %}
                         <div class="current-status-chip chip-transit"><i class="fas fa-plane"></i> {{ shipment.status }}</div>
                     {% else %}
@@ -514,9 +516,9 @@
                         {% if active_stage > 9 %}<i class="fas fa-check"></i>{% else %}<i class="fas fa-flag-checkered"></i>{% endif %}
                     </div>
                     <div class="step-content">
-                        <div class="step-title">Arrived at Destination</div>
+                        <div class="step-title">Arrived at Destination / Clearance</div>
                         <div class="step-date">{% if active_stage > 9 %}{{ shipment.last_update.strftime('%b %d') }}{% elif active_stage == 9 %}In progress...{% else %}Pending{% endif %}</div>
-                        <div class="step-desc">Package is in the destination city.</div>
+                        <div class="step-desc">Package has arrived in the destination city and is undergoing clearance.</div>
                     </div>
                 </div>
 
@@ -673,9 +675,11 @@
                     pinClass = "pin-delivered"; 
                     pinIcon = '<i class="fas fa-check"></i>';
                 } else if (statusLower.includes('out for delivery')) {
-                    popupText = "Out for Delivery 🚚";
+                    popupText = "Out for Delivery / Pickup 🚚";
                 } else if (statusLower.includes('customs')) {
                     popupText = "Processing Customs Clearance 🛂";
+                } else if (statusLower.includes('arrived at destination')) {
+                    popupText = "Arrived at Destination / Clearance 📍";
                 } else if (statusLower.includes('arrived')) {
                     popupText = "Arrived at Facility 📍";
                 } else if (activeStage === 1) {

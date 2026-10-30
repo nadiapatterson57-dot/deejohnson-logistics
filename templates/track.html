@@ -6,795 +6,697 @@
     <title>Track Package - DeeJohnson Logistics</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
     <style>
         :root {
             --navy-deep: #0A192F;
-            --navy-dark: #0B2B4D;
             --navy-medium: #0F3B5C;
-            --navy-light: #1A4A6F;
             --gold-accent: #C9A03D;
-            --gold-light: #E8D5A3;
-            --bg-light: #F8F9FC;
+            --bg-light: #F4F7FB;
             --text-dark: #1A1A2E;
-            --text-muted: #6C757D;
-            --shadow-card: 0 20px 60px rgba(10, 25, 47, 0.12);
-            --shadow-hover: 0 30px 80px rgba(10, 25, 47, 0.18);
-            --radius-card: 24px;
-            --radius-inner: 16px;
+            --text-muted: #6B7280;
+            --card-shadow: 0 20px 40px rgba(10, 25, 47, 0.08);
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-light);
+            background-color: var(--bg-light);
             min-height: 100vh;
             color: var(--text-dark);
-            overflow-x: hidden;
+            margin: 0;
+            padding-bottom: 50px;
+            background-image: radial-gradient(#E5E7EB 1px, transparent 1px);
+            background-size: 20px 20px;
         }
 
-        /* ===== HERO BACKGROUND ===== */
-        .track-hero {
-            background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy-medium) 100%);
-            padding: 60px 0 120px;
-            position: relative;
-            overflow: hidden;
+        .navbar {
+            background: white !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            padding: 15px 0;
         }
-
-        .track-hero::before {
-            content: '';
-            position: absolute;
-            top: -60%;
-            right: -20%;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(201, 160, 61, 0.15) 0%, transparent 70%);
-            border-radius: 50%;
-            animation: floatHero 20s ease-in-out infinite;
-        }
-
-        .track-hero::after {
-            content: '';
-            position: absolute;
-            bottom: -40%;
-            left: -10%;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
-            border-radius: 50%;
-            animation: floatHero 25s ease-in-out infinite reverse;
-        }
-
-        @keyframes floatHero {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(30px, -20px) scale(1.1); }
-        }
-
-        .track-hero .container {
-            position: relative;
-            z-index: 2;
-        }
-
-        .track-hero h1 {
+        .navbar-brand {
             font-weight: 800;
-            font-size: 3.2rem;
-            color: white;
             letter-spacing: -0.5px;
+            color: var(--navy-deep) !important;
         }
+        .navbar-brand i { color: var(--gold-accent); }
 
-        .track-hero p {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1.15rem;
+        .hero-header {
+            text-align: center;
+            padding: 60px 20px 20px;
+        }
+        .hero-header h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            color: var(--navy-deep);
+            margin-bottom: 15px;
+        }
+        .hero-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
             max-width: 500px;
-        }
-
-        /* ===== SEARCH CARD ===== */
-        .search-wrapper {
-            margin-top: -70px;
-            position: relative;
-            z-index: 3;
+            margin: 0 auto;
         }
 
         .search-card {
             background: white;
-            border-radius: var(--radius-card);
-            padding: 40px 45px;
-            box-shadow: var(--shadow-card);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            max-width: 750px;
+            margin: 0 auto 50px;
+            border: 1px solid rgba(0,0,0,0.03);
         }
-
-        .search-card .input-group-lg .form-control {
-            border-radius: 14px 0 0 14px;
-            border: 2px solid #E9ECEF;
-            padding: 16px 20px;
-            font-size: 1rem;
+        .search-input {
+            background: var(--bg-light);
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 18px 24px;
+            color: var(--text-dark);
+            font-size: 1.1rem;
             font-weight: 500;
             transition: all 0.3s;
-            background: #F8F9FC;
         }
-
-        .search-card .input-group-lg .form-control:focus {
-            border-color: var(--gold-accent);
+        .search-input:focus {
             background: white;
-            box-shadow: 0 0 0 4px rgba(201, 160, 61, 0.15);
+            border-color: var(--navy-medium);
+            box-shadow: 0 0 0 4px rgba(15, 59, 92, 0.1);
         }
-
-        .search-card .input-group-lg .btn {
-            border-radius: 0 14px 14px 0;
-            padding: 16px 35px;
-            font-weight: 600;
-            background: linear-gradient(135deg, var(--navy-deep), var(--navy-medium));
+        .btn-track {
+            background: var(--navy-deep);
+            color: white;
             border: none;
+            border-radius: 16px;
+            padding: 18px 30px;
+            font-weight: 700;
+            font-size: 1.1rem;
             transition: all 0.3s;
         }
-
-        .search-card .input-group-lg .btn:hover {
+        .btn-track:hover {
+            background: var(--navy-medium);
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(15, 59, 92, 0.3);
-        }
-
-        .search-card .input-group-text {
-            background: #F8F9FC;
-            border: 2px solid #E9ECEF;
-            border-right: none;
-            border-radius: 14px 0 0 14px;
-            color: var(--navy-medium);
-        }
-
-        /* ===== RESULT CARD ===== */
-        .result-wrapper {
-            margin-top: 40px;
-            animation: fadeUp 0.6s ease forwards;
-        }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            box-shadow: 0 10px 20px rgba(10, 25, 47, 0.2);
+            color: white;
         }
 
         .result-card {
             background: white;
-            border-radius: var(--radius-card);
-            padding: 40px;
-            box-shadow: var(--shadow-card);
+            border-radius: 28px;
+            padding: 45px;
+            box-shadow: var(--card-shadow);
             border: 1px solid rgba(0,0,0,0.03);
+            animation: fadeUp 0.6s ease;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .status-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: center;
             flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 30px;
-            padding-bottom: 25px;
-            border-bottom: 1px solid #F0F2F5;
+            gap: 20px;
+            padding-bottom: 30px;
+            border-bottom: 2px dashed #E5E7EB;
         }
-
-        .status-header .tracking-badge {
-            font-size: 0.85rem;
-            font-weight: 600;
+        .tracking-badge {
+            display: inline-block;
+            background: #EBF2F8;
             color: var(--navy-medium);
-            background: #E8EDF2;
             padding: 6px 16px;
             border-radius: 50px;
-            letter-spacing: 0.5px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
         }
-
-        .status-header h2 {
-            font-weight: 700;
-            font-size: 1.8rem;
+        .tracking-code-display {
+            font-family: 'Courier New', monospace;
+            font-size: 2.2rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            margin: 0;
             color: var(--navy-deep);
-            margin: 5px 0 0;
         }
-
-        .status-header .status-chip {
+        .current-status-chip {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 20px;
+            gap: 10px;
+            padding: 12px 24px;
             border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.9rem;
+            font-weight: 800;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .chip-delivered { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
+        .chip-transit { background: #FFFBEB; color: #92400E; border: 1px solid #FDE68A; }
+        .chip-pending { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
+
+        /* ===== MAP STYLES ===== */
+        #map-container {
+            height: 350px;
+            width: 100%;
+            border-radius: 20px;
+            margin: 30px 0;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            border: 2px solid #F1F5F9;
+            z-index: 1;
+        }
+        
+        /* Custom Map Pin Styles */
+        .custom-pin {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: white;
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border: 3px solid white;
+        }
+        .pin-origin { background: #10B981; }
+        .pin-dest { background: #EF4444; }
+        .pin-truck { 
+            background: var(--navy-deep); 
+            font-size: 1.2rem;
+            animation: pulsePin 2s infinite;
+        }
+        .pin-delivered {
+            background: #10B981; /* Green */
+            font-size: 1.2rem;
+            animation: none; /* Stops the pulsing once done */
         }
 
-        .status-chip.delivered { background: #E6F7E6; color: #1E7E34; }
-        .status-chip.transit { background: #FFF3CD; color: #856404; }
-        .status-chip.pending { background: #F8D7DA; color: #721C24; }
-        .status-chip.cleared { background: #D1ECF1; color: #0C5460; }
-
-        .status-chip i { font-size: 0.9rem; }
+        @keyframes pulsePin {
+            0% { box-shadow: 0 0 0 0 rgba(10, 25, 47, 0.5); }
+            70% { box-shadow: 0 0 0 15px rgba(10, 25, 47, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(10, 25, 47, 0); }
+        }
 
         /* ===== TIMELINE ===== */
         .timeline-wrapper {
-            padding: 10px 0 20px;
+            margin-top: 30px;
         }
-
         .timeline-step {
             display: flex;
-            align-items: flex-start;
             gap: 25px;
             position: relative;
             padding-bottom: 35px;
         }
+        .timeline-step:last-child { padding-bottom: 0; }
 
-        .timeline-step:last-child {
-            padding-bottom: 0;
-        }
-
-        .timeline-step .step-icon {
-            width: 48px;
-            height: 48px;
+        .step-icon {
+            width: 46px;
+            height: 46px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
-            font-size: 1.2rem;
-            font-weight: 700;
-            transition: all 0.3s;
-            border: 2px solid transparent;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            position: relative;
+            font-size: 1.1rem;
             z-index: 2;
+            flex-shrink: 0;
+            background: #F3F4F6;
+            color: #9CA3AF;
+            border: 2px solid #E5E7EB;
+            transition: all 0.3s;
         }
-
-        .timeline-step .step-icon.completed {
-            background: var(--navy-medium);
+        .step-icon.completed {
+            background: #ECFDF5;
+            color: #10B981;
+            border-color: #10B981;
+        }
+        .step-icon.active {
+            background: var(--navy-deep);
             color: white;
-            border-color: var(--navy-medium);
+            border-color: var(--navy-deep);
+            box-shadow: 0 0 0 6px rgba(10, 25, 47, 0.1);
+            animation: pulseActive 2s infinite;
+        }
+        @keyframes pulseActive {
+            0% { box-shadow: 0 0 0 0 rgba(10, 25, 47, 0.2); }
+            70% { box-shadow: 0 0 0 10px rgba(10, 25, 47, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(10, 25, 47, 0); }
         }
 
-        .timeline-step .step-icon.active {
-            background: var(--gold-accent);
-            color: var(--navy-deep);
-            border-color: var(--gold-accent);
-            animation: pulseGold 1.5s infinite;
-            box-shadow: 0 4px 20px rgba(201, 160, 61, 0.4);
-        }
-
-        .timeline-step .step-icon.pending {
-            background: #F0F2F5;
-            color: #B0B8C5;
-            border-color: #E9ECEF;
-        }
-
-        @keyframes pulseGold {
-            0% { transform: scale(1); box-shadow: 0 4px 20px rgba(201, 160, 61, 0.3); }
-            50% { transform: scale(1.08); box-shadow: 0 4px 35px rgba(201, 160, 61, 0.5); }
-            100% { transform: scale(1); box-shadow: 0 4px 20px rgba(201, 160, 61, 0.3); }
-        }
-
-        .timeline-step .step-content {
+        .step-content {
             flex: 1;
-            padding-top: 4px;
+            background: #F8FAFC;
+            border: 1px solid #F1F5F9;
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s;
         }
-
-        .timeline-step .step-content .step-title {
-            font-weight: 700;
+        .timeline-step.active .step-content {
+            background: white;
+            border-color: var(--navy-medium);
+            box-shadow: 0 10px 25px rgba(10, 25, 47, 0.05);
+            transform: scale(1.02);
+        }
+        .step-title {
+            font-weight: 800;
             font-size: 1.05rem;
             color: var(--navy-deep);
-            margin-bottom: 2px;
+            margin-bottom: 4px;
         }
-
-        .timeline-step .step-content .step-date {
+        .step-date {
             font-size: 0.8rem;
-            color: var(--text-muted);
-            font-weight: 500;
+            color: var(--gold-accent);
+            font-weight: 700;
+            margin-bottom: 8px;
         }
-
-        .timeline-step .step-content .step-desc {
+        .step-desc {
             font-size: 0.9rem;
-            color: #555;
-            margin-top: 4px;
+            color: var(--text-muted);
+            line-height: 1.5;
         }
 
-        /* Vertical connector line */
         .timeline-step::before {
             content: '';
             position: absolute;
-            left: 23px;
-            top: 48px;
+            left: 22px;
+            top: 46px;
             width: 2px;
-            height: calc(100% - 10px);
-            background: #E9ECEF;
+            height: calc(100% - 40px);
+            background: #E5E7EB;
             z-index: 1;
         }
+        .timeline-step.completed::before { background: #10B981; }
+        .timeline-step:last-child::before { display: none; }
 
-        .timeline-step.completed::before {
-            background: var(--navy-medium);
-        }
-
-        .timeline-step.active::before {
-            background: var(--gold-accent);
-            animation: pulseConnector 1.5s infinite;
-        }
-
-        .timeline-step:last-child::before {
-            display: none;
-        }
-
-        @keyframes pulseConnector {
-            0% { opacity: 0.4; }
-            50% { opacity: 1; }
-            100% { opacity: 0.4; }
-        }
-
-        /* ===== DETAILS CARD ===== */
-        .details-card {
-            background: #F8F9FC;
-            border-radius: var(--radius-inner);
-            padding: 30px 35px;
-            margin-top: 30px;
-            border: 1px solid #F0F2F5;
-        }
-
-        .details-card h6 {
-            font-weight: 700;
-            color: var(--navy-deep);
-            margin-bottom: 20px;
-            font-size: 0.95rem;
-            letter-spacing: 0.5px;
-        }
-
-        .details-grid {
+        .info-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px 40px;
-        }
-
-        .details-grid .detail-item .label {
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: var(--text-muted);
-            display: block;
-            margin-bottom: 2px;
-        }
-
-        .details-grid .detail-item .value {
-            font-weight: 600;
-            color: var(--navy-deep);
-            font-size: 0.95rem;
-        }
-
-        /* ===== PARTNER ALERT ===== */
-        .partner-box {
-            background: linear-gradient(135deg, #F8F9FC, #ffffff);
-            border-radius: var(--radius-inner);
-            padding: 20px 25px;
-            margin-top: 20px;
-            border-left: 5px solid var(--gold-accent);
-            display: flex;
-            align-items: center;
             gap: 20px;
-            flex-wrap: wrap;
+            background: #F8FAFC;
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 40px;
+            border: 1px solid #F1F5F9;
         }
-
-        .partner-box .partner-icon {
-            font-size: 2rem;
-            color: var(--gold-accent);
+        .info-item .label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
         }
-
-        .partner-box .partner-info {
-            flex: 1;
-        }
-
-        .partner-box .partner-info h6 {
+        .info-item .value {
+            font-size: 1.05rem;
             font-weight: 700;
             color: var(--navy-deep);
-            margin: 0 0 2px;
         }
 
-        .partner-box .partner-info p {
-            margin: 0;
-            font-size: 0.9rem;
-            color: #555;
-        }
-
-        .partner-box .partner-info code {
-            background: #E9ECEF;
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-weight: 600;
-            color: var(--navy-medium);
-        }
-
-        /* ===== HELP SECTION ===== */
-        .help-section {
-            text-align: center;
-            margin-top: 30px;
-            color: var(--text-muted);
-        }
-
-        .help-section a {
-            color: var(--gold-accent);
-            font-weight: 600;
-            text-decoration: none;
-        }
-
-        .help-section a:hover {
-            text-decoration: underline;
-        }
-
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .track-hero { padding: 40px 0 100px; }
-            .track-hero h1 { font-size: 2.2rem; }
-            .search-wrapper { margin-top: -50px; }
-            .search-card { padding: 25px; }
-            .search-card .input-group-lg .btn { padding: 16px 20px; }
+            .hero-header h1 { font-size: 2.2rem; }
             .result-card { padding: 25px; }
-            .status-header { flex-direction: column; align-items: stretch; }
-            .status-header h2 { font-size: 1.5rem; }
-            .timeline-step { gap: 15px; }
-            .timeline-step::before { left: 19px; }
-            .details-card { padding: 20px; }
-            .details-grid { grid-template-columns: 1fr; }
-            .partner-box { flex-direction: column; text-align: center; }
+            .tracking-code-display { font-size: 1.6rem; }
+            .status-header { flex-direction: column; align-items: flex-start; }
+            #map-container { height: 250px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== HERO SECTION ===== -->
-    <div class="track-hero">
+    <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <h1><i class="fas fa-search me-2"></i> Track Your Package</h1>
-            <p>Enter your DeeJohnson tracking code to get real-time updates on your shipment.</p>
+            <a class="navbar-brand" href="/"><i class="fas fa-shipping-fast me-2"></i>DeeJohnson Logistics</a>
+            <div class="ms-auto">
+                <a href="/" class="btn btn-outline-dark btn-sm" style="border-radius: 50px; font-weight: 600;">Home</a>
+            </div>
         </div>
+    </nav>
+
+    <div class="hero-header mt-5">
+        <h1>Track Your Package</h1>
+        <p>Watch your shipment move in real-time across the globe.</p>
     </div>
 
-    <!-- ===== SEARCH CARD ===== -->
-    <div class="container search-wrapper">
+    <div class="container">
         <div class="search-card">
             <form method="POST">
-                <div class="input-group input-group-lg">
-                    <span class="input-group-text"><i class="fas fa-qrcode"></i></span>
-                    <input type="text" name="tracking_code" class="form-control" 
-                           placeholder="e.g., DJL-2026-ZOEAY or INT-UK-2026-479432" required>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-search me-2"></i> Track
-                    </button>
-                </div>
-                <div class="mt-3 text-muted small">
-                    <i class="fas fa-info-circle"></i> Enter a DeeJohnson tracking code starting with <strong>DJL-</strong> or <strong>INT-</strong>
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <input type="text" name="tracking_code" class="form-control search-input" 
+                               placeholder="Enter tracking code (e.g., DJL-2026-ZOEAY)" required>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-track w-100">
+                            <i class="fas fa-search me-2"></i> Track
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- ===== RESULTS ===== -->
     <div class="container pb-5">
         {% if shipment %}
-        <div class="result-wrapper">
-            <div class="result-card">
-
-                <!-- Status Header -->
-                <div class="status-header">
-                    <div>
-                        <div class="tracking-badge">
-                            {% if shipment.shipment_direction == 'incoming' %}
-                                <i class="fas fa-download me-1"></i> Incoming
-                            {% else %}
-                                <i class="fas fa-upload me-1"></i> Outgoing
-                            {% endif %}
-                        </div>
-                        <h2>{{ shipment.tracking_code }}</h2>
-                    </div>
-                    <div>
-                        {% if 'Delivered' in shipment.status %}
-                            <span class="status-chip delivered"><i class="fas fa-check-circle"></i> {{ shipment.status }}</span>
-                        {% elif 'transit' in shipment.status.lower() %}
-                            <span class="status-chip transit"><i class="fas fa-truck"></i> {{ shipment.status }}</span>
-                        {% elif 'customs' in shipment.status.lower() %}
-                            <span class="status-chip cleared"><i class="fas fa-file-invoice"></i> {{ shipment.status }}</span>
+        <div class="result-card">
+            
+            <div class="status-header">
+                <div>
+                    <div class="tracking-badge">
+                        {% if shipment.shipment_direction == 'incoming' %}
+                            <i class="fas fa-download me-1"></i> Incoming
                         {% else %}
-                            <span class="status-chip pending"><i class="fas fa-clock"></i> {{ shipment.status }}</span>
+                            <i class="fas fa-upload me-1"></i> Outgoing
                         {% endif %}
                     </div>
+                    <h2 class="tracking-code-display">{{ shipment.tracking_code }}</h2>
                 </div>
-
-                <!-- Timeline -->
-                <div class="timeline-wrapper">
-                    {% set status_lower = shipment.status.lower() %}
-
-                    {% if 'delivered' in status_lower %}
-                        {% set active_stage = 11 %}
-                    {% elif 'out for delivery' in status_lower %}
-                        {% set active_stage = 10 %}
-                    {% elif 'arrived at destination' in status_lower %}
-                        {% set active_stage = 9 %}
-                    {% elif 'handed' in status_lower or 'partner' in status_lower %}
-                        {% set active_stage = 8 %}
-                    {% elif 'in transit internationally' in status_lower or 'international' in status_lower %}
-                        {% set active_stage = 7 %}
-                    {% elif 'cleared' in status_lower %}
-                        {% set active_stage = 6 %}
-                    {% elif 'customs' in status_lower %}
-                        {% set active_stage = 5 %}
-                    {% elif 'arrived at lagos' in status_lower %}
-                        {% set active_stage = 4 %}
-                    {% elif 'transit' in status_lower %}
-                        {% set active_stage = 3 %}
-                    {% elif 'picked' in status_lower or 'pickup' in status_lower %}
-                        {% set active_stage = 2 %}
+                <div>
+                    {% if 'Delivered' in shipment.status %}
+                        <div class="current-status-chip chip-delivered"><i class="fas fa-check-circle"></i> {{ shipment.status }}</div>
+                    {% elif 'transit' in shipment.status.lower() or 'flight' in shipment.status.lower() %}
+                        <div class="current-status-chip chip-transit"><i class="fas fa-plane"></i> {{ shipment.status }}</div>
                     {% else %}
-                        {% set active_stage = 1 %}
+                        <div class="current-status-chip chip-pending"><i class="fas fa-clock"></i> {{ shipment.status }}</div>
                     {% endif %}
-
-                    <!-- Step 1 -->
-                    <div class="timeline-step {% if active_stage > 1 %}completed{% elif active_stage == 1 %}active{% endif %}">
-                        <div class="step-icon {% if active_stage > 1 %}completed{% elif active_stage == 1 %}active{% else %}pending{% endif %}">
-                            {% if active_stage > 1 %}<i class="fas fa-check"></i>{% elif active_stage == 1 %}<i class="fas fa-clipboard-list"></i>{% else %}<i class="fas fa-circle"></i>{% endif %}
-                        </div>
-                        <div class="step-content">
-                            <div class="step-title">Package Registered</div>
-                            <div class="step-date">{{ shipment.last_update.strftime('%B %d, %Y - %I:%M %p') }}</div>
-                            <div class="step-desc">Your shipment has been registered with tracking code: {{ shipment.tracking_code }}</div>
-                        </div>
-                    </div>
-
-                    <!-- Step 2 -->
-                    <div class="timeline-step {% if active_stage > 2 %}completed{% elif active_stage == 2 %}active{% endif %}">
-                        <div class="step-icon {% if active_stage > 2 %}completed{% elif active_stage == 2 %}active{% else %}pending{% endif %}">
-                            {% if active_stage > 2 %}<i class="fas fa-check"></i>{% elif active_stage == 2 %}<i class="fas fa-box"></i>{% else %}<i class="fas fa-circle"></i>{% endif %}
-                        </div>
-                        <div class="step-content">
-                            <div class="step-title">Picked Up from Customer</div>
-                            <div class="step-date">
-                                {% if active_stage > 2 %}{{ shipment.last_update.strftime('%B %d, %Y') }}{% elif active_stage == 2 %}In progress...{% else %}Pending{% endif %}
-                            </div>
-                            <div class="step-desc">
-                                {% if active_stage > 2 %}Package collected from {{ shipment.customer_name }}{% elif active_stage == 2 %}Package is currently being picked up{% else %}Awaiting pickup{% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 3 -->
-                    <div class="timeline-step {% if active_stage > 3 %}completed{% elif active_stage == 3 %}active{% endif %}">
-                        <div class="step-icon {% if active_stage > 3 %}completed{% elif active_stage == 3 %}active{% else %}pending{% endif %}">
-                            {% if active_stage > 3 %}<i class="fas fa-check"></i>{% elif active_stage == 3 %}<i class="fas fa-truck"></i>{% else %}<i class="fas fa-circle"></i>{% endif %}
-                        </div>
-                        <div class="step-content">
-                            <div class="step-title">In Transit to Lagos</div>
-                            <div class="step-date">
-                                {% if active_stage > 3 %}{{ shipment.last_update.strftime('%B %d, %Y') }}{% elif active_stage == 3 %}In progress...{% else %}Pending{% endif %}
-                            </div>
-                            <div class="step-desc">
-                                {% if active_stage > 3 %}Package has arrived at Lagos{% elif active_stage == 3 %}Package is currently in transit to Lagos{% else %}Awaiting transit to Lagos{% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 4 -->
-                    <div class="timeline-step {% if active_stage > 4 %}completed{% elif active_stage == 4 %}active{% endif %}">
-                        <div class="step-icon {% if active_stage > 4 %}completed{% elif active_stage == 4 %}active{% else %}pending{% endif %}">
-                            {% if active_stage > 4 %}<i class="fas fa-check"></i>{% elif active_stage == 4 %}<i class="fas fa-plane-arrival"></i>{% else %}<i class="fas fa-circle"></i>{% endif %}
-                        </div>
-                        <div class="step-content">
-                            <div class="step-title">Arrived at Lagos Airport</div>
-                            <div class="step-date">
-                                {% if active_stage > 4 %}{{ shipment.last_update.strftime('%B %d, %Y') }}{% elif active_stage == 4 %}In progress...{% else %}Pending{% endif %}
-                            </div>
-                            <div class="step-desc">
-                                {% if active_stage > 4 %}Package has departed Lagos Airport{% elif active_stage == 4 %}Package has arrived at Lagos Airport{% else %}Awaiting arrival at Lagos Airport{% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 5 -->
-                    <div class="timeline-step {% if active_stage > 5 %}completed{% elif active_stage == 5 %}active{% endif %}">
-                        <div class="step-icon {% if active_stage > 5 %}completed{% elif active_stage == 5 %}active{% else %}pending{% endif %}">
-                            {% if active_stage > 5 %}<i class="fas fa-check"></i>{% elif active_stage == 5 %}<i class="fas fa-file-invoice"></i>{% else %}<i class="fas fa-circle"></i>{% endif %}
-                        </div>
-                        <div class="step-content">
-                            <div class="step-title">Customs Clearance</div>
-                            <div class="step-date">
-                                {% if active_stage > 5 %}{{ shipment.last_update.strftime('%B %d, %Y') }}{% elif active_stage == 5 %}In progress...{% else %}Pending{% endif %}
-                            </div>
-                            <div class="step-desc">
-                                {% if active_stage > 5 %}Customs processing complete{% elif active_stage == 5 %}Customs clearance is currently in progress{% else %}Awaiting customs clearance{% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 6 -->
-                    <div class="timeline-step {% if active_stage > 6 %}completed{% elif active_stage == 6 %}active{% endif %}">
-                        <div class="step-icon {% if active_stage > 6 %}completed{% elif active_stage == 6 %}active{% else %}pending{% endif %}">
-                            {% if active_stage > 6 %}<i class="fas fa-check"></i>{% elif active_stage == 6 %}<i class="fas fa-plane-departure"></i>{% else %}<i class="fas fa-circle"></i>{% endif %}
-                        </div>
-                        <div class="step-content">
-                            <div class="step-title">Cleared - Awaiting Flight</div>
-                            <div class="step-date">
-                                {% if active_stage > 6 %}{{ shipment.last_update.strftime('%B %d, %Y') }}{% elif active_stage == 6 %}In progress...{% else %}Pending{% endif %}
-                            </div>
-                            <div class="step-desc">
-                                {% if active_stage > 6 %}Package has departed for international flight{% elif active_stage == 6 %}Package is cleared and awaiting international flight{% else %}Awaiting clearance for international flight{% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 7 -->
-                    <div class="timeline-step {% if active_stage > 7 %}completed{% elif active_stage == 7 %}active{% endif %}">
-                        <div class="step-icon {% if active_stage > 7 %}completed{% elif active_stage == 7 %}active{% else %}pending{% endif %}">
-                            {% if active_stage > 7 %}<i class="fas fa-check"></i>{% elif active_stage == 7 %}<i class="fas fa-globe"></i>{% else %}<i class="fas fa-circle"></i>{% endif %}
-                        </div>
-                        <div class="step-content">
-                            <div class="step-title">In Transit Internationally</div>
-                            <div class="step-date">
-                                {% if active_stage > 7 %}{{ shipment.last_update.strftime('%B %d, %Y') }}{% elif active_stage == 7 %}In progress...{% else %}Pending{% endif %}
-                            </div>
-                            <div class="step-desc">
-                                {% if active_stage > 7 %}Package has arrived in destination country{% elif active_stage == 7 %}Package is currently in international transit{% else %}Awaiting international transit{% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 8 -->
-                    <div class="timeline-step {% if active_stage > 8 %}completed{% elif active_stage == 8 %}active{% endif %}">
-                        <div class="step-icon {% if active_stage > 8 %}completed{% elif active_stage == 8 %}active{% else %}pending{% endif %}">
-                            {% if active_stage > 8 %}<i class="fas fa-check"></i>{% elif active_stage == 8 %}<i class="fas fa-handshake"></i>{% else %}<i class="fas fa-circle"></i>{% endif %}
-                        </div>
-                        <div class="step-content">
-                            <div class="step-title">Handed to Partner Courier</div>
-                            <div class="step-date">
-                                {% if active_stage > 8 %}{{ shipment.last_update.strftime('%B %d, %Y') }}{% elif active_stage == 8 %}In progress...{% else %}Pending{% endif %}
-                            </div>
-                            <div class="step-desc">
-                                {% if active_stage > 8 %}
-                                    Package handed to <strong>{{ shipment.partner_courier }}</strong>
-                                {% elif active_stage == 8 %}
-                                    Package is being handed to partner courier
-                                {% else %}
-                                    Awaiting handover to partner courier
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 9 -->
-                    <div class="timeline-step {% if active_stage > 9 %}completed{% elif active_stage == 9 %}active{% endif %}">
-                        <div class="step-icon {% if active_stage > 9 %}completed{% elif active_stage == 9 %}active{% else %}pending{% endif %}">
-                            {% if active_stage > 9 %}<i class="fas fa-check"></i>{% elif active_stage == 9 %}<i class="fas fa-flag-checkered"></i>{% else %}<i class="fas fa-circle"></i>{% endif %}
-                        </div>
-                        <div class="step-content">
-                            <div class="step-title">Arrived at Destination</div>
-                            <div class="step-date">
-                                {% if active_stage > 9 %}{{ shipment.last_update.strftime('%B %d, %Y') }}{% elif active_stage == 9 %}In progress...{% else %}Pending{% endif %}
-                            </div>
-                            <div class="step-desc">
-                                {% if active_stage > 9 %}Package is out for final delivery{% elif active_stage == 9 %}Package has arrived at destination country{% else %}Awaiting arrival at destination{% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 10 -->
-                    <div class="timeline-step {% if active_stage > 10 %}completed{% elif active_stage == 10 %}active{% endif %}">
-                        <div class="step-icon {% if active_stage > 10 %}completed{% elif active_stage == 10 %}active{% else %}pending{% endif %}">
-                            {% if active_stage > 10 %}<i class="fas fa-check"></i>{% elif active_stage == 10 %}<i class="fas fa-truck-fast"></i>{% else %}<i class="fas fa-circle"></i>{% endif %}
-                        </div>
-                        <div class="step-content">
-                            <div class="step-title">Out for Delivery</div>
-                            <div class="step-date">
-                                {% if active_stage > 10 %}{{ shipment.last_update.strftime('%B %d, %Y') }}{% elif active_stage == 10 %}In progress...{% else %}Pending{% endif %}
-                            </div>
-                            <div class="step-desc">
-                                {% if active_stage > 10 %}Package has been delivered{% elif active_stage == 10 %}Package is currently out for delivery{% else %}Awaiting delivery dispatch{% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 11 -->
-                    <div class="timeline-step">
-                        <div class="step-icon {% if active_stage >= 11 %}completed{% else %}pending{% endif %}">
-                            {% if active_stage >= 11 %}<i class="fas fa-check"></i>{% else %}<i class="fas fa-circle"></i>{% endif %}
-                        </div>
-                        <div class="step-content">
-                            <div class="step-title">Delivered Successfully</div>
-                            <div class="step-date">
-                                {% if active_stage >= 11 %}{{ shipment.last_update.strftime('%B %d, %Y - %I:%M %p') }}{% else %}Pending{% endif %}
-                            </div>
-                            <div class="step-desc">
-                                {% if active_stage >= 11 %}
-                                    ✅ Package delivered to {{ shipment.destination }}
-                                {% else %}
-                                    Package is still in transit
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                </div><!-- end timeline-wrapper -->
-
-                <!-- Partner Courier -->
-                {% if shipment.partner_courier and shipment.partner_tracking %}
-                <div class="partner-box">
-                    <div class="partner-icon"><i class="fas fa-truck-fast"></i></div>
-                    <div class="partner-info">
-                        <h6>International Tracking</h6>
-                        <p>
-                            <strong>Courier:</strong> {{ shipment.partner_courier }} &nbsp;|&nbsp;
-                            <strong>Tracking:</strong> <code>{{ shipment.partner_tracking }}</code>
-                        </p>
-                    </div>
-                    <a href="{{ get_tracking_url(shipment.partner_courier, shipment.partner_tracking) }}" 
-                       target="_blank" class="btn btn-outline-primary btn-sm" style="border-radius: 50px; font-weight: 600;">
-                        <i class="fas fa-external-link-alt me-1"></i> Track on {{ shipment.partner_courier }}
-                    </a>
                 </div>
-                {% endif %}
+            </div>
 
-                <!-- Original Courier for Incoming -->
-                {% if shipment.partner_courier_original and shipment.partner_tracking_original %}
-                <div class="partner-box" style="border-left-color: #6c757d; margin-top: 15px;">
-                    <div class="partner-icon" style="color: #6c757d;"><i class="fas fa-box"></i></div>
-                    <div class="partner-info">
-                        <h6>Original Courier</h6>
-                        <p>
-                            <strong>Shipped via:</strong> {{ shipment.partner_courier_original }} &nbsp;|&nbsp;
-                            <strong>Tracking:</strong> <code>{{ shipment.partner_tracking_original }}</code>
-                        </p>
+            <!-- ========================================== -->
+            <!-- THE LIVE MAP                               -->
+            <!-- ========================================== -->
+            <div id="map-container"></div>
+
+            <!-- Dynamic Progress Logic -->
+            {% set status_lower = shipment.status.lower() %}
+            {% set active_stage = 1 %}
+            {% if 'delivered' in status_lower %}{% set active_stage = 11 %}
+            {% elif 'out for delivery' in status_lower %}{% set active_stage = 10 %}
+            {% elif 'arrived at destination' in status_lower %}{% set active_stage = 9 %}
+            {% elif 'handed' in status_lower or 'partner' in status_lower %}{% set active_stage = 8 %}
+            {% elif 'in transit internationally' in status_lower or 'international' in status_lower %}{% set active_stage = 7 %}
+            {% elif 'cleared' in status_lower %}{% set active_stage = 6 %}
+            {% elif 'customs' in status_lower %}{% set active_stage = 5 %}
+            {% elif 'lagos' in status_lower %}{% set active_stage = 4 %}
+            {% elif 'transit' in status_lower %}{% set active_stage = 3 %}
+            {% elif 'picked' in status_lower %}{% set active_stage = 2 %}
+            {% endif %}
+
+            <h5 class="mb-4 mt-4" style="font-weight: 800; color: var(--navy-deep);"><i class="fas fa-route me-2" style="color: var(--gold-accent);"></i> Live Journey Updates</h5>
+            
+            <div class="timeline-wrapper">
+                <!-- Step 1 -->
+                <div class="timeline-step {% if active_stage > 1 %}completed{% elif active_stage == 1 %}active{% endif %}">
+                    <div class="step-icon {% if active_stage > 1 %}completed{% elif active_stage == 1 %}active{% endif %}">
+                        {% if active_stage > 1 %}<i class="fas fa-check"></i>{% else %}<i class="fas fa-clipboard-list"></i>{% endif %}
                     </div>
-                    <a href="{{ get_tracking_url(shipment.partner_courier_original, shipment.partner_tracking_original) }}" 
-                       target="_blank" class="btn btn-outline-secondary btn-sm" style="border-radius: 50px; font-weight: 600;">
-                        <i class="fas fa-external-link-alt me-1"></i> Track Original
-                    </a>
-                </div>
-                {% endif %}
-
-                <!-- Details -->
-                <div class="details-card">
-                    <h6><i class="fas fa-info-circle me-2" style="color: var(--gold-accent);"></i> Shipment Details</h6>
-                    <div class="details-grid">
-                        <div class="detail-item">
-                            <span class="label">Customer</span>
-                            <span class="value">{{ shipment.customer_name }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Phone</span>
-                            <span class="value">{{ shipment.customer_phone or '-' }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Email</span>
-                            <span class="value">{{ shipment.customer_email or '-' }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Package</span>
-                            <span class="value">{{ shipment.package_type }} ({{ shipment.package_weight }} kg)</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Origin</span>
-                            <span class="value">{{ shipment.origin }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Destination</span>
-                            <span class="value">{{ shipment.destination }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Last Update</span>
-                            <span class="value">{{ shipment.last_update.strftime('%Y-%m-%d %H:%M') }}</span>
-                        </div>
+                    <div class="step-content">
+                        <div class="step-title">Package Registered</div>
+                        <div class="step-date">{{ shipment.last_update.strftime('%b %d, %Y - %I:%M %p') }}</div>
+                        <div class="step-desc">Your shipment is officially in our system.</div>
                     </div>
                 </div>
 
-            </div><!-- end result-card -->
-        </div><!-- end result-wrapper -->
+                <!-- Step 2 -->
+                <div class="timeline-step {% if active_stage > 2 %}completed{% elif active_stage == 2 %}active{% endif %}">
+                    <div class="step-icon {% if active_stage > 2 %}completed{% elif active_stage == 2 %}active{% endif %}">
+                        {% if active_stage > 2 %}<i class="fas fa-check"></i>{% else %}<i class="fas fa-box"></i>{% endif %}
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">Picked Up</div>
+                        <div class="step-date">{% if active_stage > 2 %}{{ shipment.last_update.strftime('%b %d') }}{% elif active_stage == 2 %}In progress...{% else %}Pending{% endif %}</div>
+                        <div class="step-desc">Collected from the sender.</div>
+                    </div>
+                </div>
 
+                <!-- Step 3 -->
+                <div class="timeline-step {% if active_stage > 3 %}completed{% elif active_stage == 3 %}active{% endif %}">
+                    <div class="step-icon {% if active_stage > 3 %}completed{% elif active_stage == 3 %}active{% endif %}">
+                        {% if active_stage > 3 %}<i class="fas fa-check"></i>{% else %}<i class="fas fa-truck"></i>{% endif %}
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">In Transit to Lagos</div>
+                        <div class="step-date">{% if active_stage > 3 %}{{ shipment.last_update.strftime('%b %d') }}{% elif active_stage == 3 %}In progress...{% else %}Pending{% endif %}</div>
+                        <div class="step-desc">On the road to the Lagos hub.</div>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="timeline-step {% if active_stage > 4 %}completed{% elif active_stage == 4 %}active{% endif %}">
+                    <div class="step-icon {% if active_stage > 4 %}completed{% elif active_stage == 4 %}active{% endif %}">
+                        {% if active_stage > 4 %}<i class="fas fa-check"></i>{% else %}<i class="fas fa-plane-arrival"></i>{% endif %}
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">Arrived at Lagos Airport</div>
+                        <div class="step-date">{% if active_stage > 4 %}{{ shipment.last_update.strftime('%b %d') }}{% elif active_stage == 4 %}In progress...{% else %}Pending{% endif %}</div>
+                        <div class="step-desc">Secured at the international terminal.</div>
+                    </div>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="timeline-step {% if active_stage > 5 %}completed{% elif active_stage == 5 %}active{% endif %}">
+                    <div class="step-icon {% if active_stage > 5 %}completed{% elif active_stage == 5 %}active{% endif %}">
+                        {% if active_stage > 5 %}<i class="fas fa-check"></i>{% else %}<i class="fas fa-file-invoice"></i>{% endif %}
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">Customs Clearance</div>
+                        <div class="step-date">{% if active_stage > 5 %}{{ shipment.last_update.strftime('%b %d') }}{% elif active_stage == 5 %}In progress...{% else %}Pending{% endif %}</div>
+                        <div class="step-desc">Processing export documentation.</div>
+                    </div>
+                </div>
+
+                <!-- Step 6 -->
+                <div class="timeline-step {% if active_stage > 6 %}completed{% elif active_stage == 6 %}active{% endif %}">
+                    <div class="step-icon {% if active_stage > 6 %}completed{% elif active_stage == 6 %}active{% endif %}">
+                        {% if active_stage > 6 %}<i class="fas fa-check"></i>{% else %}<i class="fas fa-plane-departure"></i>{% endif %}
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">Cleared - Awaiting Flight</div>
+                        <div class="step-date">{% if active_stage > 6 %}{{ shipment.last_update.strftime('%b %d') }}{% elif active_stage == 6 %}In progress...{% else %}Pending{% endif %}</div>
+                        <div class="step-desc">Customs cleared. Ready for boarding.</div>
+                    </div>
+                </div>
+
+                <!-- Step 7 -->
+                <div class="timeline-step {% if active_stage > 7 %}completed{% elif active_stage == 7 %}active{% endif %}">
+                    <div class="step-icon {% if active_stage > 7 %}completed{% elif active_stage == 7 %}active{% endif %}">
+                        {% if active_stage > 7 %}<i class="fas fa-check"></i>{% else %}<i class="fas fa-globe"></i>{% endif %}
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">In Transit Internationally</div>
+                        <div class="step-date">{% if active_stage > 7 %}{{ shipment.last_update.strftime('%b %d') }}{% elif active_stage == 7 %}In progress...{% else %}Pending{% endif %}</div>
+                        <div class="step-desc">En route to the destination country.</div>
+                    </div>
+                </div>
+
+                <!-- Step 8 -->
+                <div class="timeline-step {% if active_stage > 8 %}completed{% elif active_stage == 8 %}active{% endif %}">
+                    <div class="step-icon {% if active_stage > 8 %}completed{% elif active_stage == 8 %}active{% endif %}">
+                        {% if active_stage > 8 %}<i class="fas fa-check"></i>{% else %}<i class="fas fa-handshake"></i>{% endif %}
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">Handed to Partner Courier</div>
+                        <div class="step-date">{% if active_stage > 8 %}{{ shipment.last_update.strftime('%b %d') }}{% elif active_stage == 8 %}In progress...{% else %}Pending{% endif %}</div>
+                        <div class="step-desc">Passed to local delivery partner.</div>
+                    </div>
+                </div>
+
+                <!-- Step 9 -->
+                <div class="timeline-step {% if active_stage > 9 %}completed{% elif active_stage == 9 %}active{% endif %}">
+                    <div class="step-icon {% if active_stage > 9 %}completed{% elif active_stage == 9 %}active{% endif %}">
+                        {% if active_stage > 9 %}<i class="fas fa-check"></i>{% else %}<i class="fas fa-flag-checkered"></i>{% endif %}
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">Arrived at Destination</div>
+                        <div class="step-date">{% if active_stage > 9 %}{{ shipment.last_update.strftime('%b %d') }}{% elif active_stage == 9 %}In progress...{% else %}Pending{% endif %}</div>
+                        <div class="step-desc">Package is in the destination city.</div>
+                    </div>
+                </div>
+
+                <!-- Step 10 -->
+                <div class="timeline-step {% if active_stage > 10 %}completed{% elif active_stage == 10 %}active{% endif %}">
+                    <div class="step-icon {% if active_stage > 10 %}completed{% elif active_stage == 10 %}active{% endif %}">
+                        {% if active_stage > 10 %}<i class="fas fa-check"></i>{% else %}<i class="fas fa-truck-fast"></i>{% endif %}
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">Out for Delivery</div>
+                        <div class="step-date">{% if active_stage > 10 %}{{ shipment.last_update.strftime('%b %d') }}{% elif active_stage == 10 %}In progress...{% else %}Pending{% endif %}</div>
+                        <div class="step-desc">With the courier for final delivery.</div>
+                    </div>
+                </div>
+
+                <!-- Step 11 -->
+                <div class="timeline-step {% if active_stage >= 11 %}completed{% endif %}">
+                    <div class="step-icon {% if active_stage >= 11 %}completed{% else %}pending{% endif %}">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">Delivered Successfully</div>
+                        <div class="step-date">{% if active_stage >= 11 %}{{ shipment.last_update.strftime('%b %d') }}{% else %}Pending{% endif %}</div>
+                        <div class="step-desc">Package handed to the recipient.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipment Details Grid -->
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="label">Customer</div>
+                    <div class="value">{{ shipment.customer_name }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Origin</div>
+                    <div class="value">{{ shipment.origin }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Destination</div>
+                    <div class="value">{{ shipment.destination }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Package</div>
+                    <div class="value">{{ shipment.package_type }} ({{ shipment.package_weight }} kg)</div>
+                </div>
+            </div>
+
+        </div>
         {% elif request.method == 'POST' %}
-        <div class="alert alert-danger mt-4" style="border-radius: 16px; border: none; box-shadow: var(--shadow-card);">
+        <div class="alert alert-danger" style="border-radius: 16px; background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; font-weight: 600;">
             <i class="fas fa-exclamation-triangle me-2"></i> 
             <strong>Tracking code not found!</strong> Please check the code and try again.
         </div>
         {% endif %}
-
-        <!-- Help -->
-        <div class="help-section">
-            <p><i class="fas fa-question-circle me-2"></i> Need help? <a href="/#contact">Contact our support team</a></p>
-        </div>
     </div>
 
+    <!-- Leaflet Map JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {% if shipment %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Get the Origin, Destination, and Active Stage from Jinja
+            const originName = "{{ shipment.origin | safe }}";
+            const destName = "{{ shipment.destination | safe }}";
+            const activeStage = {{ active_stage }};
+            const shipmentStatus = "{{ shipment.status | safe }}";
+            const statusLower = shipmentStatus.toLowerCase();
+
+            // 2. Initialize Map
+            const map = L.map('map-container', { zoomControl: false, dragging: true, scrollWheelZoom: false }).setView([20, 0], 2);
+            
+            L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+            // USING YOUR CARTO API KEY HERE
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=cb1_4y9l_1_3b9ee8a6b88e986ba7d50e7c', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
+
+            // 3. Get Coordinates Function
+            async function getCoords(location) {
+                try {
+                    const query = encodeURIComponent(location);
+                    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1`);
+                    const data = await response.json();
+                    if (data && data.length > 0) {
+                        return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+                    }
+                    return null;
+                } catch (e) {
+                    console.warn("Geocoding failed for:", location, e);
+                    return null;
+                }
+            }
+
+            // 4. Draw the Map
+            async function drawRoute() {
+                const originCoords = await getCoords(originName);
+                const destCoords = await getCoords(destName);
+
+                const safeOrigin = originCoords || [7.3775, 3.9470]; // Ibadan default
+                const safeDest = destCoords || [51.5074, -0.1278];  // London default
+
+                // Custom Icons
+                const originIcon = L.divIcon({
+                    className: 'custom-pin pin-origin',
+                    html: '<i class="fas fa-warehouse"></i>',
+                    iconSize: [36, 36],
+                    iconAnchor: [18, 18]
+                });
+
+                const destIcon = L.divIcon({
+                    className: 'custom-pin pin-dest',
+                    html: '<i class="fas fa-map-marker-alt"></i>',
+                    iconSize: [36, 36],
+                    iconAnchor: [18, 36]
+                });
+
+                L.marker(safeOrigin, { icon: originIcon }).addTo(map)
+                    .bindPopup(`<b>Origin:</b><br>${originName}`).openPopup();
+
+                L.marker(safeDest, { icon: destIcon }).addTo(map)
+                    .bindPopup(`<b>Destination:</b><br>${destName}`);
+
+                const routeLine = L.polyline([safeOrigin, safeDest], {
+                    color: '#0F3B5C',
+                    weight: 3,
+                    opacity: 0.5,
+                    dashArray: '10, 10',
+                    lineCap: 'round'
+                }).addTo(map);
+
+                // Calculate Truck Position
+                let progressPercent = 0;
+                if (activeStage > 1) {
+                    progressPercent = (activeStage - 1) / 10;
+                }
+                if (progressPercent > 1) progressPercent = 1;
+
+                const truckLat = safeOrigin[0] + (safeDest[0] - safeOrigin[0]) * progressPercent;
+                const truckLng = safeOrigin[1] + (safeDest[1] - safeOrigin[1]) * progressPercent;
+
+                // DYNAMIC TRUCK MARKER
+                let popupText = "Package is in transit";
+                let pinClass = "pin-truck";
+                let pinIcon = '<i class="fas fa-truck"></i>';
+
+                if (statusLower.includes('delivered')) {
+                    popupText = "Package Delivered Successfully ✅";
+                    pinClass = "pin-delivered"; 
+                    pinIcon = '<i class="fas fa-check"></i>';
+                } else if (statusLower.includes('out for delivery')) {
+                    popupText = "Out for Delivery 🚚";
+                } else if (statusLower.includes('customs')) {
+                    popupText = "Processing Customs Clearance 🛂";
+                } else if (statusLower.includes('arrived')) {
+                    popupText = "Arrived at Facility 📍";
+                } else if (activeStage === 1) {
+                    popupText = "Package Registered - Awaiting Pickup";
+                }
+
+                const dynamicTruckIcon = L.divIcon({
+                    className: `custom-pin ${pinClass}`,
+                    html: pinIcon,
+                    iconSize: [36, 36],
+                    iconAnchor: [18, 18]
+                });
+
+                L.marker([truckLat, truckLng], { icon: dynamicTruckIcon, zIndexOffset: 1000 }).addTo(map)
+                    .bindPopup(`<b>Current Location:</b><br>${popupText}`).openPopup();
+
+                const bounds = L.latLngBounds([safeOrigin, safeDest]);
+                map.fitBounds(bounds, { padding: [50, 50] });
+            }
+
+            drawRoute();
+        });
+    </script>
+    {% endif %}
 </body>
 </html>
